@@ -46,6 +46,18 @@ use const Krak\Fn\toArray;
 compose(toArray, [1,2,3]);
 ```
 
+Another great example is partial application.
+
+```php
+use function Krak\Fn\{partial, map, toArray};
+use const Krak\Fn\{op};
+
+$res = toArray(map(partial(op, '*', 3)), [1,2,3]);
+assert($res == [3,6,9]);
+```
+
+The `op` function is defined as `op($operator, $b, $a)`. Essentially, what we did was call: `partial('Krak\\Fn\\op', '*', 3)`.
+
 ### Currying
 
 All functions that are curryable hav generated curry functions. A function is curryable if it has more than one required argument or one required argument with any number of optional arguments.
