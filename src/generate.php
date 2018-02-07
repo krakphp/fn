@@ -31,7 +31,8 @@ function createConstFromFunc(Function_ $fn, Namespace_ $ns) {
 
 function curryFunction(Function_ $fn) {
     list($params, $optionalParams) = partition(function($param) {
-        return $param->default ? 1 : 0;
+        return $param->default
+            || ($param->variadic && (string) $param->var->name == 'optionalArgs');
     }, $fn->params);
 
     // return all params but the first and reverse them

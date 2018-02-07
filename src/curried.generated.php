@@ -3,10 +3,10 @@
 /* This file is was automatically generated. */
 namespace Krak\Fn\Curried;
 
-function method($name, array $args = [])
+function method($name, ...$optionalArgs)
 {
-    return function ($data) use($name, $args) {
-        return $data->{$name}(...$args);
+    return function ($data) use($name, $optionalArgs) {
+        return $data->{$name}(...$optionalArgs);
     };
 }
 function prop(string $key, $else = null)

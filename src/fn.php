@@ -2,8 +2,8 @@
 
 namespace Krak\Fn;
 
-function method($name, $data, array $args = []) {
-    return $data->{$name}(...$args);
+function method($name, $data, ...$optionalArgs) {
+    return $data->{$name}(...$optionalArgs);
 }
 function prop(string $key, $data, $else = null) {
     return property_exists($key, $data) ? $data->{$key} : $else;
