@@ -1,6 +1,6 @@
 # Fn
 
-Yet another functional library for PHP. What makes this library special is that it supports creates curried versions of each function via PHP Parser.
+Yet another functional library for PHP. What makes this library special is that it uses PHP Parser to generate curried versions of the non-curried implementations for best performance.
 
 ## Installation
 
