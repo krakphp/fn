@@ -27,5 +27,10 @@
         "peridot-php/leo": "^1.6",
         "peridot-php/peridot": "^1.19",
         "symfony/var-dumper": "^4.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.0-dev"
+        }
     }
 }

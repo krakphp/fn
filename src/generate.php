@@ -19,7 +19,7 @@ use function Krak\Fn\{
 };
 
 function createDocComment() {
-    return new Comment\Doc(sprintf("/* This file is was automatically generated on %s */", date('r')));
+    return new Comment\Doc("/* This file is was automatically generated. */");
 }
 
 function createConstFromFunc(Function_ $fn, Namespace_ $ns) {

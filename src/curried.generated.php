@@ -1,12 +1,17 @@
 <?php
 
-/* This file is was automatically generated on Wed, 07 Feb 2018 02:08:38 +0000 */
+/* This file is was automatically generated. */
 namespace Krak\Fn\Curried;
 
+function method($name, array $args = [])
+{
+    return function ($data) use($name, $args) {
+        return $data->{$name}(...$args);
+    };
+}
 function prop(string $key, $else = null)
 {
     return function ($data) use($key, $else) {
-        return $data->{$key};
         return property_exists($key, $data) ? $data->{$key} : $else;
     };
 }

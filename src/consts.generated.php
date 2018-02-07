@@ -1,8 +1,9 @@
 <?php
 
-/* This file is was automatically generated on Wed, 07 Feb 2018 02:08:37 +0000 */
+/* This file is was automatically generated. */
 namespace Krak\Fn;
 
+const method = 'Krak\\Fn\\method';
 const prop = 'Krak\\Fn\\prop';
 const index = 'Krak\\Fn\\index';
 const propIn = 'Krak\\Fn\\propIn';

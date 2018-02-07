@@ -24,6 +24,11 @@ describe('Fn', function() {
             $fn = partial(_idArgs::class, 1, _(), 3);
             expect($fn(2))->equal([1,2,3]);
         });
+        it('can fully apply a function', function() {
+            $fn = function($a, $b) { return [$a, $b]; };
+            $fn = partial($fn, 1, 2);
+            expect($fn())->equal([1,2]);
+        });
     });
     describe('autoCurry', function() {
         it('can call a function if all args are available', function() {
