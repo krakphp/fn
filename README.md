@@ -60,7 +60,7 @@ The `op` function is defined as `op($operator, $b, $a)`. Essentially, what we di
 
 ### Currying
 
-All functions that are curryable hav generated curry functions. A function is curryable if it has more than one required argument or one required argument with any number of optional arguments.
+All functions that are curryable have generated curry functions. A function is curryable if it has more than one required argument or one required argument with any number of optional arguments.
 
 These function definitions aren't curryable:
 
