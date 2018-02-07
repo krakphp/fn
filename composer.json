@@ -1,0 +1,31 @@
+{
+    "name": "krak/fn",
+    "description": "Functional library for php with proper currying",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+       "functional",
+       "php",
+       "curry",
+       "partial-application"
+   ],
+    "authors": [
+        {
+            "name": "RJ Garcia",
+            "email": "rj@bighead.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Krak\\Fn\\": "src"
+        },
+        "files": ["src/fn.php", "src/curried.generated.php", "src/consts.generated.php", "src/generate.php"]
+    },
+    "require-dev": {
+        "lavoiesl/php-benchmark": "^1.4",
+        "nikic/php-parser": "v4.0.0beta1",
+        "peridot-php/leo": "^1.6",
+        "peridot-php/peridot": "^1.19",
+        "symfony/var-dumper": "^4.0"
+    }
+}
