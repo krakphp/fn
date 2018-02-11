@@ -9,6 +9,11 @@ function _idArgs(...$args) {
 }
 
 describe('Fn', function() {
+    it('can perform functional operations', function() {
+        $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
+        expect($res)->equal([9, 12]);
+    });
+
     describe('curry', function() {
         docFn(curry::class);
 
@@ -91,15 +96,15 @@ describe('Fn', function() {
     describe('filter', function() {
         docFn(filter::class);
         it('Lazily filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable', function() {
-            $values = toArray(filter(partial(op, '>', 2), [1,2,3,4])); // keep all items that are greater than 2
-            expect($values)->equal([3,4]);
+            $values = filter(partial(op, '>', 2), [1,2,3,4]); // keep all items that are greater than 2
+            expect(toArray($values))->equal([3,4]);
         });
     });
     describe('map', function() {
         docFn(map::class);
         it('Lazily maps an iterable\'s values to a different set', function() {
-            $values = toArray(map(partial(op, '*', 2), [1,2,3,4]));
-            expect($values)->equal([2,4,6,8]);
+            $values = map(partial(op, '*', 2), [1,2,3,4]);
+            expect(toArray($values))->equal([2,4,6,8]);
         });
     });
     describe('inArray', function() {
@@ -124,9 +129,29 @@ describe('Fn', function() {
             expect($res)->equal(4);
         });
     });
-    it('can perform functional operations', function() {
-        $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
-        expect($res)->equal([9, 12]);
+    describe('head', function() {
+        docFn(head::class);
+        test('Returns the fist element in an iterable', function() {
+            $res = head([1,2,3]);
+            expect($res)->equal(1);
+        });
+        test('But returns null if the iterable is empty', function() {
+            $res = head([]);
+            expect($res)->equal(null);
+        });
+    });
+    describe('toPairs', function() {
+        docFn(toPairs::class);
+        test('Transforms an associative array into an iterable of tuples [$key, $value]', function() {
+            $res = toPairs([
+                'a' => 1,
+                'b' => 2,
+            ]);
+            expect(toArray($res))->equal([
+                ['a', 1],
+                ['b', 2]
+            ]);
+        });
     });
 });
 

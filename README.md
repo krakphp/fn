@@ -90,7 +90,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td></tr></table>
 
 <h3 id="api-krak-fn-curry">curry(callable $fn, $num = 1)</h3>
 
@@ -210,9 +210,9 @@ expect([$left, $right])->equal([[1, 2], [3, 4]]);
 Lazily filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable:
 
 ```php
-$values = toArray(filter(partial(op, '>', 2), [1, 2, 3, 4]));
+$values = filter(partial(op, '>', 2), [1, 2, 3, 4]);
 // keep all items that are greater than 2
-expect($values)->equal([3, 4]);
+expect(toArray($values))->equal([3, 4]);
 ```
 
 
@@ -224,8 +224,8 @@ expect($values)->equal([3, 4]);
 Lazily maps an iterable's values to a different set:
 
 ```php
-$values = toArray(map(partial(op, '*', 2), [1, 2, 3, 4]));
-expect($values)->equal([2, 4, 6, 8]);
+$values = map(partial(op, '*', 2), [1, 2, 3, 4]);
+expect(toArray($values))->equal([2, 4, 6, 8]);
 ```
 
 
@@ -271,6 +271,39 @@ $then = function ($v) {
 };
 $res = when($if, $then, 4);
 expect($res)->equal(4);
+```
+
+
+
+<h3 id="api-krak-fn-head">head($iterable)</h3>
+
+**Name:** `Krak\Fn\head`
+
+Returns the fist element in an iterable:
+
+```php
+$res = head([1, 2, 3]);
+expect($res)->equal(1);
+```
+
+But returns null if the iterable is empty:
+
+```php
+$res = head([]);
+expect($res)->equal(null);
+```
+
+
+
+<h3 id="api-krak-fn-topairs">toPairs($iterable)</h3>
+
+**Name:** `Krak\Fn\toPairs`
+
+Transforms an associative array into an iterable of tuples [$key, $value]:
+
+```php
+$res = toPairs(['a' => 1, 'b' => 2]);
+expect(toArray($res))->equal([['a', 1], ['b', 2]]);
 ```
 
 
