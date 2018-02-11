@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "21bd12353bbafb61b5f43bfcc90c5f66",
+    "content-hash": "d1ffb9abbe9d44699be010cf245265f6",
     "packages": [],
     "packages-dev": [
         {
@@ -54,6 +54,57 @@
                 "event-emitter"
             ],
             "time": "2017-07-17T17:39:19+00:00"
+        },
+        {
+            "name": "krak/peridocs",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krakphp/peridocs.git",
+                "reference": "57b745e2087ba6cbc39b930901a3cfbafae3182a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krakphp/peridocs/zipball/57b745e2087ba6cbc39b930901a3cfbafae3182a",
+                "reference": "57b745e2087ba6cbc39b930901a3cfbafae3182a",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/php-parser": "v4.0-beta1"
+            },
+            "require-dev": {
+                "peridot-php/leo": "^1.6",
+                "peridot-php/peridot": "^1.19",
+                "symfony/var-dumper": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Krak\\Peridocs\\": "src"
+                },
+                "files": [
+                    "src/peridocs.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "RJ Garcia",
+                    "email": "rj@bighead.net"
+                }
+            ],
+            "description": "Peridot plugin for generating markdown documentation from your tests",
+            "keywords": [
+                "auto-documentation",
+                "auto-generate",
+                "documentation",
+                "peridot",
+                "peridot-plugin"
+            ],
+            "time": "2018-02-11T02:47:59+00:00"
         },
         {
             "name": "lavoiesl/php-benchmark",
@@ -695,11 +746,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
-        "nikic/php-parser": 10
+        "krak/peridocs": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []

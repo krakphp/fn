@@ -10,21 +10,32 @@ function _idArgs(...$args) {
 
 describe('Fn', function() {
     describe('curry', function() {
-        it('returns curried functions', function() {
+        docFn(curry::class);
+
+        test('currys the given function $n times', function() {
             $res = curry(_idArgs::class, 2)(1)(2)(3);
             expect($res)->equal([1,2,3]);
         });
+        docOutro('Given a function definition: (a, b) -> c. A curried version will look like (a) -> (b) -> c');
     });
     describe('partial', function() {
-        it('can partially apply a function', function() {
-            $fn = partial(_idArgs::class, 1, 2);
-            expect($fn(3))->equal([1,2,3]);
+        docFn(partial::class);
+        test('Partially applies arguments to a function. Given a function signature like f = (a, b, c) -> d, partial(f, a, b) -> (c) -> d', function() {
+            $fn = function($a, $b, $c) {
+                return ($a + $b) * $c;
+            };
+            $fn = partial($fn, 1, 2); // apply the two arguments (a, b) and return a new function with signature (c) -> d
+            expect($fn(3))->equal(9);
         });
-        it('can partially apply a function with placeholders', function() {
-            $fn = partial(_idArgs::class, 1, _(), 3);
-            expect($fn(2))->equal([1,2,3]);
+        test('You can also use place holders when partially applying', function() {
+            $fn = function($a, $b, $c) { return ($a + $b) * $c; };
+
+            // _() represents a placeholder for parameter b.
+            $fn = partial($fn, 1, _(), 3); // create the new func with signature (b) -> d
+
+            expect($fn(2))->equal(9);
         });
-        it('can fully apply a function', function() {
+        test('Full partial application also works', function() {
             $fn = function($a, $b) { return [$a, $b]; };
             $fn = partial($fn, 1, 2);
             expect($fn())->equal([1,2]);
@@ -48,19 +59,28 @@ describe('Fn', function() {
             expect($res)->equal([1,2,3]);
         });
     });
-    describe('toArrayWithKeys', function() {
-        it('can convert to an array', function() {
-            expect(toArrayWithKeys(['a' => 1, 'b' => 2]))->equal(['a' => 1, 'b' => 2]);
-        });
-    });
     describe('toArray', function() {
-        it('can be used as a constant', function() {
+        docFn(toArray::class);
+        it('will tranform any iterable into an array', function() {
+            $res = toArray((function() { yield 1; yield 2; yield 3; })());
+            expect($res)->equal([1,2,3]);
+        });
+        it('can also be used as a constant', function() {
             $res = compose(toArray, id)((function() {yield 1; yield 2; yield 3;})());
             expect($res)->equal([1,2,3]);
         });
     });
+    describe('toArrayWithKeys', function() {
+        docFn(toArrayWithKeys::class);
+        it('can convert to an array and keep the keys', function() {
+            $gen = function() { yield 'a' => 1; yield 'b' => 2; };
+            expect(toArrayWithKeys($gen()))->equal(['a' => 1, 'b' => 2]);
+        });
+    });
     describe('partition', function() {
-        it('can split data', function() {
+        docFn(partition::class);
+
+        it('Splits an iterable into different arrays based off of a predicate. The predicate should return the index to partition the data into', function() {
             list($left, $right) = partition(function($v) {
                 return $v < 3 ? 0 : 1;
             }, [1,2,3,4]);
@@ -69,10 +89,14 @@ describe('Fn', function() {
         });
     });
     describe('filter', function() {
-        it('filters data off of a predicate', function() {
-            $values = toArray(filter(partial(op, '>', 2), [1,2,3,4]));
+        docFn(filter::class);
+        it('Filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable', function() {
+            $values = toArray(filter(partial(op, '>', 2), [1,2,3,4])); // keep all items that are greater than 2
             expect($values)->equal([3,4]);
         });
+    });
+    describe('map', function() {
+        docFn(map::class);
     });
     it('can perform functional operations', function() {
         $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);

@@ -88,3 +88,135 @@ the curried verison would look like:
 ```
 (a, c = null) -> (b) -> Void
 ```
+
+## API
+### curry(callable $fn, $num = 1)
+
+**Name:** Krak\Fn\curry
+
+currys the given function $n times:
+
+```php
+$res = curry(_idArgs::class, 2)(1)(2)(3);
+expect($res)->equal([1, 2, 3]);
+```
+
+Given a function definition: (a, b) -> c. A curried version will look like (a) -> (b) -> c
+
+### partial(callable $fn, ...$appliedArgs)
+
+**Name:** Krak\Fn\partial
+
+Partially applies arguments to a function. Given a function signature like f = (a, b, c) -> d, partial(f, a, b) -> (c) -> d:
+
+```php
+$fn = function ($a, $b, $c) {
+    return ($a + $b) * $c;
+};
+$fn = partial($fn, 1, 2);
+// apply the two arguments (a, b) and return a new function with signature (c) -> d
+expect($fn(3))->equal(9);
+```
+
+You can also use place holders when partially applying:
+
+```php
+$fn = function ($a, $b, $c) {
+    return ($a + $b) * $c;
+};
+// _() represents a placeholder for parameter b.
+$fn = partial($fn, 1, _(), 3);
+// create the new func with signature (b) -> d
+expect($fn(2))->equal(9);
+```
+
+Full partial application also works:
+
+```php
+$fn = function ($a, $b) {
+    return [$a, $b];
+};
+$fn = partial($fn, 1, 2);
+expect($fn())->equal([1, 2]);
+```
+
+
+
+### toArray($iter)
+
+**Name:** Krak\Fn\toArray
+
+will tranform any iterable into an array:
+
+```php
+$res = toArray((function () {
+    (yield 1);
+    (yield 2);
+    (yield 3);
+})());
+expect($res)->equal([1, 2, 3]);
+```
+
+can also be used as a constant:
+
+```php
+$res = compose(toArray, id)((function () {
+    (yield 1);
+    (yield 2);
+    (yield 3);
+})());
+expect($res)->equal([1, 2, 3]);
+```
+
+
+
+### toArrayWithKeys($iter)
+
+**Name:** Krak\Fn\toArrayWithKeys
+
+can convert to an array and keep the keys:
+
+```php
+$gen = function () {
+    (yield 'a' => 1);
+    (yield 'b' => 2);
+};
+expect(toArrayWithKeys($gen()))->equal(['a' => 1, 'b' => 2]);
+```
+
+
+
+### partition(callable $partition, $data, $numParts = 2)
+
+**Name:** Krak\Fn\partition
+
+Splits an iterable into different arrays based off of a predicate. The predicate should return the index to partition the data into:
+
+```php
+list($left, $right) = partition(function ($v) {
+    return $v < 3 ? 0 : 1;
+}, [1, 2, 3, 4]);
+expect([$left, $right])->equal([[1, 2], [3, 4]]);
+```
+
+
+
+### filter(callable $predicate, $data)
+
+**Name:** Krak\Fn\filter
+
+Filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable:
+
+```php
+$values = toArray(filter(partial(op, '>', 2), [1, 2, 3, 4]));
+// keep all items that are greater than 2
+expect($values)->equal([3, 4]);
+```
+
+
+
+### map(callable $predicate, $data)
+
+**Name:** Krak\Fn\map
+
+

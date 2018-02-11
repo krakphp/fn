@@ -22,6 +22,7 @@
         "files": ["src/fn.php", "src/curried.generated.php", "src/consts.generated.php", "src/generate.php"]
     },
     "require-dev": {
+        "krak/peridocs": "dev-master",
         "lavoiesl/php-benchmark": "^1.4",
         "nikic/php-parser": "v4.0.0beta1",
         "peridot-php/leo": "^1.6",
@@ -32,5 +33,7 @@
         "branch-alias": {
             "dev-master": "0.1.0-dev"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

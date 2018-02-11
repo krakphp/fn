@@ -36,6 +36,10 @@ function indexIn(array $keys, array $data, $else = null) {
     return $data;
 }
 
+function when(callable $if, callable $then, $value) {
+    return $if($value) ? $then($value) : $value;
+}
+
 function head($iterable) {
     foreach ($iterable as $v) {
         return $v;
