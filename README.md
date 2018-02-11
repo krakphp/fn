@@ -207,7 +207,7 @@ expect([$left, $right])->equal([[1, 2], [3, 4]]);
 
 **Name:** `Krak\Fn\filter`
 
-Filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable:
+Lazily filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable:
 
 ```php
 $values = toArray(filter(partial(op, '>', 2), [1, 2, 3, 4]));
@@ -220,5 +220,12 @@ expect($values)->equal([3, 4]);
 <h3 id="api-krak-fn-map">map(callable $predicate, $data)</h3>
 
 **Name:** `Krak\Fn\map`
+
+Lazily maps an iterable's values to a different set:
+
+```php
+$values = toArray(map(partial(op, '*', 2), [1, 2, 3, 4]));
+expect($values)->equal([2, 4, 6, 8]);
+```
 
 

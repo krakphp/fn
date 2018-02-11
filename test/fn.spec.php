@@ -90,13 +90,17 @@ describe('Fn', function() {
     });
     describe('filter', function() {
         docFn(filter::class);
-        it('Filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable', function() {
+        it('Lazily filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable', function() {
             $values = toArray(filter(partial(op, '>', 2), [1,2,3,4])); // keep all items that are greater than 2
             expect($values)->equal([3,4]);
         });
     });
     describe('map', function() {
         docFn(map::class);
+        it('Lazily maps an iterable\'s values to a different set', function() {
+            $values = toArray(map(partial(op, '*', 2), [1,2,3,4]));
+            expect($values)->equal([2,4,6,8]);
+        });
     });
     it('can perform functional operations', function() {
         $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
