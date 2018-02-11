@@ -153,5 +153,18 @@ describe('Fn', function() {
             ]);
         });
     });
+    describe('fromPairs', function() {
+        docFn(fromPairs::class);
+        test('Converts an iterable of tuples [$key, $value] into an associative iterable', function() {
+            $res = fromPairs([
+                ['a', 1],
+                ['b', 2]
+            ]);
+            expect(toArrayWithKeys($res))->equal([
+                'a' => 1,
+                'b' => 2
+            ]);
+        });
+    });
 });
 

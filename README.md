@@ -90,7 +90,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td></tr></table>
 
 <h3 id="api-krak-fn-curry">curry(callable $fn, $num = 1)</h3>
 
@@ -304,6 +304,19 @@ Transforms an associative array into an iterable of tuples [$key, $value]:
 ```php
 $res = toPairs(['a' => 1, 'b' => 2]);
 expect(toArray($res))->equal([['a', 1], ['b', 2]]);
+```
+
+
+
+<h3 id="api-krak-fn-frompairs">fromPairs($iterable)</h3>
+
+**Name:** `Krak\Fn\fromPairs`
+
+Converts an iterable of tuples [$key, $value] into an associative iterable:
+
+```php
+$res = fromPairs([['a', 1], ['b', 2]]);
+expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
 ```
 
 
