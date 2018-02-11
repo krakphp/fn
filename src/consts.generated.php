@@ -8,6 +8,7 @@ const prop = 'Krak\\Fn\\prop';
 const index = 'Krak\\Fn\\index';
 const propIn = 'Krak\\Fn\\propIn';
 const indexIn = 'Krak\\Fn\\indexIn';
+const when = 'Krak\\Fn\\when';
 const head = 'Krak\\Fn\\head';
 const toPairs = 'Krak\\Fn\\toPairs';
 const fromPairs = 'Krak\\Fn\\fromPairs';

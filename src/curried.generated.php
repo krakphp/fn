@@ -45,6 +45,14 @@ function indexIn(array $keys, $else = null)
         return $data;
     };
 }
+function when(callable $if)
+{
+    return function (callable $then) use($if) {
+        return function ($value) use($then, $if) {
+            return $if($value) ? $then($value) : $value;
+        };
+    };
+}
 function without(array $fields)
 {
     return function ($data) use($fields) {

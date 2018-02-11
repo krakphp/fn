@@ -102,6 +102,28 @@ describe('Fn', function() {
             expect($values)->equal([2,4,6,8]);
         });
     });
+    describe('inArray', function() {
+        docFn(inArray::class);
+        it('Checks if an item is within an array of items', function() {
+            $res = inArray([1,2,3], 2);
+            expect($res)->equal(true);
+        });
+    });
+    describe('when', function() {
+        docFn(when::class);
+        it('Evaluates the given value with the $then callable if the predicate returns true', function() {
+            $if = function($v) { return $v == 3; };
+            $then = function($v) { return $v * $v; };
+            $res = when($if, $then, 3);
+            expect($res)->equal(9);
+        });
+        test('But will return the given value if the predicate returns false', function() {
+            $if = function($v) { return $v == 3; };
+            $then = function($v) { return $v * $v; };
+            $res = when($if, $then, 4);
+            expect($res)->equal(4);
+        });
+    });
     it('can perform functional operations', function() {
         $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
         expect($res)->equal([9, 12]);

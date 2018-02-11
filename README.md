@@ -90,7 +90,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td></tr></table>
 
 <h3 id="api-krak-fn-curry">curry(callable $fn, $num = 1)</h3>
 
@@ -226,6 +226,51 @@ Lazily maps an iterable's values to a different set:
 ```php
 $values = toArray(map(partial(op, '*', 2), [1, 2, 3, 4]));
 expect($values)->equal([2, 4, 6, 8]);
+```
+
+
+
+<h3 id="api-krak-fn-inarray">inArray(array $set, $item)</h3>
+
+**Name:** `Krak\Fn\inArray`
+
+Checks if an item is within an array of items:
+
+```php
+$res = inArray([1, 2, 3], 2);
+expect($res)->equal(true);
+```
+
+
+
+<h3 id="api-krak-fn-when">when(callable $if, callable $then, $value)</h3>
+
+**Name:** `Krak\Fn\when`
+
+Evaluates the given value with the $then callable if the predicate returns true:
+
+```php
+$if = function ($v) {
+    return $v == 3;
+};
+$then = function ($v) {
+    return $v * $v;
+};
+$res = when($if, $then, 3);
+expect($res)->equal(9);
+```
+
+But will return the given value if the predicate returns false:
+
+```php
+$if = function ($v) {
+    return $v == 3;
+};
+$then = function ($v) {
+    return $v * $v;
+};
+$res = when($if, $then, 4);
+expect($res)->equal(4);
 ```
 
 
