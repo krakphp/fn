@@ -90,9 +90,11 @@ the curried verison would look like:
 ```
 
 ## API
-### curry(callable $fn, $num = 1)
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td></tr></table>
 
-**Name:** Krak\Fn\curry
+<h3 id="api-krak-fn-curry">curry(callable $fn, $num = 1)</h3>
+
+**Name:** `Krak\Fn\curry`
 
 currys the given function $n times:
 
@@ -103,9 +105,9 @@ expect($res)->equal([1, 2, 3]);
 
 Given a function definition: (a, b) -> c. A curried version will look like (a) -> (b) -> c
 
-### partial(callable $fn, ...$appliedArgs)
+<h3 id="api-krak-fn-partial">partial(callable $fn, ...$appliedArgs)</h3>
 
-**Name:** Krak\Fn\partial
+**Name:** `Krak\Fn\partial`
 
 Partially applies arguments to a function. Given a function signature like f = (a, b, c) -> d, partial(f, a, b) -> (c) -> d:
 
@@ -142,9 +144,9 @@ expect($fn())->equal([1, 2]);
 
 
 
-### toArray($iter)
+<h3 id="api-krak-fn-toarray">toArray($iter)</h3>
 
-**Name:** Krak\Fn\toArray
+**Name:** `Krak\Fn\toArray`
 
 will tranform any iterable into an array:
 
@@ -170,9 +172,9 @@ expect($res)->equal([1, 2, 3]);
 
 
 
-### toArrayWithKeys($iter)
+<h3 id="api-krak-fn-toarraywithkeys">toArrayWithKeys($iter)</h3>
 
-**Name:** Krak\Fn\toArrayWithKeys
+**Name:** `Krak\Fn\toArrayWithKeys`
 
 can convert to an array and keep the keys:
 
@@ -186,9 +188,9 @@ expect(toArrayWithKeys($gen()))->equal(['a' => 1, 'b' => 2]);
 
 
 
-### partition(callable $partition, $data, $numParts = 2)
+<h3 id="api-krak-fn-partition">partition(callable $partition, $data, $numParts = 2)</h3>
 
-**Name:** Krak\Fn\partition
+**Name:** `Krak\Fn\partition`
 
 Splits an iterable into different arrays based off of a predicate. The predicate should return the index to partition the data into:
 
@@ -201,9 +203,9 @@ expect([$left, $right])->equal([[1, 2], [3, 4]]);
 
 
 
-### filter(callable $predicate, $data)
+<h3 id="api-krak-fn-filter">filter(callable $predicate, $data)</h3>
 
-**Name:** Krak\Fn\filter
+**Name:** `Krak\Fn\filter`
 
 Filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable:
 
@@ -215,8 +217,8 @@ expect($values)->equal([3, 4]);
 
 
 
-### map(callable $predicate, $data)
+<h3 id="api-krak-fn-map">map(callable $predicate, $data)</h3>
 
-**Name:** Krak\Fn\map
+**Name:** `Krak\Fn\map`
 
 
