@@ -3,6 +3,10 @@
 /* This file is was automatically generated. */
 namespace Krak\Fn;
 
+const range = 'Krak\\Fn\\range';
+const take = 'Krak\\Fn\\take';
+const drop = 'Krak\\Fn\\drop';
+const slice = 'Krak\\Fn\\slice';
 const method = 'Krak\\Fn\\method';
 const prop = 'Krak\\Fn\\prop';
 const index = 'Krak\\Fn\\index';

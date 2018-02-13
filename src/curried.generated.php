@@ -3,6 +3,58 @@
 /* This file is was automatically generated. */
 namespace Krak\Fn\Curried;
 
+function range($start, $step = null)
+{
+    return function ($end) use($start, $step) {
+        if ($start == $end) {
+            (yield $start);
+        } else {
+            if ($start < $end) {
+                $step = $step ?: 1;
+                if ($step <= 0) {
+                    throw new \InvalidArgumentException('Step must be greater than 0.');
+                }
+                for ($i = $start; $i <= $end; $i += $step) {
+                    (yield $i);
+                }
+            } else {
+                $step = $step ?: -1;
+                if ($step >= 0) {
+                    throw new \InvalidArgumentException('Step must be less than 0.');
+                }
+                for ($i = $start; $i >= $end; $i += $step) {
+                    (yield $i);
+                }
+            }
+        }
+    };
+}
+function take(int $num)
+{
+    return function ($data) use($num) {
+        return slice(0, $data, $num);
+    };
+}
+function drop(int $num)
+{
+    return function ($data) use($num) {
+        return slice($num, $data);
+    };
+}
+function slice(int $start, $length = INF)
+{
+    return function ($data) use($start, $length) {
+        assert($start >= 0);
+        $i = 0;
+        $end = $start + $length - 1;
+        foreach ($data as $k => $v) {
+            if ($start <= $i && $i <= $end) {
+                (yield $k => $v);
+            }
+            $i += 1;
+        }
+    };
+}
 function method($name, ...$optionalArgs)
 {
     return function ($data) use($name, $optionalArgs) {

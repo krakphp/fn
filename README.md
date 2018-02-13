@@ -90,7 +90,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td></tr><tr><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-take">take</a></td></tr></table>
 
 <h3 id="api-krak-fn-curry">curry(callable $fn, $num = 1)</h3>
 
@@ -317,6 +317,83 @@ Converts an iterable of tuples [$key, $value] into an associative iterable:
 ```php
 $res = fromPairs([['a', 1], ['b', 2]]);
 expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
+```
+
+
+
+<h3 id="api-krak-fn-range">range($start, $end, $step = null)</h3>
+
+**Name:** `Krak\Fn\range`
+
+Creates an iterable of a range of values starting from $start going to $end inclusively incrementing by $step:
+
+```php
+$res = range(1, 3);
+expect(toArray($res))->equal([1, 2, 3]);
+```
+
+It also allows a decreasing range:
+
+```php
+$res = range(3, 1);
+expect(toArray($res))->equal([3, 2, 1]);
+```
+
+An exception will be thrown if the $step provided goes in the wrong direction:
+
+```php
+expect(function () {
+    toArray(range(1, 2, -1));
+})->throw(\InvalidArgumentException::class);
+expect(function () {
+    toArray(range(2, 1, 1));
+})->throw(\InvalidArgumentException::class);
+```
+
+
+
+<h3 id="api-krak-fn-slice">slice(int $start, $data, $length = INF)</h3>
+
+**Name:** `Krak\Fn\slice`
+
+It takes an inclusive slice from start to a given length of an interable:
+
+```php
+$sliced = slice(1, range(0, 4), 2);
+expect(toArray($sliced))->equal([1, 2]);
+```
+
+If length is not supplied it default to the end of the iterable:
+
+```php
+$sliced = slice(2, range(0, 4));
+expect(toArray($sliced))->equal([2, 3, 4]);
+```
+
+
+
+<h3 id="api-krak-fn-take">take(int $num, $data)</h3>
+
+**Name:** `Krak\Fn\take`
+
+Takes the first num items from an iterable:
+
+```php
+$res = take(2, range(0, 10));
+expect(toArray($res))->equal([0, 1]);
+```
+
+
+
+<h3 id="api-krak-fn-take">take(int $num, $data)</h3>
+
+**Name:** `Krak\Fn\take`
+
+Drops the first num items from an iterable:
+
+```php
+$res = drop(2, range(0, 3));
+expect(toArray($res))->equal([2, 3]);
 ```
 
 

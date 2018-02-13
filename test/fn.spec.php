@@ -166,5 +166,49 @@ describe('Fn', function() {
             ]);
         });
     });
+    describe('range', function() {
+        docFn(range::class);
+        test('Creates an iterable of a range of values starting from $start going to $end inclusively incrementing by $step', function() {
+            $res = range(1, 3);
+            expect(toArray($res))->equal([1,2,3]);
+        });
+        test('It also allows a decreasing range', function() {
+            $res = range(3, 1);
+            expect(toArray($res))->equal([3,2,1]);
+        });
+        test('An exception will be thrown if the $step provided goes in the wrong direction', function() {
+            expect(function() {
+                toArray(range(1, 2, -1));
+            })->throw(\InvalidArgumentException::class);
+            expect(function() {
+                toArray(range(2, 1, 1));
+            })->throw(\InvalidArgumentException::class);
+        });
+    });
+    describe('slice', function() {
+        docFn(slice::class);
+        test('It takes an inclusive slice from start to a given length of an interable', function() {
+            $sliced = slice(1, range(0, 4), 2);
+            expect(toArray($sliced))->equal([1, 2]);
+        });
+        test('If length is not supplied it default to the end of the iterable', function() {
+            $sliced = slice(2, range(0, 4));
+            expect(toArray($sliced))->equal([2,3,4]);
+        });
+    });
+    describe('take', function() {
+        docFn(take::class);
+        test('Takes the first num items from an iterable', function() {
+            $res = take(2, range(0, 10));
+            expect(toArray($res))->equal([0, 1]);
+        });
+    });
+    describe('drop', function() {
+        docFn(take::class);
+        test('Drops the first num items from an iterable', function() {
+            $res = drop(2, range(0, 3));
+            expect(toArray($res))->equal([2,3]);
+        });
+    });
 });
 

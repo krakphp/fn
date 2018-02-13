@@ -2,6 +2,49 @@
 
 namespace Krak\Fn;
 
+function range($start, $end, $step = null) {
+    if ($start == $end) {
+        yield $start;
+    } else if ($start < $end) {
+        $step = $step ?: 1;
+        if ($step <= 0) {
+            throw new \InvalidArgumentException('Step must be greater than 0.');
+        }
+        for ($i = $start; $i <= $end; $i += $step) {
+            yield $i;
+        }
+    } else {
+        $step = $step ?: -1;
+        if ($step >= 0) {
+            throw new \InvalidArgumentException('Step must be less than 0.');
+        }
+        for ($i = $start; $i >= $end; $i += $step) {
+            yield $i;
+        }
+    }
+}
+
+function take(int $num, $data) {
+    return slice(0, $data, $num);
+}
+
+function drop(int $num, $data) {
+    return slice($num, $data);
+}
+
+function slice(int $start, $data, $length = INF) {
+    assert($start >= 0);
+
+    $i = 0;
+    $end = $start + $length - 1;
+    foreach ($data as $k => $v) {
+        if ($start <= $i && $i <= $end) {
+            yield $k => $v;
+        }
+        $i += 1;
+    }
+}
+
 function method($name, $data, ...$optionalArgs) {
     return $data->{$name}(...$optionalArgs);
 }
