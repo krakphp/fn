@@ -111,8 +111,13 @@ function op($op, $b, $a) {
     case '==':
     case 'eq':
         return $a == $b;
+    case '!=':
+    case 'neq':
+        return $a != $b;
     case '===':
         return $a === $b;
+    case '!==':
+        return $a !== $b;
     case '>':
     case 'gt':
         return $a > $b;

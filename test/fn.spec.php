@@ -3,6 +3,7 @@
 namespace Krak\Fn;
 
 use const krak\fn\{toArray, id, op};
+use stdClass;
 
 function _idArgs(...$args) {
     return $args;
@@ -208,6 +209,73 @@ describe('Fn', function() {
         test('Drops the first num items from an iterable', function() {
             $res = drop(2, range(0, 3));
             expect(toArray($res))->equal([2, 3]);
+        });
+    });
+    describe('op', function() {
+        docFn(op::class);
+
+        $intro = <<<'INTRO'
+op evaluates binary operations. It expects the right hand operator first which makes most sense when currying or partially applying the op function.
+When reading the op func, it should be read: `evaluate $op with $b with $a` e.g.:
+
+```
+op('+', 2, 3) -> add 2 with 3
+op('-', 2, 3) -> subtract 2 from 3
+op('>', 2, 3) => compare greater than 2 with 3
+```
+INTRO;
+        docIntro($intro);
+        test('Evaluates two values with a given operator', function() {
+            $res = op('<', 2, 1);
+            expect($res)->equal(true);
+        });
+        test('Supports equality operators', function() {
+            $obj = new stdClass();
+            $ops = [
+                ['==', [1, 1]],
+                ['eq', [2, 2]],
+                ['!=', [1, 2]],
+                ['neq', [2, 3]],
+                ['===', [$obj, $obj]],
+                ['!==', [new stdClass(), new stdClass()]],
+                ['>', [1, 2]],
+                ['gt', [1, 3]],
+                ['>=', [1, 2]],
+                ['gte', [1, 1]],
+                ['<', [2, 1]],
+                ['lt', [3, 1]],
+                ['<=', [2, 1]],
+                ['lte', [1, 1]],
+            ];
+
+            foreach ($ops as list($op, list($b, $a))) {
+                $res = op($op, $b, $a);
+                expect($res)->equal(true);
+            }
+        });
+        test('Supports arithmetic operators', function() {
+            $ops = [
+                ['+', [2, 3], 5],
+                ['-', [2, 3], 1],
+                ['*', [2, 3], 6],
+                ['**', [2, 3], 9],
+                ['/', [2, 3], 1.5],
+                ['%', [2, 3], 1]
+            ];
+
+            foreach ($ops as list($op, list($b, $a), $expected)) {
+                $res = op($op, $b, $a);
+                expect($res)->equal($expected);
+            }
+        });
+        test('Is more useful partially applied or curried', function() {
+            $add2 = Curried\op('+')(2);
+            $mul3 = partial(op, '*', 3);
+            $sub4 = Curried\op('-')(4);
+
+            // ((2 + 2) * 3) - 4
+            $res = compose($sub4, $mul3, $add2)(2);
+            expect($res)->equal(8);
         });
     });
 });
