@@ -204,10 +204,10 @@ describe('Fn', function() {
         });
     });
     describe('drop', function() {
-        docFn(take::class);
+        docFn(drop::class);
         test('Drops the first num items from an iterable', function() {
             $res = drop(2, range(0, 3));
-            expect(toArray($res))->equal([2,3]);
+            expect(toArray($res))->equal([2, 3]);
         });
     });
 });
