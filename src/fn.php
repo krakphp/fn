@@ -406,18 +406,17 @@ function id($v) {
     return $v;
 }
 
-function pipe($arg, callable ...$optionalFns) {
-    foreach ($optionalFns as $fn) {
-        $arg = $fn($arg);
-    }
-    return $arg;
+function pipe(callable ...$fns) {
+    return function(...$args) use ($fns) {
+        foreach ($fns as $fn) {
+            $arg = $fn($arg);
+        }
+        return $arg;
+    };
 }
 
-function compose($arg, callable ...$optionalFns) {
-    foreach (array_reverse($optionalFns) as $fn) {
-        $arg = $fn($arg);
-    }
-    return $arg;
+function compose(callable ...$fns) {
+    return pipe(...array_reverse($fns));
 }
 
 function stack(array $funcs, callable $last = null, callable $resolve = null) {
