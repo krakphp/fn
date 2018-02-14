@@ -452,3 +452,9 @@ function stack(array $funcs, callable $last = null, callable $resolve = null) {
         }, $funcs, $last ?: function() { throw new \LogicException('No stack handler was able to capture this request'); });
     };
 }
+
+function onEach(callable $handle, iterable $iter) {
+    foreach ($iter as $v) {
+        $handle($v);
+    }
+}

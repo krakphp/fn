@@ -89,7 +89,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-chain">chain</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-chain">chain</a></td></tr><tr><td><a href="#api-krak-fn-oneach">onEach</a></td></tr></table>
 
 <h3 id="api-krak-fn-curry">curry(callable $fn, int $num = 1)</h3>
 
@@ -569,3 +569,19 @@ expect(toArray($res))->equal([1, 2, 3]);
 ```
 
 
+
+<h3 id="api-krak-fn-oneach">onEach(callable $handle, iterable $iter)</h3>
+
+**Name:** `Krak\Fn\onEach`
+
+Invokes a callable on each item in an iterable:
+
+```php
+$state = [(object) ['id' => 1], (object) ['id' => 2]];
+onEach(function ($item) {
+    $item->id += 1;
+}, $state);
+expect([$state[0]->id, $state[1]->id])->equal([2, 3]);
+```
+
+Normally using php foreach should suffice for iterating over an iterable; however, php variables in foreach loops are not scoped whereas closures are.

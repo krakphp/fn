@@ -391,3 +391,11 @@ function stack(callable $last = null, callable $resolve = null)
         };
     };
 }
+function onEach(callable $handle)
+{
+    return function (iterable $iter) use($handle) {
+        foreach ($iter as $v) {
+            $handle($v);
+        }
+    };
+}

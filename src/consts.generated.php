@@ -51,3 +51,4 @@ const id = 'Krak\\Fn\\id';
 const pipe = 'Krak\\Fn\\pipe';
 const compose = 'Krak\\Fn\\compose';
 const stack = 'Krak\\Fn\\stack';
+const onEach = 'Krak\\Fn\\onEach';

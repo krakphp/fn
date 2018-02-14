@@ -343,5 +343,20 @@ INTRO;
             expect(toArray($res))->equal([1,2,3]);
         });
     });
+    describe('onEach', function() {
+        docFn(onEach::class);
+        test('Invokes a callable on each item in an iterable', function() {
+            $state = [
+                (object) ['id' => 1],
+                (object) ['id' => 2],
+            ];
+            onEach(function($item) {
+                $item->id += 1;
+            }, $state);
+
+            expect([$state[0]->id, $state[1]->id])->equal([2,3]);
+        });
+        docOutro('Normally using php foreach should suffice for iterating over an iterable; however, php variables in foreach loops are not scoped whereas closures are.');
+    });
 });
 
