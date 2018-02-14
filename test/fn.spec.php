@@ -11,7 +11,7 @@ function _idArgs(...$args) {
 
 describe('Fn', function() {
     it('can perform functional operations', function() {
-        $res = Curried\compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
+        $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
         expect($res)->equal([9, 12]);
     });
 
@@ -72,7 +72,7 @@ describe('Fn', function() {
             expect($res)->equal([1,2,3]);
         });
         it('can also be used as a constant', function() {
-            $res = Curried\compose(toArray, id)((function() {yield 1; yield 2; yield 3;})());
+            $res = compose(toArray, id)((function() {yield 1; yield 2; yield 3;})());
             expect($res)->equal([1,2,3]);
         });
     });
@@ -288,7 +288,7 @@ INTRO;
             $sub4 = Curried\op('-')(4);
 
             // ((2 + 2) * 3) - 4
-            $res = Curried\compose($sub4, $mul3, $add2)(2);
+            $res = compose($sub4, $mul3, $add2)(2);
             expect($res)->equal(8);
         });
     });
@@ -323,6 +323,17 @@ INTRO;
         test('If any of the indexes do not exist, $else will be returned', function() {
             $res = indexIn(['a', 'b'], ['a' => ['c' => 1]], 2);
             expect($res)->equal(2);
+        });
+    });
+    describe('flatten', function() {
+        docFn(flatten::class);
+        test('Flattens nested iterables into a flattened set of elements', function() {
+            $res = flatten([1, [2, [3, [4]]]]);
+            expect(toArray($res))->equal([1,2,3,4]);
+        });
+        test('Can flatten a specific number of levels', function() {
+            $res = flatten([1,[2, [3]]], 1);
+            expect(toArray($res))->equal([1, 2, [3]]);
         });
     });
 });

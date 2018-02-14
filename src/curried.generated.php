@@ -200,6 +200,31 @@ function flatMap(callable $map)
 function flatten($levels = INF)
 {
     return function (iterable $iter) use($levels) {
+        if ($levels == 0) {
+            return $iter;
+        } else {
+            if ($levels == 1) {
+                foreach ($iter as $k => $v) {
+                    if (\is_iterable($v)) {
+                        foreach ($v as $k1 => $v1) {
+                            (yield $k1 => $v1);
+                        }
+                    } else {
+                        (yield $k => $v);
+                    }
+                }
+            } else {
+                foreach ($iter as $k => $v) {
+                    if (\is_iterable($v)) {
+                        foreach (flatten($v, $levels - 1) as $k1 => $v1) {
+                            (yield $k1 => $v1);
+                        }
+                    } else {
+                        (yield $k => $v);
+                    }
+                }
+            }
+        }
     };
 }
 function when(callable $if)
@@ -348,24 +373,6 @@ function partial(callable $fn)
             }, [[], $args]);
             return $fn(...$appliedArgs, ...$args);
         };
-    };
-}
-function pipe(callable ...$optionalFns)
-{
-    return function ($arg) use($optionalFns) {
-        foreach ($optionalFns as $fn) {
-            $arg = $fn($arg);
-        }
-        return $arg;
-    };
-}
-function compose(callable ...$optionalFns)
-{
-    return function ($arg) use($optionalFns) {
-        foreach (array_reverse($optionalFns) as $fn) {
-            $arg = $fn($arg);
-        }
-        return $arg;
     };
 }
 function stack(callable $last = null, callable $resolve = null)

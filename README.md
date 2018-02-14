@@ -89,7 +89,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td></tr></table>
 
 <h3 id="api-krak-fn-curry">curry(callable $fn, int $num = 1)</h3>
 
@@ -161,7 +161,7 @@ expect($res)->equal([1, 2, 3]);
 can also be used as a constant:
 
 ```php
-$res = Curried\compose(toArray, id)((function () {
+$res = compose(toArray, id)((function () {
     (yield 1);
     (yield 2);
     (yield 3);
@@ -471,7 +471,7 @@ $add2 = Curried\op('+')(2);
 $mul3 = partial(op, '*', 3);
 $sub4 = Curried\op('-')(4);
 // ((2 + 2) * 3) - 4
-$res = Curried\compose($sub4, $mul3, $add2)(2);
+$res = compose($sub4, $mul3, $add2)(2);
 expect($res)->equal(8);
 ```
 
@@ -533,6 +533,26 @@ If any of the indexes do not exist, $else will be returned:
 ```php
 $res = indexIn(['a', 'b'], ['a' => ['c' => 1]], 2);
 expect($res)->equal(2);
+```
+
+
+
+<h3 id="api-krak-fn-flatten">flatten(iterable $iter, $levels = INF)</h3>
+
+**Name:** `Krak\Fn\flatten`
+
+Flattens nested iterables into a flattened set of elements:
+
+```php
+$res = flatten([1, [2, [3, [4]]]]);
+expect(toArray($res))->equal([1, 2, 3, 4]);
+```
+
+Can flatten a specific number of levels:
+
+```php
+$res = flatten([1, [2, [3]]], 1);
+expect(toArray($res))->equal([1, 2, [3]]);
 ```
 
 

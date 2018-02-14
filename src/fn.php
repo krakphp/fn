@@ -215,7 +215,29 @@ function flatMap(callable $map, iterable $iter): iterable {
 }
 
 function flatten(iterable $iter, $levels = INF) {
-
+    if ($levels == 0) {
+        return $iter;
+    } else if ($levels == 1) {
+        foreach ($iter as $k => $v) {
+            if (\is_iterable($v)) {
+                foreach ($v as $k1 => $v1) {
+                    yield $k1 => $v1;
+                }
+            } else {
+                yield $k => $v;
+            }
+        }
+    } else {
+        foreach ($iter as $k => $v) {
+            if (\is_iterable($v)) {
+                foreach (flatten($v, $levels - 1) as $k1 => $v1) {
+                    yield $k1 => $v1;
+                }
+            } else {
+                yield $k => $v;
+            }
+        }
+    }
 }
 
 
@@ -407,7 +429,7 @@ function id($v) {
 }
 
 function pipe(callable ...$fns) {
-    return function(...$args) use ($fns) {
+    return function($arg) use ($fns) {
         foreach ($fns as $fn) {
             $arg = $fn($arg);
         }
