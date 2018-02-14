@@ -13,8 +13,7 @@ All functions are defined in `Krak\Fn`, are not curried, and are data last. Curr
 ```php
 <?php
 
-use function Krak\Fn\{compose};
-use function Krak\Fn\Curried\{filter, map, op};
+use function Krak\Fn\Curried\{compose, filter, map, op};
 use const Krak\Fn\{toArray};
 
 $res = compose(
