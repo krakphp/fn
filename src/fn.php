@@ -2,60 +2,19 @@
 
 namespace Krak\Fn;
 
-function range($start, $end, $step = null) {
-    if ($start == $end) {
-        yield $start;
-    } else if ($start < $end) {
-        $step = $step ?: 1;
-        if ($step <= 0) {
-            throw new \InvalidArgumentException('Step must be greater than 0.');
-        }
-        for ($i = $start; $i <= $end; $i += $step) {
-            yield $i;
-        }
-    } else {
-        $step = $step ?: -1;
-        if ($step >= 0) {
-            throw new \InvalidArgumentException('Step must be less than 0.');
-        }
-        for ($i = $start; $i >= $end; $i += $step) {
-            yield $i;
-        }
-    }
-}
+// ACCESS
 
-function take(int $num, $data) {
-    return slice(0, $data, $num);
-}
-
-function drop(int $num, $data) {
-    return slice($num, $data);
-}
-
-function slice(int $start, $data, $length = INF) {
-    assert($start >= 0);
-
-    $i = 0;
-    $end = $start + $length - 1;
-    foreach ($data as $k => $v) {
-        if ($start <= $i && $i <= $end) {
-            yield $k => $v;
-        }
-        $i += 1;
-    }
-}
-
-function method($name, $data, ...$optionalArgs) {
+function method($name, /* object */ $data, ...$optionalArgs) {
     return $data->{$name}(...$optionalArgs);
 }
-function prop(string $key, $data, $else = null) {
+function prop(string $key, /* object */ $data, $else = null) {
     return property_exists($key, $data) ? $data->{$key} : $else;
 }
-function index($key, array $data, $else = null) {
+function index(/* string|int */ $key, array $data, $else = null) {
     return array_key_exists($key, $data) ? $data[$key] : $else;
 }
 
-function propIn(array $keys, $data, $else = null) {
+function propIn(array $keys, /* object */ $data, $else = null) {
     foreach ($props as $prop) {
         if (!is_object($obj) || !isset($obj->{$prop})) {
             return $else;
@@ -79,34 +38,103 @@ function indexIn(array $keys, array $data, $else = null) {
     return $data;
 }
 
-function when(callable $if, callable $then, $value) {
-    return $if($value) ? $then($value) : $value;
+// SLICING
+
+function takeWhile(callable $predicate, iterable $iter): iterable {
+    foreach ($iter as $k => $v) {
+        if ($predicate($v)) {
+            yield $k => $v;
+        } else {
+            return;
+        }
+    }
 }
 
-function head($iterable) {
-    foreach ($iterable as $v) {
+function dropWhile(callable $predicate, iterable $iter): iterable {
+    $stillDropping = true;
+    foreach ($iter as $k => $v) {
+        if ($stillDropping && $predicate($v)) {
+            continue;
+        } else if ($stillDropping) {
+            $stillDropping = false;
+        }
+
+        yield $k => $v;
+    }
+}
+
+function take(int $num, iterable $iter): iterable {
+    return slice(0, $iter, $num);
+}
+
+function drop(int $num, iterable $iter): iterable {
+    return slice($num, $iter);
+}
+
+function slice(int $start, iterable $iter, $length = INF): iterable {
+    assert($start >= 0);
+
+    $i = 0;
+    $end = $start + $length - 1;
+    foreach ($iter as $k => $v) {
+        if ($start <= $i && $i <= $end) {
+            yield $k => $v;
+        }
+        $i += 1;
+    }
+}
+
+function head(iterable $iter) {
+    foreach ($iter as $v) {
         return $v;
     }
 }
 
-function toPairs($iterable) {
-    foreach ($iterable as $key => $val) {
-        yield [$key, $val];
+function chunk(int $size, iterable $iter): iterable {
+    assert($size > 0);
+
+    $chunk = [];
+    foreach ($iter as $v) {
+        $chunk[] = $v;
+        if (\count($chunk) == $size) {
+            yield $chunk;
+            $chunk = [];
+        }
     }
-}
-function fromPairs($iterable) {
-    foreach ($iterable as list($key, $val)) {
-        yield $key => $val;
+
+    if ($chunk) {
+        yield $chunk;
     }
 }
 
-function without(array $fields, $data) {
-    return fromPairs(filter(function($tup) use ($fields) {
-        return !\in_array($tup[0], $fields);
-    }, toPairs($data)));
+
+// GENERATORS
+
+function range($start, $end, $step = null) {
+    if ($start == $end) {
+        yield $start;
+    } else if ($start < $end) {
+        $step = $step ?: 1;
+        if ($step <= 0) {
+            throw new \InvalidArgumentException('Step must be greater than 0.');
+        }
+        for ($i = $start; $i <= $end; $i += $step) {
+            yield $i;
+        }
+    } else {
+        $step = $step ?: -1;
+        if ($step >= 0) {
+            throw new \InvalidArgumentException('Step must be less than 0.');
+        }
+        for ($i = $start; $i >= $end; $i += $step) {
+            yield $i;
+        }
+    }
 }
 
-function op($op, $b, $a) {
+// OPERATORS
+
+function op(string $op, $b, $a) {
     switch ($op) {
     case '==':
     case 'eq':
@@ -147,11 +175,7 @@ function op($op, $b, $a) {
     }
 }
 
-function inArray(array $set, $item) {
-    return \in_array($item, $set);
-}
-
-function andf(...$fns) {
+function andf(callable ...$fns) {
     return function($el) use ($fns) {
         foreach ($fns as $fn) {
             if (!$fn($el)) {
@@ -161,7 +185,7 @@ function andf(...$fns) {
         return true;
     };
 }
-function orf(...$fns) {
+function orf(callable ...$fns) {
     return function($el) use ($fns) {
         foreach ($fns as $fn) {
             if ($fn($el)) {
@@ -171,8 +195,60 @@ function orf(...$fns) {
         return false;
     };
 }
-function all(callable $predicate, $data) {
-    foreach ($data as $key => $value) {
+
+
+
+function chain(iterable ...$iters) {
+    foreach ($iters as $iter) {
+        foreach ($iter as $k => $v) {
+            yield $k => $v;
+        }
+    }
+}
+
+function flatMap(callable $map, iterable $iter): iterable {
+    foreach ($iter as $k => $v) {
+        foreach ($map($v) as $k => $v) {
+            yield $k => $v;
+        }
+    }
+}
+
+function flatten(iterable $iter, $levels = INF) {
+
+}
+
+
+function when(callable $if, callable $then, $value) {
+    return $if($value) ? $then($value) : $value;
+}
+
+function toPairs(iterable $iter): iterable {
+    foreach ($iter as $key => $val) {
+        yield [$key, $val];
+    }
+}
+function fromPairs(iterable $iter): iterable {
+    foreach ($iter as list($key, $val)) {
+        yield $key => $val;
+    }
+}
+
+function without(array $fields, iterable $iter): iterable {
+    foreach ($iter as $k => $v) {
+        if (!\in_array($k, $fields)) {
+            yield $k => $v;
+        }
+    }
+}
+
+
+function inArray(array $set, $item): bool {
+    return \in_array($item, $set);
+}
+
+function all(callable $predicate, iterable $iter): bool {
+    foreach ($iter as $key => $value) {
         if (!$predicate($value)) {
             return false;
         }
@@ -180,8 +256,8 @@ function all(callable $predicate, $data) {
 
     return true;
 }
-function any(callable $predicate, $data) {
-    foreach ($data as $key => $value) {
+function any(callable $predicate, iterable $iter): bool {
+    foreach ($iter as $key => $value) {
         if ($predicate($value)) {
             return true;
         }
@@ -189,11 +265,18 @@ function any(callable $predicate, $data) {
 
     return false;
 }
-/** yas */
+function search(callable $predicate, iterable $iter) {
+    foreach ($iter as $value) {
+        if ($predicate($value)) {
+            return $value;
+        }
+    }
+}
+
 function trans(callable $trans, callable $fn, $data) {
     return $fn($trans($data));
 }
-function not(callable $fn, ...$args) {
+function not(callable $fn, ...$args): bool {
     return !$fn(...$args);
 }
 function isInstance($class, $item) {
@@ -204,9 +287,9 @@ function isNull($val) {
     return \is_null($item);
 }
 
-function partition(callable $partition, $data, $numParts = 2) {
+function partition(callable $partition, iterable $iter, int $numParts = 2): array {
     $parts = array_fill(0, $numParts, []);
-    foreach ($data as $val) {
+    foreach ($iter as $val) {
         $index = (int) $partition($val);
         $parts[$index][] = $val;
     }
@@ -214,41 +297,33 @@ function partition(callable $partition, $data, $numParts = 2) {
     return $parts;
 }
 
-function search(callable $predicate, $data) {
-    foreach ($data as $value) {
-        if ($predicate($value)) {
-            return $value;
-        }
-    }
-}
-
-function map(callable $predicate, $data) {
-    foreach ($data as $key => $value) {
+function map(callable $predicate, iterable $iter): iterable {
+    foreach ($iter as $key => $value) {
         yield $key => $predicate($value);
     }
 }
 
-function mapKeys(callable $predicate, $data) {
-    foreach ($data as $key => $value) {
+function mapKeys(callable $predicate, iterable $iter): iterable {
+    foreach ($iter as $key => $value) {
         yield $predicate($key) => $value;
     }
 }
 
-function reduce(callable $reduce, $data, $acc = null) {
+function reduce(callable $reduce, iterable $iter, $acc = null) {
     foreach ($data as $key => $value) {
         $acc = $reduce($acc, $value);
     }
     return $acc;
 }
 
-function filter(callable $predicate, $data) {
-    foreach ($data as $key => $value) {
+function filter(callable $predicate, iterable $iter): iterable {
+    foreach ($iter as $key => $value) {
         if ($predicate($value)) {
             yield $key => $value;
         }
     }
 }
-function filterKeys(callable $predicate, $data) {
+function filterKeys(callable $predicate, iterable $iter): iterable {
     foreach ($data as $key => $value) {
         if ($predicate($key)) {
             yield $key => $value;
@@ -256,7 +331,7 @@ function filterKeys(callable $predicate, $data) {
     }
 }
 
-function curry(callable $fn, $num = 1) {
+function curry(callable $fn, int $num = 1) {
     if ($num == 0) {
         return $fn;
     }
@@ -311,7 +386,7 @@ function autoCurry(array $args, $numArgs, callable $fn) {
     );
 }
 
-function toArray($iter) {
+function toArray(iterable $iter): array {
     $data = [];
     foreach ($iter as $key => $val) {
         $data[] = $val;
@@ -319,7 +394,7 @@ function toArray($iter) {
     return $data;
 }
 
-function toArrayWithKeys($iter) {
+function toArrayWithKeys(iterable $iter): array {
     $data = [];
     foreach ($iter as $key => $val) {
         $data[$key] = $val;
@@ -331,20 +406,21 @@ function id($v) {
     return $v;
 }
 
-function pipe(...$fns) {
-    return function($arg) use ($fns) {
-        foreach ($fns as $fn) {
-            $arg = $fn($arg);
-        }
-        return $arg;
-    };
+function pipe($arg, callable ...$optionalFns) {
+    foreach ($optionalFns as $fn) {
+        $arg = $fn($arg);
+    }
+    return $arg;
 }
 
-function compose(...$fns) {
-    return pipe(...array_reverse($fns));
+function compose($arg, callable ...$optionalFns) {
+    foreach (array_reverse($optionalFns) as $fn) {
+        $arg = $fn($arg);
+    }
+    return $arg;
 }
 
-function stack($funcs, callable $last = null, callable $resolve = null) {
+function stack(array $funcs, callable $last = null, callable $resolve = null) {
     return function(...$args) use ($funcs, $resolve, $last) {
         return reduce(function($acc, $func) use ($resolve) {
             return function(...$args) use ($acc, $func, $resolve) {

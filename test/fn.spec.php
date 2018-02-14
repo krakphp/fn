@@ -11,7 +11,7 @@ function _idArgs(...$args) {
 
 describe('Fn', function() {
     it('can perform functional operations', function() {
-        $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
+        $res = Curried\compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
         expect($res)->equal([9, 12]);
     });
 
@@ -72,7 +72,7 @@ describe('Fn', function() {
             expect($res)->equal([1,2,3]);
         });
         it('can also be used as a constant', function() {
-            $res = compose(toArray, id)((function() {yield 1; yield 2; yield 3;})());
+            $res = Curried\compose(toArray, id)((function() {yield 1; yield 2; yield 3;})());
             expect($res)->equal([1,2,3]);
         });
     });
@@ -204,11 +204,25 @@ describe('Fn', function() {
             expect(toArray($res))->equal([0, 1]);
         });
     });
+    describe('takeWhile', function() {
+        docFn(takeWhile::class);
+        test('Takes elements from an iterable while the $predicate returns true', function() {
+            $res = takeWhile(Curried\op('>')(0), [2, 1, 0, 1, 2]);
+            expect(toArray($res))->equal([2,1]);
+        });
+    });
     describe('drop', function() {
         docFn(drop::class);
         test('Drops the first num items from an iterable', function() {
             $res = drop(2, range(0, 3));
             expect(toArray($res))->equal([2, 3]);
+        });
+    });
+    describe('dropWhile', function() {
+        docFn(dropWhile::class);
+        test('Drops elements from the iterable while the predicate returns true', function() {
+            $res = dropWhile(Curried\op('>')(0), [2, 1, 0, 1, 2]);
+            expect(toArray($res))->equal([0, 1, 2]);
         });
     });
     describe('op', function() {
@@ -274,8 +288,41 @@ INTRO;
             $sub4 = Curried\op('-')(4);
 
             // ((2 + 2) * 3) - 4
-            $res = compose($sub4, $mul3, $add2)(2);
+            $res = Curried\compose($sub4, $mul3, $add2)(2);
             expect($res)->equal(8);
+        });
+    });
+    describe('chunk', function() {
+        docFn(chunk::class);
+        test('Chunks an iterable into equal sized chunks.', function() {
+            $res = chunk(2, [1,2,3,4]);
+            expect(toArray($res))->equal([[1,2], [3,4]]);
+        });
+        test('If there is any remainder, it is yielded as is', function() {
+            $res = chunk(3, [1,2,3,4]);
+            expect(toArray($res))->equal([[1,2,3], [4]]);
+        });
+    });
+    describe('index', function() {
+        docFn(index::class);
+        test('Accesses an index in an array', function() {
+            $res = index('a', ['a' => 1]);
+            expect($res)->equal(1);
+        });
+        test('If no value exists at the given index, $else will be returned', function() {
+            $res = index('a', ['b' => 1], 2);
+            expect($res)->equal(2);
+        });
+    });
+    describe('indexIn', function() {
+        docFn(indexIn::class);
+        test('Accesses a nested index in a deep array structure', function() {
+            $res = indexIn(['a', 'b'], ['a' => ['b' => 1]]);
+            expect($res)->equal(1);
+        });
+        test('If any of the indexes do not exist, $else will be returned', function() {
+            $res = indexIn(['a', 'b'], ['a' => ['c' => 1]], 2);
+            expect($res)->equal(2);
         });
     });
 });

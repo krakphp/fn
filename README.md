@@ -90,9 +90,9 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td></tr><tr><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-drop">drop</a></td></tr><tr><td><a href="#api-krak-fn-op">op</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td></tr></table>
 
-<h3 id="api-krak-fn-curry">curry(callable $fn, $num = 1)</h3>
+<h3 id="api-krak-fn-curry">curry(callable $fn, int $num = 1)</h3>
 
 **Name:** `Krak\Fn\curry`
 
@@ -144,7 +144,7 @@ expect($fn())->equal([1, 2]);
 
 
 
-<h3 id="api-krak-fn-toarray">toArray($iter)</h3>
+<h3 id="api-krak-fn-toarray">toArray(iterable $iter): array</h3>
 
 **Name:** `Krak\Fn\toArray`
 
@@ -162,7 +162,7 @@ expect($res)->equal([1, 2, 3]);
 can also be used as a constant:
 
 ```php
-$res = compose(toArray, id)((function () {
+$res = Curried\compose(toArray, id)((function () {
     (yield 1);
     (yield 2);
     (yield 3);
@@ -172,7 +172,7 @@ expect($res)->equal([1, 2, 3]);
 
 
 
-<h3 id="api-krak-fn-toarraywithkeys">toArrayWithKeys($iter)</h3>
+<h3 id="api-krak-fn-toarraywithkeys">toArrayWithKeys(iterable $iter): array</h3>
 
 **Name:** `Krak\Fn\toArrayWithKeys`
 
@@ -188,7 +188,7 @@ expect(toArrayWithKeys($gen()))->equal(['a' => 1, 'b' => 2]);
 
 
 
-<h3 id="api-krak-fn-partition">partition(callable $partition, $data, $numParts = 2)</h3>
+<h3 id="api-krak-fn-partition">partition(callable $partition, iterable $iter, int $numParts = 2): array</h3>
 
 **Name:** `Krak\Fn\partition`
 
@@ -203,7 +203,7 @@ expect([$left, $right])->equal([[1, 2], [3, 4]]);
 
 
 
-<h3 id="api-krak-fn-filter">filter(callable $predicate, $data)</h3>
+<h3 id="api-krak-fn-filter">filter(callable $predicate, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\filter`
 
@@ -217,7 +217,7 @@ expect(toArray($values))->equal([3, 4]);
 
 
 
-<h3 id="api-krak-fn-map">map(callable $predicate, $data)</h3>
+<h3 id="api-krak-fn-map">map(callable $predicate, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\map`
 
@@ -230,7 +230,7 @@ expect(toArray($values))->equal([2, 4, 6, 8]);
 
 
 
-<h3 id="api-krak-fn-inarray">inArray(array $set, $item)</h3>
+<h3 id="api-krak-fn-inarray">inArray(array $set, $item): bool</h3>
 
 **Name:** `Krak\Fn\inArray`
 
@@ -275,7 +275,7 @@ expect($res)->equal(4);
 
 
 
-<h3 id="api-krak-fn-head">head($iterable)</h3>
+<h3 id="api-krak-fn-head">head(iterable $iter)</h3>
 
 **Name:** `Krak\Fn\head`
 
@@ -295,7 +295,7 @@ expect($res)->equal(null);
 
 
 
-<h3 id="api-krak-fn-topairs">toPairs($iterable)</h3>
+<h3 id="api-krak-fn-topairs">toPairs(iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\toPairs`
 
@@ -308,7 +308,7 @@ expect(toArray($res))->equal([['a', 1], ['b', 2]]);
 
 
 
-<h3 id="api-krak-fn-frompairs">fromPairs($iterable)</h3>
+<h3 id="api-krak-fn-frompairs">fromPairs(iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\fromPairs`
 
@@ -352,7 +352,7 @@ expect(function () {
 
 
 
-<h3 id="api-krak-fn-slice">slice(int $start, $data, $length = INF)</h3>
+<h3 id="api-krak-fn-slice">slice(int $start, iterable $iter, $length = INF): iterable</h3>
 
 **Name:** `Krak\Fn\slice`
 
@@ -372,7 +372,7 @@ expect(toArray($sliced))->equal([2, 3, 4]);
 
 
 
-<h3 id="api-krak-fn-take">take(int $num, $data)</h3>
+<h3 id="api-krak-fn-take">take(int $num, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\take`
 
@@ -385,7 +385,20 @@ expect(toArray($res))->equal([0, 1]);
 
 
 
-<h3 id="api-krak-fn-drop">drop(int $num, $data)</h3>
+<h3 id="api-krak-fn-takewhile">takeWhile(callable $predicate, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\takeWhile`
+
+Takes elements from an iterable while the $predicate returns true:
+
+```php
+$res = takeWhile(Curried\op('>')(0), [2, 1, 0, 1, 2]);
+expect(toArray($res))->equal([2, 1]);
+```
+
+
+
+<h3 id="api-krak-fn-drop">drop(int $num, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\drop`
 
@@ -398,7 +411,20 @@ expect(toArray($res))->equal([2, 3]);
 
 
 
-<h3 id="api-krak-fn-op">op($op, $b, $a)</h3>
+<h3 id="api-krak-fn-dropwhile">dropWhile(callable $predicate, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\dropWhile`
+
+Drops elements from the iterable while the predicate returns true:
+
+```php
+$res = dropWhile(Curried\op('>')(0), [2, 1, 0, 1, 2]);
+expect(toArray($res))->equal([0, 1, 2]);
+```
+
+
+
+<h3 id="api-krak-fn-op">op(string $op, $b, $a)</h3>
 
 **Name:** `Krak\Fn\op`
 
@@ -446,8 +472,68 @@ $add2 = Curried\op('+')(2);
 $mul3 = partial(op, '*', 3);
 $sub4 = Curried\op('-')(4);
 // ((2 + 2) * 3) - 4
-$res = compose($sub4, $mul3, $add2)(2);
+$res = Curried\compose($sub4, $mul3, $add2)(2);
 expect($res)->equal(8);
+```
+
+
+
+<h3 id="api-krak-fn-chunk">chunk(int $size, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\chunk`
+
+Chunks an iterable into equal sized chunks.:
+
+```php
+$res = chunk(2, [1, 2, 3, 4]);
+expect(toArray($res))->equal([[1, 2], [3, 4]]);
+```
+
+If there is any remainder, it is yielded as is:
+
+```php
+$res = chunk(3, [1, 2, 3, 4]);
+expect(toArray($res))->equal([[1, 2, 3], [4]]);
+```
+
+
+
+<h3 id="api-krak-fn-index">index($key, array $data, $else = null)</h3>
+
+**Name:** `Krak\Fn\index`
+
+Accesses an index in an array:
+
+```php
+$res = index('a', ['a' => 1]);
+expect($res)->equal(1);
+```
+
+If no value exists at the given index, $else will be returned:
+
+```php
+$res = index('a', ['b' => 1], 2);
+expect($res)->equal(2);
+```
+
+
+
+<h3 id="api-krak-fn-indexin">indexIn(array $keys, array $data, $else = null)</h3>
+
+**Name:** `Krak\Fn\indexIn`
+
+Accesses a nested index in a deep array structure:
+
+```php
+$res = indexIn(['a', 'b'], ['a' => ['b' => 1]]);
+expect($res)->equal(1);
+```
+
+If any of the indexes do not exist, $else will be returned:
+
+```php
+$res = indexIn(['a', 'b'], ['a' => ['c' => 1]], 2);
+expect($res)->equal(2);
 ```
 
 

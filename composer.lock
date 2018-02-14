@@ -61,12 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/krakphp/peridocs.git",
-                "reference": "5eb3a8e5ec43f2ca3b5fd7a713d9461c7741e161"
+                "reference": "ba1b4c642cff8177e9054e7d5a0b82cc7318ec9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krakphp/peridocs/zipball/5eb3a8e5ec43f2ca3b5fd7a713d9461c7741e161",
-                "reference": "5eb3a8e5ec43f2ca3b5fd7a713d9461c7741e161",
+                "url": "https://api.github.com/repos/krakphp/peridocs/zipball/ba1b4c642cff8177e9054e7d5a0b82cc7318ec9b",
+                "reference": "ba1b4c642cff8177e9054e7d5a0b82cc7318ec9b",
                 "shasum": ""
             },
             "require": {
@@ -104,7 +104,7 @@
                 "peridot",
                 "peridot-plugin"
             ],
-            "time": "2018-02-11T03:56:30+00:00"
+            "time": "2018-02-14T02:18:09+00:00"
         },
         {
             "name": "lavoiesl/php-benchmark",

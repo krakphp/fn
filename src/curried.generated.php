@@ -3,58 +3,6 @@
 /* This file is was automatically generated. */
 namespace Krak\Fn\Curried;
 
-function range($start, $step = null)
-{
-    return function ($end) use($start, $step) {
-        if ($start == $end) {
-            (yield $start);
-        } else {
-            if ($start < $end) {
-                $step = $step ?: 1;
-                if ($step <= 0) {
-                    throw new \InvalidArgumentException('Step must be greater than 0.');
-                }
-                for ($i = $start; $i <= $end; $i += $step) {
-                    (yield $i);
-                }
-            } else {
-                $step = $step ?: -1;
-                if ($step >= 0) {
-                    throw new \InvalidArgumentException('Step must be less than 0.');
-                }
-                for ($i = $start; $i >= $end; $i += $step) {
-                    (yield $i);
-                }
-            }
-        }
-    };
-}
-function take(int $num)
-{
-    return function ($data) use($num) {
-        return slice(0, $data, $num);
-    };
-}
-function drop(int $num)
-{
-    return function ($data) use($num) {
-        return slice($num, $data);
-    };
-}
-function slice(int $start, $length = INF)
-{
-    return function ($data) use($start, $length) {
-        assert($start >= 0);
-        $i = 0;
-        $end = $start + $length - 1;
-        foreach ($data as $k => $v) {
-            if ($start <= $i && $i <= $end) {
-                (yield $k => $v);
-            }
-            $i += 1;
-        }
-    };
-}
 function method($name, ...$optionalArgs)
 {
     return function ($data) use($name, $optionalArgs) {
@@ -97,23 +45,104 @@ function indexIn(array $keys, $else = null)
         return $data;
     };
 }
-function when(callable $if)
+function takeWhile(callable $predicate)
 {
-    return function (callable $then) use($if) {
-        return function ($value) use($then, $if) {
-            return $if($value) ? $then($value) : $value;
-        };
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $k => $v) {
+            if ($predicate($v)) {
+                (yield $k => $v);
+            } else {
+                return;
+            }
+        }
     };
 }
-function without(array $fields)
+function dropWhile(callable $predicate)
 {
-    return function ($data) use($fields) {
-        return fromPairs(filter(function ($tup) use($fields) {
-            return !\in_array($tup[0], $fields);
-        }, toPairs($data)));
+    return function (iterable $iter) use($predicate) {
+        $stillDropping = true;
+        foreach ($iter as $k => $v) {
+            if ($stillDropping && $predicate($v)) {
+                continue;
+            } else {
+                if ($stillDropping) {
+                    $stillDropping = false;
+                }
+            }
+            (yield $k => $v);
+        }
     };
 }
-function op($op)
+function take(int $num)
+{
+    return function (iterable $iter) use($num) {
+        return slice(0, $iter, $num);
+    };
+}
+function drop(int $num)
+{
+    return function (iterable $iter) use($num) {
+        return slice($num, $iter);
+    };
+}
+function slice(int $start, $length = INF)
+{
+    return function (iterable $iter) use($start, $length) {
+        assert($start >= 0);
+        $i = 0;
+        $end = $start + $length - 1;
+        foreach ($iter as $k => $v) {
+            if ($start <= $i && $i <= $end) {
+                (yield $k => $v);
+            }
+            $i += 1;
+        }
+    };
+}
+function chunk(int $size)
+{
+    return function (iterable $iter) use($size) {
+        assert($size > 0);
+        $chunk = [];
+        foreach ($iter as $v) {
+            $chunk[] = $v;
+            if (\count($chunk) == $size) {
+                (yield $chunk);
+                $chunk = [];
+            }
+        }
+        if ($chunk) {
+            (yield $chunk);
+        }
+    };
+}
+function range($start, $step = null)
+{
+    return function ($end) use($start, $step) {
+        if ($start == $end) {
+            (yield $start);
+        } else {
+            if ($start < $end) {
+                $step = $step ?: 1;
+                if ($step <= 0) {
+                    throw new \InvalidArgumentException('Step must be greater than 0.');
+                }
+                for ($i = $start; $i <= $end; $i += $step) {
+                    (yield $i);
+                }
+            } else {
+                $step = $step ?: -1;
+                if ($step >= 0) {
+                    throw new \InvalidArgumentException('Step must be less than 0.');
+                }
+                for ($i = $start; $i >= $end; $i += $step) {
+                    (yield $i);
+                }
+            }
+        }
+    };
+}
+function op(string $op)
 {
     return function ($b) use($op) {
         return function ($a) use($b, $op) {
@@ -121,8 +150,13 @@ function op($op)
                 case '==':
                 case 'eq':
                     return $a == $b;
+                case '!=':
+                case 'neq':
+                    return $a != $b;
                 case '===':
                     return $a === $b;
+                case '!==':
+                    return $a !== $b;
                 case '>':
                 case 'gt':
                     return $a > $b;
@@ -153,6 +187,39 @@ function op($op)
         };
     };
 }
+function flatMap(callable $map)
+{
+    return function (iterable $iter) use($map) {
+        foreach ($iter as $k => $v) {
+            foreach ($map($v) as $k => $v) {
+                (yield $k => $v);
+            }
+        }
+    };
+}
+function flatten($levels = INF)
+{
+    return function (iterable $iter) use($levels) {
+    };
+}
+function when(callable $if)
+{
+    return function (callable $then) use($if) {
+        return function ($value) use($then, $if) {
+            return $if($value) ? $then($value) : $value;
+        };
+    };
+}
+function without(array $fields)
+{
+    return function (iterable $iter) use($fields) {
+        foreach ($iter as $k => $v) {
+            if (!\in_array($k, $fields)) {
+                (yield $k => $v);
+            }
+        }
+    };
+}
 function inArray(array $set)
 {
     return function ($item) use($set) {
@@ -161,8 +228,8 @@ function inArray(array $set)
 }
 function all(callable $predicate)
 {
-    return function ($data) use($predicate) {
-        foreach ($data as $key => $value) {
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $key => $value) {
             if (!$predicate($value)) {
                 return false;
             }
@@ -172,13 +239,23 @@ function all(callable $predicate)
 }
 function any(callable $predicate)
 {
-    return function ($data) use($predicate) {
-        foreach ($data as $key => $value) {
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $key => $value) {
             if ($predicate($value)) {
                 return true;
             }
         }
         return false;
+    };
+}
+function search(callable $predicate)
+{
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $value) {
+            if ($predicate($value)) {
+                return $value;
+            }
+        }
     };
 }
 function trans(callable $trans)
@@ -201,46 +278,36 @@ function isInstance($class)
         return $item instanceof $class;
     };
 }
-function partition(callable $partition, $numParts = 2)
+function partition(callable $partition, int $numParts = 2)
 {
-    return function ($data) use($partition, $numParts) {
+    return function (iterable $iter) use($partition, $numParts) {
         $parts = array_fill(0, $numParts, []);
-        foreach ($data as $val) {
+        foreach ($iter as $val) {
             $index = (int) $partition($val);
             $parts[$index][] = $val;
         }
         return $parts;
     };
 }
-function search(callable $predicate)
-{
-    return function ($data) use($predicate) {
-        foreach ($data as $value) {
-            if ($predicate($value)) {
-                return $value;
-            }
-        }
-    };
-}
 function map(callable $predicate)
 {
-    return function ($data) use($predicate) {
-        foreach ($data as $key => $value) {
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $key => $value) {
             (yield $key => $predicate($value));
         }
     };
 }
 function mapKeys(callable $predicate)
 {
-    return function ($data) use($predicate) {
-        foreach ($data as $key => $value) {
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $key => $value) {
             (yield $predicate($key) => $value);
         }
     };
 }
 function reduce(callable $reduce, $acc = null)
 {
-    return function ($data) use($reduce, $acc) {
+    return function (iterable $iter) use($reduce, $acc) {
         foreach ($data as $key => $value) {
             $acc = $reduce($acc, $value);
         }
@@ -249,8 +316,8 @@ function reduce(callable $reduce, $acc = null)
 }
 function filter(callable $predicate)
 {
-    return function ($data) use($predicate) {
-        foreach ($data as $key => $value) {
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $key => $value) {
             if ($predicate($value)) {
                 (yield $key => $value);
             }
@@ -259,7 +326,7 @@ function filter(callable $predicate)
 }
 function filterKeys(callable $predicate)
 {
-    return function ($data) use($predicate) {
+    return function (iterable $iter) use($predicate) {
         foreach ($data as $key => $value) {
             if ($predicate($key)) {
                 (yield $key => $value);
@@ -283,9 +350,27 @@ function partial(callable $fn)
         };
     };
 }
+function pipe(callable ...$optionalFns)
+{
+    return function ($arg) use($optionalFns) {
+        foreach ($optionalFns as $fn) {
+            $arg = $fn($arg);
+        }
+        return $arg;
+    };
+}
+function compose(callable ...$optionalFns)
+{
+    return function ($arg) use($optionalFns) {
+        foreach (array_reverse($optionalFns) as $fn) {
+            $arg = $fn($arg);
+        }
+        return $arg;
+    };
+}
 function stack(callable $last = null, callable $resolve = null)
 {
-    return function ($funcs) use($last, $resolve) {
+    return function (array $funcs) use($last, $resolve) {
         return function (...$args) use($funcs, $resolve, $last) {
             return reduce(function ($acc, $func) use($resolve) {
                 return function (...$args) use($acc, $func, $resolve) {
