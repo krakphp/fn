@@ -336,5 +336,12 @@ INTRO;
             expect(toArray($res))->equal([1, 2, [3]]);
         });
     });
+    describe('chain', function() {
+        docFn(chain::class);
+        test('Chains iterables together into one iterable', function() {
+            $res = chain([1], range(2, 3));
+            expect(toArray($res))->equal([1,2,3]);
+        });
+    });
 });
 
