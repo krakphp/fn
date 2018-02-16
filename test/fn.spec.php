@@ -82,6 +82,17 @@ describe('Fn', function() {
             expect(toArray($values))->equal([3,4]);
         });
     });
+    describe('filterKeys', function() {
+        docFn(filterKeys::class);
+        test('Filters an iterable off of the keys', function() {
+            $res = filterKeys(Curried\inArray(['a', 'b']), [
+                'a' => 1,
+                'b' => 2,
+                'c' => 3,
+            ]);
+            expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
+        });
+    });
     describe('flatten', function() {
         docFn(flatten::class);
         test('Flattens nested iterables into a flattened set of elements', function() {
@@ -286,6 +297,15 @@ INTRO;
             expect(function() {
                 toArray(range(2, 1, 1));
             })->throw(\InvalidArgumentException::class);
+        });
+    });
+    describe('reduce', function() {
+        docFn(reduce::class);
+        test('Reduces an iterable into a single value', function() {
+            $res = reduce(function($acc, $v) {
+                return $acc + $v;
+            }, range(1,3), 0);
+            expect($res)->equal(6);
         });
     });
     describe('slice', function() {

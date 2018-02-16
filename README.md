@@ -89,7 +89,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td></tr><tr><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-partial">partial</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td></tr><tr><td><a href="#api-krak-fn-when">when</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td></tr><tr><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td></tr><tr><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td></tr><tr><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-when">when</a></td></tr></table>
 
 <h3 id="api-krak-fn-chain">chain(iterable ...$iters)</h3>
 
@@ -173,6 +173,19 @@ Lazily filters an iterable off of a predicate that should return true or false. 
 $values = filter(partial(op, '>', 2), [1, 2, 3, 4]);
 // keep all items that are greater than 2
 expect(toArray($values))->equal([3, 4]);
+```
+
+
+
+<h3 id="api-krak-fn-filterkeys">filterKeys(callable $predicate, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\filterKeys`
+
+Filters an iterable off of the keys:
+
+```php
+$res = filterKeys(Curried\inArray(['a', 'b']), ['a' => 1, 'b' => 2, 'c' => 3]);
+expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
 ```
 
 
@@ -447,6 +460,21 @@ expect(function () {
 expect(function () {
     toArray(range(2, 1, 1));
 })->throw(\InvalidArgumentException::class);
+```
+
+
+
+<h3 id="api-krak-fn-reduce">reduce(callable $reduce, iterable $iter, $acc = null)</h3>
+
+**Name:** `Krak\Fn\reduce`
+
+Reduces an iterable into a single value:
+
+```php
+$res = reduce(function ($acc, $v) {
+    return $acc + $v;
+}, range(1, 3), 0);
+expect($res)->equal(6);
 ```
 
 

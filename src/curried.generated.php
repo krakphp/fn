@@ -333,7 +333,7 @@ function mapKeys(callable $predicate)
 function reduce(callable $reduce, $acc = null)
 {
     return function (iterable $iter) use($reduce, $acc) {
-        foreach ($data as $key => $value) {
+        foreach ($iter as $key => $value) {
             $acc = $reduce($acc, $value);
         }
         return $acc;
@@ -352,7 +352,7 @@ function filter(callable $predicate)
 function filterKeys(callable $predicate)
 {
     return function (iterable $iter) use($predicate) {
-        foreach ($data as $key => $value) {
+        foreach ($iter as $key => $value) {
             if ($predicate($key)) {
                 (yield $key => $value);
             }
