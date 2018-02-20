@@ -89,7 +89,7 @@ the curried verison would look like:
 ```
 
 ## API
-<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td></tr><tr><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td></tr><tr><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td></tr><tr><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-when">when</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td></tr><tr><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td></tr><tr><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-when">when</a></td></tr></table>
 
 <h3 id="api-krak-fn-chain">chain(iterable ...$iters)</h3>
 
@@ -219,6 +219,26 @@ Converts an iterable of tuples [$key, $value] into an associative iterable:
 ```php
 $res = fromPairs([['a', 1], ['b', 2]]);
 expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
+```
+
+
+
+<h3 id="api-krak-fn-hasindexin">hasIndexIn(array $keys, array $data): bool</h3>
+
+**Name:** `Krak\Fn\hasIndexIn`
+
+Checks if a nested index exists in the given data:
+
+```php
+$res = hasIndexIn(['a', 'b', 'c'], ['a' => ['b' => ['c' => null]]]);
+expect($res)->equal(true);
+```
+
+Returns false if any of the indexes do not exist in the data:
+
+```php
+$res = hasIndexIn(['a', 'b', 'c'], ['a' => ['b' => []]]);
+expect($res)->equal(false);
 ```
 
 
@@ -578,6 +598,32 @@ Transforms an associative array into an iterable of tuples [$key, $value]:
 ```php
 $res = toPairs(['a' => 1, 'b' => 2]);
 expect(toArray($res))->equal([['a', 1], ['b', 2]]);
+```
+
+
+
+<h3 id="api-krak-fn-updateindexin">updateIndexIn(array $keys, callable $update, array $data): array</h3>
+
+**Name:** `Krak\Fn\updateIndexIn`
+
+Updates a nested element within a deep array structure:
+
+```php
+$data = ['a' => ['b' => ['c' => 3]]];
+$data = updateIndexIn(['a', 'b', 'c'], function ($v) {
+    return $v * $v;
+}, $data);
+expect($data)->equal(['a' => ['b' => ['c' => 9]]]);
+```
+
+Throws an exception if nested key does not exist:
+
+```php
+expect(function () {
+    $data = ['a' => ['b' => ['c' => 9]]];
+    updateIndexIn(['a', 'c', 'c'], function () {
+    }, $data);
+})->throw(\RuntimeException::class, 'Could not updateIn because the keys a -> c -> c could not be found.');
 ```
 
 

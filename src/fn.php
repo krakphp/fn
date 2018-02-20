@@ -28,12 +28,38 @@ function propIn(array $keys, /* object */ $data, $else = null) {
 
 function indexIn(array $keys, array $data, $else = null) {
     foreach ($keys as $part) {
-        if (!is_array($data) || !array_key_exists($part, $data)) {
+        if (!\is_array($data) || !\array_key_exists($part, $data)) {
             return $else;
         }
 
         $data = $data[$part];
     }
+
+    return $data;
+}
+
+function hasIndexIn(array $keys, array $data): bool {
+    foreach ($keys as $key) {
+        if (!\is_array($data) || !\array_key_exists($key, $data)) {
+            return false;
+        }
+        $data = $data[$key];
+    }
+
+    return true;
+}
+
+function updateIndexIn(array $keys, callable $update, array $data): array {
+    $curData = &$data;
+    foreach (\array_slice($keys, 0, -1) as $key) {
+        if (!\array_key_exists($key, $curData)) {
+            throw new \RuntimeException('Could not updateIn because the keys ' . implode(' -> ', $keys) . ' could not be found.');
+        }
+        $curData = &$curData[$key];
+    }
+
+    $lastKey = $keys[count($keys) - 1];
+    $curData[$lastKey] = $update($curData[$lastKey] ?? null);
 
     return $data;
 }

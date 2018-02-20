@@ -37,12 +37,41 @@ function indexIn(array $keys, $else = null)
 {
     return function (array $data) use($keys, $else) {
         foreach ($keys as $part) {
-            if (!is_array($data) || !array_key_exists($part, $data)) {
+            if (!\is_array($data) || !\array_key_exists($part, $data)) {
                 return $else;
             }
             $data = $data[$part];
         }
         return $data;
+    };
+}
+function hasIndexIn(array $keys)
+{
+    return function (array $data) use($keys) {
+        foreach ($keys as $key) {
+            if (!\is_array($data) || !\array_key_exists($key, $data)) {
+                return false;
+            }
+            $data = $data[$key];
+        }
+        return true;
+    };
+}
+function updateIndexIn(array $keys)
+{
+    return function (callable $update) use($keys) {
+        return function (array $data) use($update, $keys) {
+            $curData =& $data;
+            foreach (\array_slice($keys, 0, -1) as $key) {
+                if (!\array_key_exists($key, $curData)) {
+                    throw new \RuntimeException('Could not updateIn because the keys ' . implode(' -> ', $keys) . ' could not be found.');
+                }
+                $curData =& $curData[$key];
+            }
+            $lastKey = $keys[count($keys) - 1];
+            $curData[$lastKey] = $update($curData[$lastKey] ?? null);
+            return $data;
+        };
     };
 }
 function takeWhile(callable $predicate)

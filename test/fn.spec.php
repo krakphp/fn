@@ -117,6 +117,24 @@ describe('Fn', function() {
             ]);
         });
     });
+    describe('hasIndexIn', function() {
+        docFn(hasIndexIn::class);
+
+        test('Checks if a nested index exists in the given data', function() {
+            $res = hasIndexIn(['a', 'b', 'c'], [
+                'a' => ['b' => ['c' => null]]
+            ]);
+
+            expect($res)->equal(true);
+        });
+        test('Returns false if any of the indexes do not exist in the data', function() {
+            $res = hasIndexIn(['a', 'b', 'c'], [
+                'a' => ['b' => []]
+            ]);
+
+            expect($res)->equal(false);
+        });
+    });
     describe('head', function() {
         docFn(head::class);
         test('Returns the fist element in an iterable', function() {
@@ -362,6 +380,25 @@ INTRO;
                 ['a', 1],
                 ['b', 2]
             ]);
+        });
+    });
+    describe('updateIndexIn', function() {
+        docFn(updateIndexIn::class);
+
+        test('Updates a nested element within a deep array structure', function() {
+            $data = ['a' => ['b' => ['c' => 3]]];
+
+            $data = updateIndexIn(['a', 'b', 'c'], function($v) {
+                return $v * $v;
+            }, $data);
+
+            expect($data)->equal(['a' => ['b' => ['c' => 9]]]);
+        });
+        test('Throws an exception if nested key does not exist', function() {
+            expect(function() {
+                $data = ['a' => ['b' => ['c' => 9]]];
+                updateIndexIn(['a', 'c', 'c'], function() {}, $data);
+            })->throw(\RuntimeException::class, 'Could not updateIn because the keys a -> c -> c could not be found.');
         });
     });
     describe('when', function() {
