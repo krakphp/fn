@@ -75,6 +75,21 @@ describe('Fn', function() {
             expect(toArray($res))->equal([0, 1, 2]);
         });
     });
+    describe('each', function() {
+        docFn(each::class);
+        test('Invokes a callable on each item in an iterable', function() {
+            $state = [
+                (object) ['id' => 1],
+                (object) ['id' => 2],
+            ];
+            each(function($item) {
+                $item->id += 1;
+            }, $state);
+
+            expect([$state[0]->id, $state[1]->id])->equal([2,3]);
+        });
+        docOutro('Normally using php foreach should suffice for iterating over an iterable; however, php variables in foreach loops are not scoped whereas closures are.');
+    });
     describe('filter', function() {
         docFn(filter::class);
         it('Lazily filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable', function() {
@@ -102,6 +117,13 @@ describe('Fn', function() {
         test('Can flatten a specific number of levels', function() {
             $res = flatten([1,[2, [3]]], 1);
             expect(toArray($res))->equal([1, 2, [3]]);
+        });
+    });
+    describe('flip', function() {
+        docFn(flip::class);
+        test('Flips the keys => values of an iterable to values => keys', function() {
+            $res = flip(['a' => 0, 'b' => 1]);
+            expect(toArray($res))->equal(['a', 'b']);
         });
     });
     describe('fromPairs', function() {
@@ -175,6 +197,46 @@ describe('Fn', function() {
             expect($res)->equal(2);
         });
     });
+    describe('iter', function() {
+        docFn(iter::class);
+        docIntro('Converts any iterable into a proper instance of Iterator.');
+        test('Can convert arrays', function() {
+            expect(iter([1,2,3]))->instanceof('Iterator');
+        });
+        test('Can convert an Iterator', function() {
+            expect(iter(new \ArrayIterator([1,2,3])))->instanceof('Iterator');
+        });
+        test('Can convert objects', function() {
+            $obj = (object) ['a' => 1, 'b' => 2];
+            expect(iter($obj))->instanceof('Iterator');
+            expect(toArrayWithKeys(iter($obj)))->equal(['a' => 1, 'b' => 2]);
+        });
+        test('Can convert any iterable', function() {
+            $a = new class() implements \IteratorAggregate {
+                public function getIterator() {
+                    return new \ArrayIterator([1,2,3]);
+                }
+            };
+            expect(iter($a))->instanceof('Iterator');
+            expect(toArray(iter($a)))->equal([1,2,3]);
+        });
+        test('Can convert strings', function() {
+            expect(iter('abc'))->instanceof('Iterator');
+            expect(toArray(iter('abc')))->equal(['a', 'b', 'c']);
+        });
+        test('Will throw an exception otherwise', function() {
+            expect(function() {
+                iter(1);
+            })->throw('LogicException', 'Iter could not be converted into an iterable.');
+        });
+    });
+    describe('keys', function() {
+        docFn(keys::class);
+        test('Yields only the keys of an in iterable', function() {
+            $keys = keys(['a' => 1, 'b' => 2]);
+            expect(toArray($keys))->equal(['a', 'b']);
+        });
+    });
     describe('map', function() {
         docFn(map::class);
         it('Lazily maps an iterable\'s values to a different set', function() {
@@ -182,8 +244,31 @@ describe('Fn', function() {
             expect(toArray($values))->equal([2,4,6,8]);
         });
     });
+    describe('mapKeys', function() {
+        docFn(mapKeys::class);
+        it('Lazily maps an iterable\'s keys to a different set', function() {
+            $keys = mapKeys(partial(op, '.', '_'), ['a' => 1, 'b' => 2]);
+            expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 2]);
+        });
+    });
+    describe('mapOn', function() {
+        docFn(mapOn::class);
+        it('Maps values on specific keys', function() {
+            $values = mapOn([
+                'a' => partial(op, '*', 3),
+                'b' => partial(op, '+', 1),
+            ], [
+                'a' => 1,
+                'b' => 2,
+                'c' => 3,
+            ]);
+
+            expect(toArray($values))->equal([3,3,3]);
+        });
+    });
     describe('onEach', function() {
         docFn(onEach::class);
+        docIntro('Duplicate of each.');
         test('Invokes a callable on each item in an iterable', function() {
             $state = [
                 (object) ['id' => 1],
@@ -239,14 +324,15 @@ INTRO;
                 expect($res)->equal(true);
             }
         });
-        test('Supports arithmetic operators', function() {
+        test('Supports other operators', function() {
             $ops = [
                 ['+', [2, 3], 5],
                 ['-', [2, 3], 1],
                 ['*', [2, 3], 6],
                 ['**', [2, 3], 9],
                 ['/', [2, 3], 1.5],
-                ['%', [2, 3], 1]
+                ['%', [2, 3], 1],
+                ['.', ['b', 'a'], 'ab'],
             ];
 
             foreach ($ops as list($op, list($b, $a), $expected)) {
@@ -401,6 +487,13 @@ INTRO;
             })->throw(\RuntimeException::class, 'Could not updateIn because the keys a -> c -> c could not be found.');
         });
     });
+    describe('values', function() {
+        docFn(values::class);
+        test('Exports only the values of an iterable', function() {
+            $res = values(['a' => 1, 'b' => 2]);
+            expect(toArrayWithKeys($res))->equal([1,2]);
+        });
+    });
     describe('when', function() {
         docFn(when::class);
         it('Evaluates the given value with the $then callable if the predicate returns true', function() {
@@ -414,6 +507,20 @@ INTRO;
             $then = function($v) { return $v * $v; };
             $res = when($if, $then, 4);
             expect($res)->equal(4);
+        });
+    });
+    describe('zip', function() {
+        docFn(zip::class);
+        test('Zips multiple iterables into an iterable n-tuples', function() {
+            $res = zip(iter('abc'), range(1,3), [4,5,6]);
+            expect(toArray($res))->equal([
+                ['a', 1, 4],
+                ['b', 2, 5],
+                ['c', 3, 6],
+            ]);
+        });
+        test('Returns an empty iterable if no iters are present', function() {
+            expect(toArray(zip()))->equal([]);
         });
     });
 });

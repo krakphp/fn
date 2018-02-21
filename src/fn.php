@@ -196,6 +196,8 @@ function op(string $op, $b, $a) {
         return $a / $b;
     case '%':
         return $a % $b;
+    case '.':
+        return $a . $b;
     default:
         throw new \LogicException('Invalid operator '.$op);
     }
@@ -222,13 +224,31 @@ function orf(callable ...$fns) {
     };
 }
 
-
-
 function chain(iterable ...$iters) {
     foreach ($iters as $iter) {
         foreach ($iter as $k => $v) {
             yield $k => $v;
         }
+    }
+}
+
+function zip(iterable ...$iters): \Iterator {
+    if (count($iters) == 0) {
+        return;
+    }
+
+    $iters = \array_map(iter::class, $iters);
+
+    while (true) {
+        $tup = [];
+        foreach ($iters as $iter) {
+            if (!$iter->valid()) {
+                return;
+            }
+            $tup[] = $iter->current();
+            $iter->next();
+        }
+        yield $tup;
     }
 }
 
@@ -357,6 +377,16 @@ function mapKeys(callable $predicate, iterable $iter): iterable {
     }
 }
 
+function mapOn(array $maps, iterable $iter): iterable {
+    foreach ($iter as $key => $value) {
+        if (isset($maps[$key])) {
+            yield $key => $maps[$key]($value);
+        } else {
+            yield $key => $value;
+        }
+    }
+}
+
 function reduce(callable $reduce, iterable $iter, $acc = null) {
     foreach ($iter as $key => $value) {
         $acc = $reduce($acc, $value);
@@ -376,6 +406,24 @@ function filterKeys(callable $predicate, iterable $iter): iterable {
         if ($predicate($key)) {
             yield $key => $value;
         }
+    }
+}
+
+function values(iterable $iter): \Iterator {
+    foreach ($iter as $v) {
+        yield $v;
+    }
+}
+
+function keys(iterable $iter): \Iterator {
+    foreach ($iter as $k => $v) {
+        yield $k;
+    }
+}
+
+function flip(iterable $iter) {
+    foreach ($iter as $k => $v) {
+        yield $v => $k;
     }
 }
 
@@ -479,8 +527,36 @@ function stack(array $funcs, callable $last = null, callable $resolve = null) {
     };
 }
 
+function each(callable $handle, iterable $iter) {
+    foreach ($iter as $v) {
+        $handle($v);
+    }
+}
+/** @deprecated */
 function onEach(callable $handle, iterable $iter) {
     foreach ($iter as $v) {
         $handle($v);
     }
+}
+
+function iter($iter): \Iterator {
+    if (\is_array($iter)) {
+        return new \ArrayIterator($iter);
+    } else if ($iter instanceof \Iterator) {
+        return $iter;
+    } else if (\is_object($iter) || \is_iterable($iter)) {
+        return (function($iter) {
+            foreach ($iter as $key => $value) {
+                yield $key => $value;
+            }
+        })($iter);
+    } else if (\is_string($iter)) {
+        return (function($s) {
+            for ($i = 0; $i < strlen($s); $i++) {
+                yield $i => $s[$i];
+            }
+        })($iter);
+    }
+
+    throw new \LogicException('Iter could not be converted into an iterable.');
 }

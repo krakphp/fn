@@ -43,6 +43,8 @@ function main() {
     $pp = new PrettyPrinter\Standard();
     file_put_contents(__DIR__ . '/src/consts.generated.php', $pp->prettyPrintFile($ast));
 
+    $ast[0]->name->parts[] = 'Consts';
+    file_put_contents(__DIR__ . '/src/consts.ns.generated.php', $pp->prettyPrintFile($ast));
 }
 
 main();

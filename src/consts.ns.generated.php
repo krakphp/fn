@@ -1,7 +1,7 @@
 <?php
 
 /* This file is was automatically generated. */
-namespace Krak\Fn;
+namespace Krak\Fn\Consts;
 
 const method = 'Krak\\Fn\\method';
 const prop = 'Krak\\Fn\\prop';

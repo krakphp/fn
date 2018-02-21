@@ -8,7 +8,7 @@ Install with composer at `krak/fn`
 
 ## Usage
 
-All functions are defined in `Krak\Fn`, are not curried, and are data last. Curried versions of functions are defined `Kran\Fn\Curried`. Constants are also generated per function in `Krak\Fn`.
+All functions are defined in `Krak\Fn`, are not curried, and are data last. Curried versions of functions are defined `Kran\Fn\Curried`. Constants are also generated per function in `Krak\Fn` and `Krak\Fn\Consts`.
 
 ```php
 <?php
@@ -88,8 +88,30 @@ the curried verison would look like:
 (a, c = null) -> (b) -> Void
 ```
 
+### Importing
+
+I've found the most practical way to import functions and constants from the Fn library is as follows:
+
+```php
+<?php
+
+use Krak\Fn\{Curried as c, Consts as cn};
+use function Krak\Fn\{compose, zip};
+
+
+$res = compose(
+    cn\toArray,
+    cn\fromPairs,
+    c\map(function($tup) {
+        return [$tup[0], $tup[1] * $tup[1]];
+    }),
+)(zip(['a', 'b', 'c'], [1,2,3]))
+```
+
+This way, all constants and curried functions are easily available, easy to read in the source, while giving you the ability to import any one off of functions.
+
 ## API
-<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td></tr><tr><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td></tr><tr><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-when">when</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-each">each</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td></tr><tr><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-flip">flip</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td></tr><tr><td><a href="#api-krak-fn-iter">iter</a></td><td><a href="#api-krak-fn-keys">keys</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-mapkeys">mapKeys</a></td><td><a href="#api-krak-fn-mapon">mapOn</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-partial">partial</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-values">values</a></td><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-zip">zip</a></td></tr></table>
 
 <h3 id="api-krak-fn-chain">chain(iterable ...$iters)</h3>
 
@@ -163,6 +185,22 @@ expect(toArray($res))->equal([0, 1, 2]);
 
 
 
+<h3 id="api-krak-fn-each">each(callable $handle, iterable $iter)</h3>
+
+**Name:** `Krak\Fn\each`
+
+Invokes a callable on each item in an iterable:
+
+```php
+$state = [(object) ['id' => 1], (object) ['id' => 2]];
+each(function ($item) {
+    $item->id += 1;
+}, $state);
+expect([$state[0]->id, $state[1]->id])->equal([2, 3]);
+```
+
+Normally using php foreach should suffice for iterating over an iterable; however, php variables in foreach loops are not scoped whereas closures are.
+
 <h3 id="api-krak-fn-filter">filter(callable $predicate, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\filter`
@@ -206,6 +244,19 @@ Can flatten a specific number of levels:
 ```php
 $res = flatten([1, [2, [3]]], 1);
 expect(toArray($res))->equal([1, 2, [3]]);
+```
+
+
+
+<h3 id="api-krak-fn-flip">flip(iterable $iter)</h3>
+
+**Name:** `Krak\Fn\flip`
+
+Flips the keys => values of an iterable to values => keys:
+
+```php
+$res = flip(['a' => 0, 'b' => 1]);
+expect(toArray($res))->equal(['a', 'b']);
 ```
 
 
@@ -316,6 +367,76 @@ expect($res)->equal(2);
 
 
 
+<h3 id="api-krak-fn-iter">iter($iter): \Iterator</h3>
+
+**Name:** `Krak\Fn\iter`
+
+Converts any iterable into a proper instance of Iterator.
+
+Can convert arrays:
+
+```php
+expect(iter([1, 2, 3]))->instanceof('Iterator');
+```
+
+Can convert an Iterator:
+
+```php
+expect(iter(new \ArrayIterator([1, 2, 3])))->instanceof('Iterator');
+```
+
+Can convert objects:
+
+```php
+$obj = (object) ['a' => 1, 'b' => 2];
+expect(iter($obj))->instanceof('Iterator');
+expect(toArrayWithKeys(iter($obj)))->equal(['a' => 1, 'b' => 2]);
+```
+
+Can convert any iterable:
+
+```php
+$a = new class implements \IteratorAggregate
+{
+    public function getIterator()
+    {
+        return new \ArrayIterator([1, 2, 3]);
+    }
+};
+expect(iter($a))->instanceof('Iterator');
+expect(toArray(iter($a)))->equal([1, 2, 3]);
+```
+
+Can convert strings:
+
+```php
+expect(iter('abc'))->instanceof('Iterator');
+expect(toArray(iter('abc')))->equal(['a', 'b', 'c']);
+```
+
+Will throw an exception otherwise:
+
+```php
+expect(function () {
+    iter(1);
+})->throw('LogicException', 'Iter could not be converted into an iterable.');
+```
+
+
+
+<h3 id="api-krak-fn-keys">keys(iterable $iter): \Iterator</h3>
+
+**Name:** `Krak\Fn\keys`
+
+Yields only the keys of an in iterable:
+
+```php
+$keys = keys(['a' => 1, 'b' => 2]);
+expect(toArray($keys))->equal(['a', 'b']);
+```
+
+
+
 <h3 id="api-krak-fn-map">map(callable $predicate, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\map`
@@ -329,9 +450,37 @@ expect(toArray($values))->equal([2, 4, 6, 8]);
 
 
 
+<h3 id="api-krak-fn-mapkeys">mapKeys(callable $predicate, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\mapKeys`
+
+Lazily maps an iterable's keys to a different set:
+
+```php
+$keys = mapKeys(partial(op, '.', '_'), ['a' => 1, 'b' => 2]);
+expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 2]);
+```
+
+
+
+<h3 id="api-krak-fn-mapon">mapOn(array $maps, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\mapOn`
+
+Maps values on specific keys:
+
+```php
+$values = mapOn(['a' => partial(op, '*', 3), 'b' => partial(op, '+', 1)], ['a' => 1, 'b' => 2, 'c' => 3]);
+expect(toArray($values))->equal([3, 3, 3]);
+```
+
+
+
 <h3 id="api-krak-fn-oneach">onEach(callable $handle, iterable $iter)</h3>
 
 **Name:** `Krak\Fn\onEach`
+
+Duplicate of each.
 
 Invokes a callable on each item in an iterable:
 
@@ -376,10 +525,10 @@ foreach ($ops as list($op, list($b, $a))) {
 }
 ```
 
-Supports arithmetic operators:
+Supports other operators:
 
 ```php
-$ops = [['+', [2, 3], 5], ['-', [2, 3], 1], ['*', [2, 3], 6], ['**', [2, 3], 9], ['/', [2, 3], 1.5], ['%', [2, 3], 1]];
+$ops = [['+', [2, 3], 5], ['-', [2, 3], 1], ['*', [2, 3], 6], ['**', [2, 3], 9], ['/', [2, 3], 1.5], ['%', [2, 3], 1], ['.', ['b', 'a'], 'ab']];
 foreach ($ops as list($op, list($b, $a), $expected)) {
     $res = op($op, $b, $a);
     expect($res)->equal($expected);
@@ -628,6 +777,19 @@ expect(function () {
 
 
 
+<h3 id="api-krak-fn-values">values(iterable $iter): \Iterator</h3>
+
+**Name:** `Krak\Fn\values`
+
+Exports only the values of an iterable:
+
+```php
+$res = values(['a' => 1, 'b' => 2]);
+expect(toArrayWithKeys($res))->equal([1, 2]);
+```
+
+
+
 <h3 id="api-krak-fn-when">when(callable $if, callable $then, $value)</h3>
 
 **Name:** `Krak\Fn\when`
@@ -656,6 +818,25 @@ $then = function ($v) {
 };
 $res = when($if, $then, 4);
 expect($res)->equal(4);
+```
+
+
+
+<h3 id="api-krak-fn-zip">zip(iterable ...$iters): \Iterator</h3>
+
+**Name:** `Krak\Fn\zip`
+
+Zips multiple iterables into an iterable n-tuples:
+
+```php
+$res = zip(iter('abc'), range(1, 3), [4, 5, 6]);
+expect(toArray($res))->equal([['a', 1, 4], ['b', 2, 5], ['c', 3, 6]]);
+```
+
+Returns an empty iterable if no iters are present:
+
+```php
+expect(toArray(zip()))->equal([]);
 ```
 
 

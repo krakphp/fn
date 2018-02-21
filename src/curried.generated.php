@@ -210,6 +210,8 @@ function op(string $op)
                     return $a / $b;
                 case '%':
                     return $a % $b;
+                case '.':
+                    return $a . $b;
                 default:
                     throw new \LogicException('Invalid operator ' . $op);
             }
@@ -359,6 +361,18 @@ function mapKeys(callable $predicate)
         }
     };
 }
+function mapOn(array $maps)
+{
+    return function (iterable $iter) use($maps) {
+        foreach ($iter as $key => $value) {
+            if (isset($maps[$key])) {
+                (yield $key => $maps[$key]($value));
+            } else {
+                (yield $key => $value);
+            }
+        }
+    };
+}
 function reduce(callable $reduce, $acc = null)
 {
     return function (iterable $iter) use($reduce, $acc) {
@@ -418,6 +432,14 @@ function stack(callable $last = null, callable $resolve = null)
                 throw new \LogicException('No stack handler was able to capture this request');
             });
         };
+    };
+}
+function each(callable $handle)
+{
+    return function (iterable $iter) use($handle) {
+        foreach ($iter as $v) {
+            $handle($v);
+        }
     };
 }
 function onEach(callable $handle)
