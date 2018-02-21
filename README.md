@@ -13,7 +13,8 @@ All functions are defined in `Krak\Fn`, are not curried, and are data last. Curr
 ```php
 <?php
 
-use function Krak\Fn\Curried\{compose, filter, map, op};
+use function Krak\Fn\Curried\{filter, map, op};
+use function Krak\Fn\{compose};
 use const Krak\Fn\{toArray};
 
 $res = compose(
@@ -36,6 +37,8 @@ namespace Krak\Fn {
     const toArray = 'Krak\\Fn\\toArray';
 };
 ```
+
+Constants are also generated in the `Krak\Fn\Consts` namespace for convenience as well.
 
 With the example of `toArray`, you can call `toArray` on the data, or if you want to use compose, you can use the constant to reference the function.
 
@@ -97,7 +100,6 @@ I've found the most practical way to import functions and constants from the Fn 
 
 use Krak\Fn\{Curried as c, Consts as cn};
 use function Krak\Fn\{compose, zip};
-
 
 $res = compose(
     cn\toArray,
