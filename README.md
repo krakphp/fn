@@ -29,23 +29,32 @@ Check the `src/fn.php` for examples of all the functions.
 
 ### Constants
 
-All functions have equivalent constants generated. These constants are defined as the fully qualified name of the function.
+All functions have equivalent constants generated. These constants are defined as the fully qualified name of the function and in the Consts namespace.
 
 ```php
 namespace Krak\Fn {
-    function toArray($data);
+    function toArray($data) {};
     const toArray = 'Krak\\Fn\\toArray';
 };
+namespace Krak\Fn\Consts {
+    const toArray = 'Krak\\Fn\\toArray';
+}
 ```
 
-Constants are also generated in the `Krak\Fn\Consts` namespace for convenience as well.
-
-With the example of `toArray`, you can call `toArray` on the data, or if you want to use compose, you can use the constant to reference the function.
+One great way to use the consts is with compose or pipe chains:
 
 ```php
-use function Krak\Fn\compose;
-use const Krak\Fn\toArray;
-compose(toArray, [1,2,3]);
+use Krak\Fn\{Curried as c, Consts as cn};
+use function Krak\Fn\{compose};
+
+$res = compose(
+    cn\toArray,
+    c\map(function($tup) {
+        return $tup[0] + $tup[1];
+    }),
+    cn\toPairs
+)([1,2,3]);
+// $res == [1, 3, 5]
 ```
 
 Another great example is partial application.
@@ -113,7 +122,7 @@ $res = compose(
 This way, all constants and curried functions are easily available, easy to read in the source, while giving you the ability to import any one off of functions.
 
 ## API
-<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-each">each</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td></tr><tr><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-flip">flip</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td></tr><tr><td><a href="#api-krak-fn-iter">iter</a></td><td><a href="#api-krak-fn-keys">keys</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-mapkeys">mapKeys</a></td><td><a href="#api-krak-fn-mapon">mapOn</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-partial">partial</a></td></tr><tr><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-values">values</a></td><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-zip">zip</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-compose">compose</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-each">each</a></td><td><a href="#api-krak-fn-filter">filter</a></td></tr><tr><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-flip">flip</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td></tr><tr><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-iter">iter</a></td><td><a href="#api-krak-fn-keys">keys</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-mapkeys">mapKeys</a></td><td><a href="#api-krak-fn-mapon">mapOn</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td></tr><tr><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-pipe">pipe</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-values">values</a></td><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-zip">zip</a></td></tr></table>
 
 <h3 id="api-krak-fn-chain">chain(iterable ...$iters)</h3>
 
@@ -144,6 +153,22 @@ If there is any remainder, it is yielded as is:
 ```php
 $res = chunk(3, [1, 2, 3, 4]);
 expect(toArray($res))->equal([[1, 2, 3], [4]]);
+```
+
+
+
+<h3 id="api-krak-fn-compose">compose(callable ...$fns)</h3>
+
+**Name:** `Krak\Fn\compose`
+
+Composes functions together. compose(f, g)(x) == f(g(x)):
+
+```php
+$mul2 = Curried\op('*')(2);
+$add3 = Curried\op('+')(3);
+$add3ThenMul2 = compose($mul2, $add3);
+$res = $add3ThenMul2(5);
+expect($res)->equal(16);
 ```
 
 
@@ -603,6 +628,22 @@ expect([$left, $right])->equal([[1, 2], [3, 4]]);
 ```
 
 
+
+<h3 id="api-krak-fn-pipe">pipe(callable ...$fns)</h3>
+
+**Name:** `Krak\Fn\pipe`
+
+Creates a function that pipes values from one func to the next.:
+
+```php
+$add3 = Curried\op('+')(3);
+$mul2 = Curried\op('*')(2);
+$add3ThenMul2 = pipe($add3, $mul2);
+$res = $add3ThenMul2(5);
+expect($res)->equal(16);
+```
+
+`pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))
 
 <h3 id="api-krak-fn-range">range($start, $end, $step = null)</h3>
 

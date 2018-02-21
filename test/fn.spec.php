@@ -52,6 +52,18 @@ describe('Fn', function() {
             expect(toArray($res))->equal([[1,2,3], [4]]);
         });
     });
+    describe('compose', function() {
+        docFn(compose::class);
+
+        test('Composes functions together. compose(f, g)(x) == f(g(x))', function() {
+            $mul2 = Curried\op('*')(2);
+            $add3 = Curried\op('+')(3);
+
+            $add3ThenMul2 = compose($mul2, $add3);
+            $res = $add3ThenMul2(5);
+            expect($res)->equal(16);
+        });
+    });
     describe('curry', function() {
         docFn(curry::class);
 
@@ -383,6 +395,20 @@ INTRO;
 
             expect([$left, $right])->equal([[1,2], [3,4]]);
         });
+    });
+    describe('pipe', function() {
+        docFn(pipe::class);
+
+        test('Creates a function that pipes values from one func to the next.', function() {
+            $add3 = Curried\op('+')(3);
+            $mul2 = Curried\op('*')(2);
+
+            $add3ThenMul2 = pipe($add3, $mul2);
+            $res = $add3ThenMul2(5);
+            expect($res)->equal(16);
+        });
+
+        docOutro('`pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))');
     });
     describe('range', function() {
         docFn(range::class);
