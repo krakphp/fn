@@ -278,13 +278,13 @@ function when(callable $if)
 function within(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        return filterKeys(Curried\inArray($fields), $iter);
+        return filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
     };
 }
 function without(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        return filterKeys(Curried\not(Curried\inArray($fields)), $iter);
+        return filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
     };
 }
 function inArray(array $set)

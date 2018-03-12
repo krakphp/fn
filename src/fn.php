@@ -310,10 +310,10 @@ function fromPairs(iterable $iter): iterable {
 }
 
 function within(array $fields, iterable $iter): \Iterator {
-    return filterKeys(Curried\inArray($fields), $iter);
+    return filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
 }
 function without(array $fields, iterable $iter): \Iterator {
-    return filterKeys(Curried\not(Curried\inArray($fields)), $iter);
+    return filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
 }
 
 
