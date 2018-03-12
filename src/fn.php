@@ -53,7 +53,7 @@ function updateIndexIn(array $keys, callable $update, array $data): array {
     $curData = &$data;
     foreach (\array_slice($keys, 0, -1) as $key) {
         if (!\array_key_exists($key, $curData)) {
-            throw new \RuntimeException('Could not updateIn because the keys ' . implode(' -> ', $keys) . ' could not be found.');
+            throw new \RuntimeException('Could not updateIn because the keys ' . \implode(' -> ', $keys) . ' could not be found.');
         }
         $curData = &$curData[$key];
     }
@@ -97,11 +97,11 @@ function dropWhile(callable $predicate, iterable $iter): iterable {
 }
 
 function take(int $num, iterable $iter): iterable {
-    return slice(0, $iter, $num);
+    return \Krak\Fn\slice(0, $iter, $num);
 }
 
 function drop(int $num, iterable $iter): iterable {
-    return slice($num, $iter);
+    return \Krak\Fn\slice($num, $iter);
 }
 
 function slice(int $start, iterable $iter, $length = INF): iterable {
@@ -310,10 +310,10 @@ function fromPairs(iterable $iter): iterable {
 }
 
 function within(array $fields, iterable $iter): \Iterator {
-    return filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
+    return \Krak\Fn\filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
 }
 function without(array $fields, iterable $iter): \Iterator {
-    return filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
+    return \Krak\Fn\filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
 }
 
 
@@ -372,7 +372,7 @@ function isNull($val) {
 }
 
 function partition(callable $partition, iterable $iter, int $numParts = 2): array {
-    $parts = array_fill(0, $numParts, []);
+    $parts = \array_fill(0, $numParts, []);
     foreach ($iter as $val) {
         $index = (int) $partition($val);
         $parts[$index][] = $val;
@@ -474,9 +474,9 @@ function _() {
 
 function partial(callable $fn, ...$appliedArgs) {
     return function(...$args) use ($fn, $appliedArgs) {
-        list($appliedArgs, $args) = array_reduce($appliedArgs, function($acc, $arg) {
+        list($appliedArgs, $args) = \array_reduce($appliedArgs, function($acc, $arg) {
             list($appliedArgs, $args) = $acc;
-            if ($arg === placeholder()) {
+            if ($arg === \Krak\Fn\placeholder()) {
                 $arg = array_shift($args);
             }
 
@@ -489,19 +489,19 @@ function partial(callable $fn, ...$appliedArgs) {
 }
 
 function autoCurry(array $args, $numArgs, callable $fn) {
-    if (count($args) >= $numArgs) {
+    if (\count($args) >= $numArgs) {
         return $fn(...$args);
     }
-    if (count($args) == $numArgs - 1) {
-        return partial($fn, ...$args);
+    if (\count($args) == $numArgs - 1) {
+        return \Krak\Fn\partial($fn, ...$args);
     }
-    if (count($args) == 0) {
-        return curry($fn, $numArgs - 1);
+    if (\count($args) == 0) {
+        return \Krak\Fn\curry($fn, $numArgs - 1);
     }
 
-    return curry(
-        partial($fn, ...$args),
-        ($numArgs - 1 - count($args))
+    return \Krak\Fn\curry(
+        \Krak\Fn\partial($fn, ...$args),
+        ($numArgs - 1 - \count($args))
     );
 }
 
@@ -535,12 +535,12 @@ function pipe(callable ...$fns) {
 }
 
 function compose(callable ...$fns) {
-    return pipe(...array_reverse($fns));
+    return \Krak\Fn\pipe(...\array_reverse($fns));
 }
 
 function stack(array $funcs, callable $last = null, callable $resolve = null) {
     return function(...$args) use ($funcs, $resolve, $last) {
-        return reduce(function($acc, $func) use ($resolve) {
+        return \Krak\Fn\reduce(function($acc, $func) use ($resolve) {
             return function(...$args) use ($acc, $func, $resolve) {
                 $args[] = $acc;
                 $func = $resolve ? $resolve($func) : $func;
@@ -575,7 +575,7 @@ function iter($iter): \Iterator {
         })($iter);
     } else if (\is_string($iter)) {
         return (function($s) {
-            for ($i = 0; $i < strlen($s); $i++) {
+            for ($i = 0; $i < \strlen($s); $i++) {
                 yield $i => $s[$i];
             }
         })($iter);

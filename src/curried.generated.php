@@ -64,7 +64,7 @@ function updateIndexIn(array $keys)
             $curData =& $data;
             foreach (\array_slice($keys, 0, -1) as $key) {
                 if (!\array_key_exists($key, $curData)) {
-                    throw new \RuntimeException('Could not updateIn because the keys ' . implode(' -> ', $keys) . ' could not be found.');
+                    throw new \RuntimeException('Could not updateIn because the keys ' . \implode(' -> ', $keys) . ' could not be found.');
                 }
                 $curData =& $curData[$key];
             }
@@ -114,13 +114,13 @@ function dropWhile(callable $predicate)
 function take(int $num)
 {
     return function (iterable $iter) use($num) {
-        return slice(0, $iter, $num);
+        return \Krak\Fn\slice(0, $iter, $num);
     };
 }
 function drop(int $num)
 {
     return function (iterable $iter) use($num) {
-        return slice($num, $iter);
+        return \Krak\Fn\slice($num, $iter);
     };
 }
 function slice(int $start, $length = INF)
@@ -278,13 +278,13 @@ function when(callable $if)
 function within(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        return filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
+        return \Krak\Fn\filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
     };
 }
 function without(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        return filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
+        return \Krak\Fn\filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
     };
 }
 function inArray(array $set)
@@ -360,7 +360,7 @@ function isInstance($class)
 function partition(callable $partition, int $numParts = 2)
 {
     return function (iterable $iter) use($partition, $numParts) {
-        $parts = array_fill(0, $numParts, []);
+        $parts = \array_fill(0, $numParts, []);
         foreach ($iter as $val) {
             $index = (int) $partition($val);
             $parts[$index][] = $val;
@@ -438,9 +438,9 @@ function partial(callable $fn)
 {
     return function (...$appliedArgs) use($fn) {
         return function (...$args) use($fn, $appliedArgs) {
-            list($appliedArgs, $args) = array_reduce($appliedArgs, function ($acc, $arg) {
+            list($appliedArgs, $args) = \array_reduce($appliedArgs, function ($acc, $arg) {
                 list($appliedArgs, $args) = $acc;
-                if ($arg === placeholder()) {
+                if ($arg === \Krak\Fn\placeholder()) {
                     $arg = array_shift($args);
                 }
                 $appliedArgs[] = $arg;
@@ -454,7 +454,7 @@ function stack(callable $last = null, callable $resolve = null)
 {
     return function (array $funcs) use($last, $resolve) {
         return function (...$args) use($funcs, $resolve, $last) {
-            return reduce(function ($acc, $func) use($resolve) {
+            return \Krak\Fn\reduce(function ($acc, $func) use($resolve) {
                 return function (...$args) use($acc, $func, $resolve) {
                     $args[] = $acc;
                     $func = $resolve ? $resolve($func) : $func;
