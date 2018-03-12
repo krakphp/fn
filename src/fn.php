@@ -317,8 +317,18 @@ function without(array $fields, iterable $iter): \Iterator {
 }
 
 
+// ALIASES
+
 function inArray(array $set, $item): bool {
     return \in_array($item, $set);
+}
+
+function arrayMap(callable $fn, array $data): array {
+    return \array_map($fn, $data);
+}
+
+function arrayFilter(callable $fn, array $data): array {
+    return \array_filter($data, $fn);
 }
 
 function all(callable $predicate, iterable $iter): bool {

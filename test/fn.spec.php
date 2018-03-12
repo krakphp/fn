@@ -34,6 +34,20 @@ describe('Fn', function() {
         });
     });
 
+    describe('arrayFilter', function() {
+        docFn(arrayFilter::class);
+        test('Alias of array_filter', function() {
+            $res = arrayFilter(partial(op, '<', 2), [1,2,3]);
+            expect($res)->equal([1]);
+        });
+    });
+    describe('arrayMap', function() {
+        docFn(arrayMap::class);
+        test('Alias of array_map', function() {
+            $res = arrayMap(partial(op, '*', 2), [1,2,3]);
+            expect($res)->equal([2,4,6]);
+        });
+    });
     describe('assign', function() {
         docFn(assign::class);
         test('Assigns iterable keys and values to an object', function() {

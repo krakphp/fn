@@ -293,6 +293,18 @@ function inArray(array $set)
         return \in_array($item, $set);
     };
 }
+function arrayMap(callable $fn)
+{
+    return function (array $data) use($fn) {
+        return \array_map($fn, $data);
+    };
+}
+function arrayFilter(callable $fn)
+{
+    return function (array $data) use($fn) {
+        return \array_filter($data, $fn);
+    };
+}
 function all(callable $predicate)
 {
     return function (iterable $iter) use($predicate) {
