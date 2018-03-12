@@ -12,20 +12,20 @@ function method($name, ...$optionalArgs)
 function prop(string $key, $else = null)
 {
     return function ($data) use($key, $else) {
-        return property_exists($key, $data) ? $data->{$key} : $else;
+        return \property_exists($data, $key) ? $data->{$key} : $else;
     };
 }
 function index($key, $else = null)
 {
     return function (array $data) use($key, $else) {
-        return array_key_exists($key, $data) ? $data[$key] : $else;
+        return \array_key_exists($key, $data) ? $data[$key] : $else;
     };
 }
-function propIn(array $keys, $else = null)
+function propIn(array $props, $else = null)
 {
-    return function ($data) use($keys, $else) {
+    return function ($obj) use($props, $else) {
         foreach ($props as $prop) {
-            if (!is_object($obj) || !isset($obj->{$prop})) {
+            if (!\is_object($obj) || !\property_exists($obj, $prop)) {
                 return $else;
             }
             $obj = $obj->{$prop};
@@ -72,6 +72,15 @@ function updateIndexIn(array $keys)
             $curData[$lastKey] = $update($curData[$lastKey] ?? null);
             return $data;
         };
+    };
+}
+function assign($obj)
+{
+    return function (iterable $data) use($obj) {
+        foreach ($data as $key => $value) {
+            $obj->{$key} = $value;
+        }
+        return $obj;
     };
 }
 function takeWhile(callable $predicate)
@@ -266,14 +275,16 @@ function when(callable $if)
         };
     };
 }
+function within(array $fields)
+{
+    return function (iterable $iter) use($fields) {
+        return filterKeys(Curried\inArray($fields), $iter);
+    };
+}
 function without(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        foreach ($iter as $k => $v) {
-            if (!\in_array($k, $fields)) {
-                (yield $k => $v);
-            }
-        }
+        return filterKeys(Curried\not(Curried\inArray($fields)), $iter);
     };
 }
 function inArray(array $set)
@@ -358,6 +369,15 @@ function mapKeys(callable $predicate)
     return function (iterable $iter) use($predicate) {
         foreach ($iter as $key => $value) {
             (yield $predicate($key) => $value);
+        }
+    };
+}
+function mapKeyValue(callable $fn)
+{
+    return function (iterable $iter) use($fn) {
+        foreach ($iter as $key => $value) {
+            [$key, $value] = $fn([$key, $value]);
+            (yield $key => $value);
         }
     };
 }

@@ -8,15 +8,15 @@ function method($name, /* object */ $data, ...$optionalArgs) {
     return $data->{$name}(...$optionalArgs);
 }
 function prop(string $key, /* object */ $data, $else = null) {
-    return property_exists($key, $data) ? $data->{$key} : $else;
+    return \property_exists($data, $key) ? $data->{$key} : $else;
 }
 function index(/* string|int */ $key, array $data, $else = null) {
-    return array_key_exists($key, $data) ? $data[$key] : $else;
+    return \array_key_exists($key, $data) ? $data[$key] : $else;
 }
 
-function propIn(array $keys, /* object */ $data, $else = null) {
+function propIn(array $props, /* object */ $obj, $else = null) {
     foreach ($props as $prop) {
-        if (!is_object($obj) || !isset($obj->{$prop})) {
+        if (!\is_object($obj) || !\property_exists($obj, $prop)) {
             return $else;
         }
 
@@ -62,6 +62,13 @@ function updateIndexIn(array $keys, callable $update, array $data): array {
     $curData[$lastKey] = $update($curData[$lastKey] ?? null);
 
     return $data;
+}
+
+function assign($obj, iterable $data) {
+    foreach ($data as $key => $value) {
+        $obj->{$key} = $value;
+    }
+    return $obj;
 }
 
 // SLICING
@@ -302,12 +309,11 @@ function fromPairs(iterable $iter): iterable {
     }
 }
 
-function without(array $fields, iterable $iter): iterable {
-    foreach ($iter as $k => $v) {
-        if (!\in_array($k, $fields)) {
-            yield $k => $v;
-        }
-    }
+function within(array $fields, iterable $iter): \Iterator {
+    return filterKeys(Curried\inArray($fields), $iter);
+}
+function without(array $fields, iterable $iter): \Iterator {
+    return filterKeys(Curried\not(Curried\inArray($fields)), $iter);
 }
 
 
@@ -374,6 +380,13 @@ function map(callable $predicate, iterable $iter): iterable {
 function mapKeys(callable $predicate, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         yield $predicate($key) => $value;
+    }
+}
+
+function mapKeyValue(callable $fn , iterable $iter) {
+    foreach ($iter as $key => $value) {
+        [$key, $value] = $fn([$key, $value]);
+        yield $key => $value;
     }
 }
 

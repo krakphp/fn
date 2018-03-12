@@ -34,6 +34,16 @@ describe('Fn', function() {
         });
     });
 
+    describe('assign', function() {
+        docFn(assign::class);
+        test('Assigns iterable keys and values to an object', function() {
+            $obj = new \StdClass();
+            $obj = assign($obj, ['a' => 1, 'b' => 2]);
+            expect($obj->a)->equal(1);
+            expect($obj->b)->equal(2);
+        });
+    });
+
     describe('chain', function() {
         docFn(chain::class);
         test('Chains iterables together into one iterable', function() {
@@ -119,6 +129,19 @@ describe('Fn', function() {
             ]);
             expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
         });
+    });
+    describe('flatMap', function() {
+        docFn(flatMap::class);
+
+        test('Maps and then flattens an iterable', function() {
+            $res = flatMap(function($v) {
+                return [-$v, $v];
+            }, range(1, 3));
+
+            expect(toArray($res))->equal([-1, 1, -2, 2, -3, 3]);
+        });
+
+        docOutro('flatMap is perfect for when you want to map an iterable and also add elements to the resulting iterable.');
     });
     describe('flatten', function() {
         docFn(flatten::class);
@@ -261,6 +284,16 @@ describe('Fn', function() {
         it('Lazily maps an iterable\'s keys to a different set', function() {
             $keys = mapKeys(partial(op, '.', '_'), ['a' => 1, 'b' => 2]);
             expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 2]);
+        });
+    });
+    describe('mapKeyValue', function() {
+        docFn(mapKeyValue::class);
+        it('Lazily maps an iterable\'s key/value tuples to a different set', function() {
+            $keys = mapKeyValue(function($kv) {
+                [$key, $value] = $kv;
+                return ["{$key}_", $value * $value];
+            }, ['a' => 1, 'b' => 2]);
+            expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 4]);
         });
     });
     describe('mapOn', function() {
@@ -410,6 +443,40 @@ INTRO;
 
         docOutro('`pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))');
     });
+    describe('prop', function() {
+        docFn(prop::class);
+
+        test('Accesses a property from an object', function() {
+            $obj = new \StdClass();
+            $obj->id = 1;
+            $res = prop('id', $obj);
+            expect($res)->equal(1);
+        });
+        test('If no property exists, it will return the $else value', function() {
+            $obj = new \StdClass();
+            $res = prop('id', $obj, 2);
+            expect($res)->equal(2);
+        });
+    });
+    describe('propIn', function() {
+        docFn(propIn::class);
+
+        test('Accesses a property deep in an object tree', function() {
+            $obj = new \StdClass();
+            $obj->id = 1;
+            $obj->child = new \StdClass();
+            $obj->child->id = 2;
+            $res = propIn(['child', 'id'], $obj);
+            expect($res)->equal(2);
+        });
+        test('If any property is missing in the tree, it will return the $else value', function() {
+            $obj = new \StdClass();
+            $obj->id = 1;
+            $obj->child = new \StdClass();
+            $res = propIn(['child', 'id'], $obj, 3);
+            expect($res)->equal(3);
+        });
+    });
     describe('range', function() {
         docFn(range::class);
         test('Creates an iterable of a range of values starting from $start going to $end inclusively incrementing by $step', function() {
@@ -533,6 +600,24 @@ INTRO;
             $then = function($v) { return $v * $v; };
             $res = when($if, $then, 4);
             expect($res)->equal(4);
+        });
+    });
+    describe('within', function() {
+        docFn(within::class);
+
+        test('Only allows keys within the given array to stay', function() {
+            $data = flip(iter('abcd'));
+            $res = within(['a', 'c'], $data);
+            expect(toArrayWithKeys($res))->equal(['a' => 0, 'c' => 2]);
+        });
+    });
+    describe('without', function() {
+        docFn(without::class);
+
+        test('Filters an iterable to be without the given keys', function() {
+            $data = flip(iter('abcd'));
+            $res = without(['a', 'c'], $data);
+            expect(toArrayWithKeys($res))->equal(['b' => 1, 'd' => 3]);
         });
     });
     describe('zip', function() {

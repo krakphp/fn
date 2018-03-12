@@ -134,7 +134,22 @@ The constants and curried functions are generated with `make code`.
 Tests are run via `make test` and are stored in the `test` directory. We use peridot for testing.
 
 ## API
-<table><tr><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-compose">compose</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-each">each</a></td><td><a href="#api-krak-fn-filter">filter</a></td></tr><tr><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-flip">flip</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td></tr><tr><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-iter">iter</a></td><td><a href="#api-krak-fn-keys">keys</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-mapkeys">mapKeys</a></td><td><a href="#api-krak-fn-mapon">mapOn</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td></tr><tr><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-pipe">pipe</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-values">values</a></td><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-zip">zip</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fn-assign">assign</a></td><td><a href="#api-krak-fn-chain">chain</a></td><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-compose">compose</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-each">each</a></td></tr><tr><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatmap">flatMap</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-flip">flip</a></td><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td></tr><tr><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-iter">iter</a></td><td><a href="#api-krak-fn-keys">keys</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-mapkeys">mapKeys</a></td><td><a href="#api-krak-fn-mapkeyvalue">mapKeyValue</a></td></tr><tr><td><a href="#api-krak-fn-mapon">mapOn</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-pipe">pipe</a></td><td><a href="#api-krak-fn-prop">prop</a></td><td><a href="#api-krak-fn-propin">propIn</a></td></tr><tr><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td></tr><tr><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-values">values</a></td><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-within">within</a></td><td><a href="#api-krak-fn-without">without</a></td><td><a href="#api-krak-fn-zip">zip</a></td></tr></table>
+
+<h3 id="api-krak-fn-assign">assign($obj, iterable $data)</h3>
+
+**Name:** `Krak\Fn\assign`
+
+Assigns iterable keys and values to an object:
+
+```php
+$obj = new \StdClass();
+$obj = assign($obj, ['a' => 1, 'b' => 2]);
+expect($obj->a)->equal(1);
+expect($obj->b)->equal(2);
+```
+
+
 
 <h3 id="api-krak-fn-chain">chain(iterable ...$iters)</h3>
 
@@ -266,6 +281,21 @@ expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
 ```
 
 
+
+<h3 id="api-krak-fn-flatmap">flatMap(callable $map, iterable $iter): iterable</h3>
+
+**Name:** `Krak\Fn\flatMap`
+
+Maps and then flattens an iterable:
+
+```php
+$res = flatMap(function ($v) {
+    return [-$v, $v];
+}, range(1, 3));
+expect(toArray($res))->equal([-1, 1, -2, 2, -3, 3]);
+```
+
+flatMap is perfect for when you want to map an iterable and also add elements to the resulting iterable.
 
 <h3 id="api-krak-fn-flatten">flatten(iterable $iter, $levels = INF)</h3>
 
@@ -502,6 +532,22 @@ expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 2]);
 
 
 
+<h3 id="api-krak-fn-mapkeyvalue">mapKeyValue(callable $fn, iterable $iter)</h3>
+
+**Name:** `Krak\Fn\mapKeyValue`
+
+Lazily maps an iterable's key/value tuples to a different set:
+
+```php
+$keys = mapKeyValue(function ($kv) {
+    [$key, $value] = $kv;
+    return ["{$key}_", $value * $value];
+}, ['a' => 1, 'b' => 2]);
+expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 4]);
+```
+
+
+
 <h3 id="api-krak-fn-mapon">mapOn(array $maps, iterable $iter): iterable</h3>
 
 **Name:** `Krak\Fn\mapOn`
@@ -656,6 +702,56 @@ expect($res)->equal(16);
 ```
 
 `pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))
+
+<h3 id="api-krak-fn-prop">prop(string $key, $data, $else = null)</h3>
+
+**Name:** `Krak\Fn\prop`
+
+Accesses a property from an object:
+
+```php
+$obj = new \StdClass();
+$obj->id = 1;
+$res = prop('id', $obj);
+expect($res)->equal(1);
+```
+
+If no property exists, it will return the $else value:
+
+```php
+$obj = new \StdClass();
+$res = prop('id', $obj, 2);
+expect($res)->equal(2);
+```
+
+
+
+<h3 id="api-krak-fn-propin">propIn(array $props, $obj, $else = null)</h3>
+
+**Name:** `Krak\Fn\propIn`
+
+Accesses a property deep in an object tree:
+
+```php
+$obj = new \StdClass();
+$obj->id = 1;
+$obj->child = new \StdClass();
+$obj->child->id = 2;
+$res = propIn(['child', 'id'], $obj);
+expect($res)->equal(2);
+```
+
+If any property is missing in the tree, it will return the $else value:
+
+```php
+$obj = new \StdClass();
+$obj->id = 1;
+$obj->child = new \StdClass();
+$res = propIn(['child', 'id'], $obj, 3);
+expect($res)->equal(3);
+```
+
+
 
 <h3 id="api-krak-fn-range">range($start, $end, $step = null)</h3>
 
@@ -873,6 +969,34 @@ $then = function ($v) {
 };
 $res = when($if, $then, 4);
 expect($res)->equal(4);
+```
+
+
+
+<h3 id="api-krak-fn-within">within(array $fields, iterable $iter): \Iterator</h3>
+
+**Name:** `Krak\Fn\within`
+
+Only allows keys within the given array to stay:
+
+```php
+$data = flip(iter('abcd'));
+$res = within(['a', 'c'], $data);
+expect(toArrayWithKeys($res))->equal(['a' => 0, 'c' => 2]);
+```
+
+
+
+<h3 id="api-krak-fn-without">without(array $fields, iterable $iter): \Iterator</h3>
+
+**Name:** `Krak\Fn\without`
+
+Filters an iterable to be without the given keys:
+
+```php
+$data = flip(iter('abcd'));
+$res = without(['a', 'c'], $data);
+expect(toArrayWithKeys($res))->equal(['b' => 1, 'd' => 3]);
 ```
 
 
