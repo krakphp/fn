@@ -525,6 +525,37 @@ function id($v) {
     return $v;
 }
 
+
+// UTILITY
+
+function retry(callable $fn, $shouldRetry = null) {
+    if (\is_null($shouldRetry)) {
+        $shouldRetry = function($numRetries, \Throwable $t = null) { return true; };
+    }
+    if (\is_int($shouldRetry)) {
+        $maxTries = $shouldRetry;
+        if ($maxTries < 0) {
+            throw new \LogicException("maxTries must be greater than or equal to 0");
+        }
+        $shouldRetry = function($numRetries, \Throwable $t = null) use ($maxTries) { return $numRetries <= $maxTries; };
+    }
+    if (!\is_callable($shouldRetry)) {
+        throw new \InvalidArgumentException('shouldRetry must be an int or callable');
+    }
+
+
+    $numRetries = 0;
+    $t = null;
+    while ($shouldRetry($numRetries, $t)) {
+        try {
+            return $fn();
+        } catch (\Throwable $t) {}
+        $numRetries += 1;
+    }
+
+    throw $t;
+}
+
 function pipe(callable ...$fns) {
     return function($arg) use ($fns) {
         foreach ($fns as $fn) {

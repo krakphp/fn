@@ -60,6 +60,7 @@ const autoCurry = 'Krak\\Fn\\autoCurry';
 const toArray = 'Krak\\Fn\\toArray';
 const toArrayWithKeys = 'Krak\\Fn\\toArrayWithKeys';
 const id = 'Krak\\Fn\\id';
+const retry = 'Krak\\Fn\\retry';
 const pipe = 'Krak\\Fn\\pipe';
 const compose = 'Krak\\Fn\\compose';
 const stack = 'Krak\\Fn\\stack';

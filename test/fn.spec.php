@@ -519,6 +519,44 @@ INTRO;
             expect($res)->equal(6);
         });
     });
+    describe('retry', function() {
+        docFn(retry::class);
+        test('Executes a function and retries if an exception is thrown', function() {
+            $i = 0;
+            $res = retry(function() use (&$i) {
+                $i += 1;
+                if ($i <= 1) {
+                    throw new \Exception('bad');
+                }
+
+                return $i;
+            });
+
+            expect($res)->equal(2);
+        });
+        test('Only retries $maxTries times else it gives up and bubbles the exception', function() {
+            expect(function() {
+                $i = 0;
+                retry(function() use (&$i) {
+                    $i += 1;
+                    throw new \Exception((string) $i);
+                }, 5);
+            })->throw('Exception', '6');
+        });
+        test('Retries until $shouldRetry returns false', function() {
+            $i = 0;
+
+            expect(function() {
+                $res = retry(function() use (&$i) {
+                    $i += 1;
+                    throw new \Exception((string) $i);
+                }, function($numRetries, \Throwable $t = null) {
+                    return $numRetries < 2;
+                });
+            })->throw('Exception', '2');
+        });
+        docOutro('Keep in mind that maxTries determines the number of *re*-tries. This means the function will execute maxTries + 1 times since the first invocation is not a retry.');
+    });
     describe('slice', function() {
         docFn(slice::class);
         test('It takes an inclusive slice from start to a given length of an interable', function() {
