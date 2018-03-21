@@ -267,7 +267,7 @@ function flatMap(callable $map, iterable $iter): iterable {
     }
 }
 
-function flatten(iterable $iter, $levels = INF) {
+function flatten(iterable $iter, $levels = INF): iterable {
     if ($levels == 0) {
         return $iter;
     } else if ($levels == 1) {
@@ -356,6 +356,13 @@ function search(callable $predicate, iterable $iter) {
         }
     }
 }
+function indexOf(callable $predicate, iterable $iter) {
+    foreach ($iter as $key => $value) {
+        if ($predicate($value)) {
+            return $key;
+        }
+    }
+}
 
 function trans(callable $trans, callable $fn, $data) {
     return $fn($trans($data));
@@ -393,7 +400,7 @@ function mapKeys(callable $predicate, iterable $iter): iterable {
     }
 }
 
-function mapKeyValue(callable $fn , iterable $iter) {
+function mapKeyValue(callable $fn , iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         [$key, $value] = $fn([$key, $value]);
         yield $key => $value;
@@ -432,19 +439,19 @@ function filterKeys(callable $predicate, iterable $iter): iterable {
     }
 }
 
-function values(iterable $iter): \Iterator {
+function values(iterable $iter): iterable {
     foreach ($iter as $v) {
         yield $v;
     }
 }
 
-function keys(iterable $iter): \Iterator {
+function keys(iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         yield $k;
     }
 }
 
-function flip(iterable $iter) {
+function flip(iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         yield $v => $k;
     }

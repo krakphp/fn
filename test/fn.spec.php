@@ -246,6 +246,13 @@ describe('Fn', function() {
             expect($res)->equal(2);
         });
     });
+    describe('indexOf', function() {
+        docFn(indexOf::class);
+        test('Searches for an element and returns the key if found', function() {
+            $res = indexOf(partial(op, '==', 'b'), ['a', 'b', 'c']);
+            expect($res)->equal(1);
+        });
+    });
     describe('iter', function() {
         docFn(iter::class);
         docIntro('Converts any iterable into a proper instance of Iterator.');

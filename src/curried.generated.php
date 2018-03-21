@@ -337,6 +337,16 @@ function search(callable $predicate)
         }
     };
 }
+function indexOf(callable $predicate)
+{
+    return function (iterable $iter) use($predicate) {
+        foreach ($iter as $key => $value) {
+            if ($predicate($value)) {
+                return $key;
+            }
+        }
+    };
+}
 function trans(callable $trans)
 {
     return function (callable $fn) use($trans) {

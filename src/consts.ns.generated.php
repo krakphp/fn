@@ -37,6 +37,7 @@ const arrayFilter = 'Krak\\Fn\\arrayFilter';
 const all = 'Krak\\Fn\\all';
 const any = 'Krak\\Fn\\any';
 const search = 'Krak\\Fn\\search';
+const indexOf = 'Krak\\Fn\\indexOf';
 const trans = 'Krak\\Fn\\trans';
 const not = 'Krak\\Fn\\not';
 const isInstance = 'Krak\\Fn\\isInstance';
