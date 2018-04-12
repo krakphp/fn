@@ -526,6 +526,20 @@ INTRO;
             expect($res)->equal(6);
         });
     });
+    describe('reindex', function() {
+        docFn(reindex::class);
+        test('Re-indexes a collection via a callable', function() {
+            $res = reindex(function($v) {
+                return $v['id'];
+            }, [['id' => 2], ['id' => 3], ['id' => 1]]);
+
+            expect(toArrayWithKeys($res))->equal([
+                2 => ['id' => 2],
+                3 => ['id' => 3],
+                1 => ['id' => 1],
+            ]);
+        });
+    });
     describe('retry', function() {
         docFn(retry::class);
         test('Executes a function and retries if an exception is thrown', function() {
@@ -563,6 +577,21 @@ INTRO;
             })->throw('Exception', '2');
         });
         docOutro('Keep in mind that maxTries determines the number of *re*-tries. This means the function will execute maxTries + 1 times since the first invocation is not a retry.');
+    });
+    describe('search', function() {
+        docFn(search::class);
+        test('Searches for an element in a collection where the callable returns true', function() {
+            $res = search(function($v) {
+                return $v['id'] == 2;
+            }, [['id' => 1], ['id' => 2], ['id' => 3]]);
+            expect($res)->equal(['id' => 2]);
+        });
+        test('Returns null if no element was found', function() {
+            $res = search(function($v) {
+                return false;
+            }, [['id' => 1], ['id' => 2], ['id' => 3]]);
+            expect($res)->equal(null);
+        });
     });
     describe('slice', function() {
         docFn(slice::class);

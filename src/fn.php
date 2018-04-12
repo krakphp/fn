@@ -417,6 +417,12 @@ function mapOn(array $maps, iterable $iter): iterable {
     }
 }
 
+function reindex(callable $fn, iterable $iter): iterable {
+    foreach ($iter as $key => $value) {
+        yield $fn($value) => $value;
+    }
+}
+
 function reduce(callable $reduce, iterable $iter, $acc = null) {
     foreach ($iter as $key => $value) {
         $acc = $reduce($acc, $value);

@@ -415,6 +415,14 @@ function mapOn(array $maps)
         }
     };
 }
+function reindex(callable $fn)
+{
+    return function (iterable $iter) use($fn) {
+        foreach ($iter as $key => $value) {
+            (yield $fn($value) => $value);
+        }
+    };
+}
 function reduce(callable $reduce, $acc = null)
 {
     return function (iterable $iter) use($reduce, $acc) {

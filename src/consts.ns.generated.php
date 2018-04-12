@@ -47,6 +47,7 @@ const map = 'Krak\\Fn\\map';
 const mapKeys = 'Krak\\Fn\\mapKeys';
 const mapKeyValue = 'Krak\\Fn\\mapKeyValue';
 const mapOn = 'Krak\\Fn\\mapOn';
+const reindex = 'Krak\\Fn\\reindex';
 const reduce = 'Krak\\Fn\\reduce';
 const filter = 'Krak\\Fn\\filter';
 const filterKeys = 'Krak\\Fn\\filterKeys';
