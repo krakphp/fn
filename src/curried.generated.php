@@ -295,14 +295,14 @@ function inArray(array $set)
 }
 function arrayMap(callable $fn)
 {
-    return function (array $data) use($fn) {
-        return \array_map($fn, $data);
+    return function (iterable $data) use($fn) {
+        return \array_map($fn, \is_array($data) ? $data : \Krak\Fn\toArray($data));
     };
 }
 function arrayFilter(callable $fn)
 {
-    return function (array $data) use($fn) {
-        return \array_filter($data, $fn);
+    return function (iterable $data) use($fn) {
+        return \array_filter(\is_array($data) ? $data : \Krak\Fn\toArray($data), $fn);
     };
 }
 function all(callable $predicate)

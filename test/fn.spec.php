@@ -40,11 +40,19 @@ describe('Fn', function() {
             $res = arrayFilter(partial(op, '<', 2), [1,2,3]);
             expect($res)->equal([1]);
         });
+        test('Filters iterables as well as arrays', function() {
+            $res = arrayFilter(partial(op, '<', 2), range(1, 3));
+            expect($res)->equal([1]);
+        });
     });
     describe('arrayMap', function() {
         docFn(arrayMap::class);
         test('Alias of array_map', function() {
             $res = arrayMap(partial(op, '*', 2), [1,2,3]);
+            expect($res)->equal([2,4,6]);
+        });
+        test('Maps iterables as well as arrays', function() {
+            $res = arrayMap(partial(op, '*', 2), range(1, 3));
             expect($res)->equal([2,4,6]);
         });
     });

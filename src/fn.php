@@ -323,12 +323,12 @@ function inArray(array $set, $item): bool {
     return \in_array($item, $set);
 }
 
-function arrayMap(callable $fn, array $data): array {
-    return \array_map($fn, $data);
+function arrayMap(callable $fn, iterable $data): array {
+    return \array_map($fn, \is_array($data) ? $data : \Krak\Fn\toArray($data));
 }
 
-function arrayFilter(callable $fn, array $data): array {
-    return \array_filter($data, $fn);
+function arrayFilter(callable $fn, iterable $data): array {
+    return \array_filter(\is_array($data) ? $data : \Krak\Fn\toArray($data), $fn);
 }
 
 function all(callable $predicate, iterable $iter): bool {
