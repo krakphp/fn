@@ -11,6 +11,7 @@ const indexIn = 'Krak\\Fn\\indexIn';
 const hasIndexIn = 'Krak\\Fn\\hasIndexIn';
 const updateIndexIn = 'Krak\\Fn\\updateIndexIn';
 const assign = 'Krak\\Fn\\assign';
+const join = 'Krak\\Fn\\join';
 const takeWhile = 'Krak\\Fn\\takeWhile';
 const dropWhile = 'Krak\\Fn\\dropWhile';
 const take = 'Krak\\Fn\\take';

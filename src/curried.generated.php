@@ -76,11 +76,19 @@ function updateIndexIn(array $keys)
 }
 function assign($obj)
 {
-    return function (iterable $data) use($obj) {
-        foreach ($data as $key => $value) {
+    return function (iterable $iter) use($obj) {
+        foreach ($iter as $key => $value) {
             $obj->{$key} = $value;
         }
         return $obj;
+    };
+}
+function join(string $sep)
+{
+    return function (iterable $iter) use($sep) {
+        return \Krak\Fn\reduce(function ($acc, $v) use($sep) {
+            return $acc ? $acc . $sep . $v : $v;
+        }, $iter, "");
     };
 }
 function takeWhile(callable $predicate)

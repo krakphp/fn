@@ -294,6 +294,13 @@ describe('Fn', function() {
             })->throw('LogicException', 'Iter could not be converted into an iterable.');
         });
     });
+    describe('join', function() {
+        docFn(join::class);
+        test('Joins an iterable with a given separator', function() {
+            $res = join(",", range(1,3));
+            expect($res)->equal("1,2,3");
+        });
+    });
     describe('keys', function() {
         docFn(keys::class);
         test('Yields only the keys of an in iterable', function() {

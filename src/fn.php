@@ -64,11 +64,17 @@ function updateIndexIn(array $keys, callable $update, array $data): array {
     return $data;
 }
 
-function assign($obj, iterable $data) {
-    foreach ($data as $key => $value) {
+function assign($obj, iterable $iter) {
+    foreach ($iter as $key => $value) {
         $obj->{$key} = $value;
     }
     return $obj;
+}
+
+function join(string $sep, iterable $iter) {
+    return \Krak\Fn\reduce(function($acc, $v) use ($sep) {
+        return $acc ? $acc . $sep . $v : $v;
+    }, $iter, "");
 }
 
 // SLICING
