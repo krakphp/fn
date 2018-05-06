@@ -14,6 +14,22 @@ function index(/* string|int */ $key, array $data, $else = null) {
     return \array_key_exists($key, $data) ? $data[$key] : $else;
 }
 
+function setProp(string $key, $value, /* object */ $data) {
+    $data->{$key} = $value;
+    return $data;
+}
+
+function setIndex(/* string|int */ $key, $value, array $data) {
+    $data[$key] = $value;
+    return $data;
+}
+
+function setIndexIn(array $keys, $value, array $data) {
+    return \Krak\Fn\updateIndexIn($keys, function() use ($value) {
+        return $value;
+    }, $data);
+}
+
 function propIn(array $props, /* object */ $obj, $else = null) {
     foreach ($props as $prop) {
         if (!\is_object($obj) || !\property_exists($obj, $prop)) {

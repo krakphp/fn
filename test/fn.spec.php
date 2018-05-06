@@ -608,6 +608,27 @@ INTRO;
             expect($res)->equal(null);
         });
     });
+    describe('setIndex', function() {
+        docFn(setIndex::class);
+        test('Sets an index in an array', function() {
+            $res = setIndex('a', 1, []);
+            expect($res['a'])->equal(1);
+        });
+    });
+    describe('setIndexIn', function() {
+        docFn(setIndexIn::class);
+        test('Sets a nested index in an array', function() {
+            $res = setIndexIn(['a', 'b'], 1, ['a' => []]);
+            expect($res['a']['b'])->equal(1);
+        });
+    });
+    describe('setProp', function() {
+        docFn(setProp::class);
+        test('Sets a property in an object', function() {
+            $res = setProp('a', 1, (object) []);
+            expect($res->a)->equal(1);
+        });
+    });
     describe('slice', function() {
         docFn(slice::class);
         test('It takes an inclusive slice from start to a given length of an interable', function() {

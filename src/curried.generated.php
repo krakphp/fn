@@ -21,6 +21,34 @@ function index($key, $else = null)
         return \array_key_exists($key, $data) ? $data[$key] : $else;
     };
 }
+function setProp(string $key)
+{
+    return function ($value) use($key) {
+        return function ($data) use($value, $key) {
+            $data->{$key} = $value;
+            return $data;
+        };
+    };
+}
+function setIndex($key)
+{
+    return function ($value) use($key) {
+        return function (array $data) use($value, $key) {
+            $data[$key] = $value;
+            return $data;
+        };
+    };
+}
+function setIndexIn(array $keys)
+{
+    return function ($value) use($keys) {
+        return function (array $data) use($value, $keys) {
+            return \Krak\Fn\updateIndexIn($keys, function () use($value) {
+                return $value;
+            }, $data);
+        };
+    };
+}
 function propIn(array $props, $else = null)
 {
     return function ($obj) use($props, $else) {
