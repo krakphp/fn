@@ -96,6 +96,13 @@ describe('Fn', function() {
             expect($res)->equal(16);
         });
     });
+    describe('construct', function() {
+        docFn(construct::class);
+        test('Constructs (instantiates) a new class with the given arguments', function() {
+            $res = construct(\ArrayObject::class, [1,2,3]);
+            expect($res->count())->equal(3);
+        });
+    });
     describe('curry', function() {
         docFn(curry::class);
 

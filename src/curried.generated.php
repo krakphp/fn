@@ -119,6 +119,12 @@ function join(string $sep)
         }, $iter, "");
     };
 }
+function construct($className)
+{
+    return function (...$args) use($className) {
+        return new $className(...$args);
+    };
+}
 function takeWhile(callable $predicate)
 {
     return function (iterable $iter) use($predicate) {

@@ -80,6 +80,8 @@ function updateIndexIn(array $keys, callable $update, array $data): array {
     return $data;
 }
 
+// UTILITY
+
 function assign($obj, iterable $iter) {
     foreach ($iter as $key => $value) {
         $obj->{$key} = $value;
@@ -91,6 +93,10 @@ function join(string $sep, iterable $iter) {
     return \Krak\Fn\reduce(function($acc, $v) use ($sep) {
         return $acc ? $acc . $sep . $v : $v;
     }, $iter, "");
+}
+
+function construct($className, ...$args) {
+    return new $className(...$args);
 }
 
 // SLICING
