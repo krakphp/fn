@@ -107,19 +107,16 @@ I've found the most practical way to import functions and constants from the Fn 
 ```php
 <?php
 
-use Krak\Fn\{Curried as c, Consts as cn};
-use function Krak\Fn\{compose, zip};
+use Krak\{Fn as f, Fn\Curried as c, Fn\Consts as cn};
 
-$res = compose(
+$res = f\compose(
     cn\toArray,
     cn\fromPairs,
     c\map(function($tup) {
         return [$tup[0], $tup[1] * $tup[1]];
     }),
-)(zip(['a', 'b', 'c'], [1,2,3]))
+)(f\zip(['a', 'b', 'c'], [1,2,3]))
 ```
-
-This way, all constants and curried functions are easily available, easy to read in the source, while giving you the ability to import any one off of functions.
 
 ## Docs
 
