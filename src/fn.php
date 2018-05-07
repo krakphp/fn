@@ -445,6 +445,16 @@ function mapOn(array $maps, iterable $iter): iterable {
     }
 }
 
+function mapAccum(callable $fn, iterable $iter, $acc = null) {
+    $data = [];
+    foreach ($iter as $key => $value) {
+        [$acc, $value] = $fn($acc, $value);
+        $data[] = $value;
+    }
+
+    return [$acc, $data];
+}
+
 function reindex(callable $fn, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         yield $fn($value) => $value;
@@ -454,6 +464,13 @@ function reindex(callable $fn, iterable $iter): iterable {
 function reduce(callable $reduce, iterable $iter, $acc = null) {
     foreach ($iter as $key => $value) {
         $acc = $reduce($acc, $value);
+    }
+    return $acc;
+}
+
+function reduceKeyValue(callable $reduce, iterable $iter, $acc = null) {
+    foreach ($iter as $key => $value) {
+        $acc = $reduce($acc, [$key, $value]);
     }
     return $acc;
 }

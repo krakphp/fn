@@ -322,6 +322,26 @@ describe('Fn', function() {
             expect(toArray($values))->equal([2,4,6,8]);
         });
     });
+    describe('mapAccum', function() {
+        docFn(mapAccum::class);
+
+        test('Maps a function to each element of a list while passing in an accumulator to accumulate over every iteration', function() {
+            $data = iter('abcd');
+            [$totalSort, $values] = mapAccum(function($acc, $value) {
+                return [$acc + 1, ['name' => $value, 'sort' => $acc]];
+            }, iter('abcd'), 0);
+
+            expect($totalSort)->equal(4);
+            expect($values)->equal([
+                ['name' => 'a', 'sort' => 0],
+                ['name' => 'b', 'sort' => 1],
+                ['name' => 'c', 'sort' => 2],
+                ['name' => 'd', 'sort' => 3],
+            ]);
+        });
+
+        docOutro('Note: mapAccum converts the interable into an array and is not lazy like most of the other functions in this library');
+    });
     describe('mapKeys', function() {
         docFn(mapKeys::class);
         it('Lazily maps an iterable\'s keys to a different set', function() {
@@ -546,6 +566,16 @@ INTRO;
                 return $acc + $v;
             }, range(1,3), 0);
             expect($res)->equal(6);
+        });
+    });
+    describe('reduceKeyValue', function() {
+        docFn(reduceKeyValue::class);
+        test('Reduces an iterables key value pairs into a value', function() {
+            $res = reduceKeyValue(function($acc, $kv) {
+                [$key, $value] = $kv;
+                return $acc . $key . $value;
+            }, fromPairs([['a', 1], ['b', 2]]), "");
+            expect($res)->equal("a1b2");
         });
     });
     describe('reindex', function() {

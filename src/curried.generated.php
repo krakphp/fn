@@ -457,6 +457,17 @@ function mapOn(array $maps)
         }
     };
 }
+function mapAccum(callable $fn, $acc = null)
+{
+    return function (iterable $iter) use($fn, $acc) {
+        $data = [];
+        foreach ($iter as $key => $value) {
+            [$acc, $value] = $fn($acc, $value);
+            $data[] = $value;
+        }
+        return [$acc, $data];
+    };
+}
 function reindex(callable $fn)
 {
     return function (iterable $iter) use($fn) {
@@ -470,6 +481,15 @@ function reduce(callable $reduce, $acc = null)
     return function (iterable $iter) use($reduce, $acc) {
         foreach ($iter as $key => $value) {
             $acc = $reduce($acc, $value);
+        }
+        return $acc;
+    };
+}
+function reduceKeyValue(callable $reduce, $acc = null)
+{
+    return function (iterable $iter) use($reduce, $acc) {
+        foreach ($iter as $key => $value) {
+            $acc = $reduce($acc, [$key, $value]);
         }
         return $acc;
     };
