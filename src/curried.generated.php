@@ -530,6 +530,24 @@ function partial(callable $fn)
         };
     };
 }
+function sortFromArray(callable $fn)
+{
+    return function (array $orderedElements) use($fn) {
+        return function (iterable $iter) use($orderedElements, $fn) {
+            $data = [];
+            $flippedElements = \array_flip($orderedElements);
+            foreach ($iter as $value) {
+                $key = $fn($value);
+                if (!\array_key_exists($key, $flippedElements)) {
+                    throw new \LogicException('Cannot sort element key ' . $key . ' because it does not exist in the ordered elements.');
+                }
+                $data[$flippedElements[$key]] = $value;
+            }
+            ksort($data);
+            return $data;
+        };
+    };
+}
 function retry($shouldRetry = null)
 {
     return function (callable $fn) use($shouldRetry) {

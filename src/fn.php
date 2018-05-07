@@ -586,6 +586,23 @@ function id($v) {
 
 // UTILITY
 
+function sortFromArray(callable $fn, array $orderedElements, iterable $iter): array {
+    $data = [];
+    $flippedElements = \array_flip($orderedElements);
+
+    foreach ($iter as $value) {
+        $key = $fn($value);
+        if (!\array_key_exists($key, $flippedElements)) {
+            throw new \LogicException('Cannot sort element key '  . $key . ' because it does not exist in the ordered elements.');
+        }
+
+        $data[$flippedElements[$key]] = $value;
+    }
+
+    ksort($data);
+    return $data;
+}
+
 function retry(callable $fn, $shouldRetry = null) {
     if (\is_null($shouldRetry)) {
         $shouldRetry = function($numRetries, \Throwable $t = null) { return true; };

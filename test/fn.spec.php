@@ -666,6 +666,26 @@ INTRO;
             expect($res->a)->equal(1);
         });
     });
+    describe('sortFromArray', function() {
+        docFn(sortFromArray::class);
+        test("Sort an iterable with a given array of ordered elements to sort by", function() {
+            $data = [
+                ['id' => 1, 'name' => 'A'],
+                ['id' => 2, 'name' => 'B'],
+                ['id' => 3, 'name' => 'C'],
+            ];
+            $res = sortFromArray(Curried\index('id'), [2,3,1], $data);
+            expect(arrayMap(Curried\index('name'), $res))->equal(['B', 'C', 'A']);
+        });
+        test('Throws an exception if any item in the iterable is not within the orderedElements', function() {
+            expect(function() {
+                $data = [['id' => 1]];
+                $res = sortFromArray(Curried\index('id'), [], $data);
+            })->throw(\LogicException::class, 'Cannot sort element key 1 because it does not exist in the ordered elements.');
+        });
+
+        docOutro("I've found this to be very useful when you fetch records from a database with a WHERE IN clause, and you need to make sure the results are in the same order as the ids in the WHERE IN clause.");
+    });
     describe('slice', function() {
         docFn(slice::class);
         test('It takes an inclusive slice from start to a given length of an interable', function() {
