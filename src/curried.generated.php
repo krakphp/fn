@@ -530,6 +530,16 @@ function partial(callable $fn)
         };
     };
 }
+function differenceWith(callable $cmp)
+{
+    return function (iterable $a) use($cmp) {
+        return function (iterable $b) use($a, $cmp) {
+            return \Krak\Fn\filter(function ($aItem) use($cmp, $b) {
+                return \Krak\Fn\indexOf(\Krak\Fn\partial($cmp, $aItem), $b) === null;
+            }, $a);
+        };
+    };
+}
 function sortFromArray(callable $fn)
 {
     return function (array $orderedElements) use($fn) {

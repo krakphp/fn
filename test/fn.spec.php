@@ -112,6 +112,13 @@ describe('Fn', function() {
         });
         docOutro('Given a function definition: (a, b) -> c. A curried version will look like (a) -> (b) -> c');
     });
+    describe('differenceWith', function() {
+        docFn(differenceWith::class);
+        test('Takes the difference between two iterables with a given comparator', function() {
+            $res = differenceWith(partial(op, '==='), [1,2,3,4,5], [2,3,4]);
+            expect(toArray($res))->equal([1,5]);
+        });
+    });
     describe('drop', function() {
         docFn(drop::class);
         test('Drops the first num items from an iterable', function() {

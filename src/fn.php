@@ -586,6 +586,12 @@ function id($v) {
 
 // UTILITY
 
+function differenceWith(callable $cmp, iterable $a, iterable $b) {
+    return \Krak\Fn\filter(function($aItem) use ($cmp, $b) {
+        return \Krak\Fn\indexOf(\Krak\Fn\partial($cmp, $aItem), $b) === null;
+    }, $a);
+}
+
 function sortFromArray(callable $fn, array $orderedElements, iterable $iter): array {
     $data = [];
     $flippedElements = \array_flip($orderedElements);

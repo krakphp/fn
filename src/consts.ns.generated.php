@@ -69,6 +69,7 @@ const autoCurry = 'Krak\\Fn\\autoCurry';
 const toArray = 'Krak\\Fn\\toArray';
 const toArrayWithKeys = 'Krak\\Fn\\toArrayWithKeys';
 const id = 'Krak\\Fn\\id';
+const differenceWith = 'Krak\\Fn\\differenceWith';
 const sortFromArray = 'Krak\\Fn\\sortFromArray';
 const retry = 'Krak\\Fn\\retry';
 const pipe = 'Krak\\Fn\\pipe';
