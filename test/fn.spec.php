@@ -635,6 +635,16 @@ INTRO;
                 });
             })->throw('Exception', '2');
         });
+        test("Sends numRetries into the main fn", function() {
+            $res = retry(function($numRetries) {
+                if (!$numRetries) {
+                    throw new Exception('bad');
+                }
+
+                return $numRetries;
+            }, 2);
+            expect($res)->equal(1);
+        });
         docOutro('Keep in mind that maxTries determines the number of *re*-tries. This means the function will execute maxTries + 1 times since the first invocation is not a retry.');
     });
     describe('search', function() {

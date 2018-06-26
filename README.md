@@ -980,6 +980,18 @@ expect(function () {
 })->throw('Exception', '2');
 ```
 
+Sends numRetries into the main fn:
+
+```php
+$res = retry(function ($numRetries) {
+    if (!$numRetries) {
+        throw new Exception('bad');
+    }
+    return $numRetries;
+}, 2);
+expect($res)->equal(1);
+```
+
 Keep in mind that maxTries determines the number of *re*-tries. This means the function will execute maxTries + 1 times since the first invocation is not a retry.
 
 <h3 id="api-krak-fn-search">search(callable $predicate, iterable $iter)</h3>

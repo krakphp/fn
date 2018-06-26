@@ -579,14 +579,13 @@ function retry($shouldRetry = null)
             throw new \InvalidArgumentException('shouldRetry must be an int or callable');
         }
         $numRetries = 0;
-        $t = null;
-        while ($shouldRetry($numRetries, $t)) {
+        do {
             try {
-                return $fn();
+                return $fn($numRetries);
             } catch (\Throwable $t) {
             }
             $numRetries += 1;
-        }
+        } while ($shouldRetry($numRetries, $t));
         throw $t;
     };
 }
