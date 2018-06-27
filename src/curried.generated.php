@@ -125,6 +125,12 @@ function construct($className)
         return new $className(...$args);
     };
 }
+function spread(callable $fn)
+{
+    return function (array $data) use($fn) {
+        return $fn(...$data);
+    };
+}
 function takeWhile(callable $predicate)
 {
     return function (iterable $iter) use($predicate) {

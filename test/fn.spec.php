@@ -683,6 +683,17 @@ INTRO;
             expect($res->a)->equal(1);
         });
     });
+    describe('slice', function() {
+        docFn(slice::class);
+        test('It takes an inclusive slice from start to a given length of an interable', function() {
+            $sliced = slice(1, range(0, 4), 2);
+            expect(toArray($sliced))->equal([1, 2]);
+        });
+        test('If length is not supplied it default to the end of the iterable', function() {
+            $sliced = slice(2, range(0, 4));
+            expect(toArray($sliced))->equal([2,3,4]);
+        });
+    });
     describe('sortFromArray', function() {
         docFn(sortFromArray::class);
         test("Sort an iterable with a given array of ordered elements to sort by", function() {
@@ -703,16 +714,15 @@ INTRO;
 
         docOutro("I've found this to be very useful when you fetch records from a database with a WHERE IN clause, and you need to make sure the results are in the same order as the ids in the WHERE IN clause.");
     });
-    describe('slice', function() {
-        docFn(slice::class);
-        test('It takes an inclusive slice from start to a given length of an interable', function() {
-            $sliced = slice(1, range(0, 4), 2);
-            expect(toArray($sliced))->equal([1, 2]);
+    describe('spread', function() {
+        docFn(spread::class);
+        test("Spreads an array of arguments to a callable", function() {
+            $res = spread(function($a, $b) {
+                return $a . $b;
+            }, ['a', 'b']);
+            expect($res)->equal('ab');
         });
-        test('If length is not supplied it default to the end of the iterable', function() {
-            $sliced = slice(2, range(0, 4));
-            expect(toArray($sliced))->equal([2,3,4]);
-        });
+        docOutro("Note: this is basically just an alias for `call_user_func_array` or simply a functional wrapper around the `...` (spread) operator.");
     });
     describe('take', function() {
         docFn(take::class);

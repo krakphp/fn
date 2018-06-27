@@ -99,6 +99,10 @@ function construct($className, ...$args) {
     return new $className(...$args);
 }
 
+function spread(callable $fn, array $data) {
+    return $fn(...$data);
+}
+
 // SLICING
 
 function takeWhile(callable $predicate, iterable $iter): iterable {
