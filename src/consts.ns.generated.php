@@ -54,6 +54,7 @@ const mapKeys = 'Krak\\Fn\\mapKeys';
 const mapKeyValue = 'Krak\\Fn\\mapKeyValue';
 const mapOn = 'Krak\\Fn\\mapOn';
 const mapAccum = 'Krak\\Fn\\mapAccum';
+const arrayReindex = 'Krak\\Fn\\arrayReindex';
 const reindex = 'Krak\\Fn\\reindex';
 const reduce = 'Krak\\Fn\\reduce';
 const reduceKeyValue = 'Krak\\Fn\\reduceKeyValue';

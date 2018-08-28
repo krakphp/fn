@@ -474,6 +474,16 @@ function mapAccum(callable $fn, $acc = null)
         return [$acc, $data];
     };
 }
+function arrayReindex(callable $fn)
+{
+    return function (iterable $iter) use($fn) {
+        $res = [];
+        foreach ($iter as $key => $value) {
+            $res[$fn($value)] = $value;
+        }
+        return $res;
+    };
+}
 function reindex(callable $fn)
 {
     return function (iterable $iter) use($fn) {

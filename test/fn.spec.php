@@ -56,6 +56,20 @@ describe('Fn', function() {
             expect($res)->equal([2,4,6]);
         });
     });
+    describe('arrayReindex', function() {
+        docFn(arrayReindex::class);
+        test('Re-indexes a collection via a callable into an associative array', function() {
+            $res = arrayReindex(function($v) {
+                return $v['id'];
+            }, [['id' => 2], ['id' => 3], ['id' => 1]]);
+
+            expect($res)->equal([
+                2 => ['id' => 2],
+                3 => ['id' => 3],
+                1 => ['id' => 1],
+            ]);
+        });
+    });
     describe('assign', function() {
         docFn(assign::class);
         test('Assigns iterable keys and values to an object', function() {

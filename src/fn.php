@@ -459,6 +459,14 @@ function mapAccum(callable $fn, iterable $iter, $acc = null) {
     return [$acc, $data];
 }
 
+function arrayReindex(callable $fn, iterable $iter): iterable {
+    $res = [];
+    foreach ($iter as $key => $value) {
+        $res[$fn($value)] = $value;
+    }
+    return $res;
+}
+
 function reindex(callable $fn, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         yield $fn($value) => $value;
