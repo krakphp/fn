@@ -459,6 +459,14 @@ function mapAccum(callable $fn, iterable $iter, $acc = null) {
     return [$acc, $data];
 }
 
+function withState(callable $fn, $initialState = null) {
+    $state = $initialState;
+    return function(...$args) use ($fn, &$state) {
+        [$state, $res] = $fn($state, ...$args);
+        return $res;
+    };
+}
+
 function arrayReindex(callable $fn, iterable $iter): iterable {
     $res = [];
     foreach ($iter as $key => $value) {

@@ -474,6 +474,16 @@ function mapAccum(callable $fn, $acc = null)
         return [$acc, $data];
     };
 }
+function withState($initialState = null)
+{
+    return function (callable $fn) use($initialState) {
+        $state = $initialState;
+        return function (...$args) use($fn, &$state) {
+            [$state, $res] = $fn($state, ...$args);
+            return $res;
+        };
+    };
+}
 function arrayReindex(callable $fn)
 {
     return function (iterable $iter) use($fn) {

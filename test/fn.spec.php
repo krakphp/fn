@@ -824,6 +824,17 @@ INTRO;
             expect($res)->equal(4);
         });
     });
+    describe('withState', function() {
+        docFn(withState::class);
+
+        test('Decorate a function with accumulating state', function() {
+            $fn = withState(function($state, $v) {
+                return [$state + 1, $state . ': ' . $v];
+            }, 1);
+            $res = arrayMap($fn, iter('abcd'));
+            expect($res)->equal(['1: a', '2: b', '3: c', '4: d']);
+        });
+    });
     describe('within', function() {
         docFn(within::class);
 
