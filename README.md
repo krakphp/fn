@@ -1090,6 +1090,21 @@ $sliced = slice(2, range(0, 4));
 expect(toArray($sliced))->equal([2, 3, 4]);
 ```
 
+will not consume the iterator once the slice has been yielded:
+
+```php
+$i = 0;
+$gen = function () use(&$i) {
+    foreach (range(0, 4) as $v) {
+        $i = $v;
+        (yield $i);
+    }
+};
+$sliced = toArray(slice(1, $gen(), 2));
+expect($sliced)->equal([1, 2]);
+expect($i)->equal(2);
+```
+
 
 
 <h3 id="api-krak-fn-sortfromarray">sortFromArray(callable $fn, array $orderedElements, iterable $iter): array</h3>

@@ -182,6 +182,9 @@ function slice(int $start, $length = INF)
                 (yield $k => $v);
             }
             $i += 1;
+            if ($i > $end) {
+                return;
+            }
         }
     };
 }

@@ -145,7 +145,11 @@ function slice(int $start, iterable $iter, $length = INF): iterable {
         if ($start <= $i && $i <= $end) {
             yield $k => $v;
         }
+
         $i += 1;
+        if ($i > $end) {
+            return;
+        }
     }
 }
 
