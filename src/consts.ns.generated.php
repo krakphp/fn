@@ -48,6 +48,7 @@ const trans = 'Krak\\Fn\\trans';
 const not = 'Krak\\Fn\\not';
 const isInstance = 'Krak\\Fn\\isInstance';
 const isNull = 'Krak\\Fn\\isNull';
+const nullable = 'Krak\\Fn\\nullable';
 const partition = 'Krak\\Fn\\partition';
 const map = 'Krak\\Fn\\map';
 const mapKeys = 'Krak\\Fn\\mapKeys';

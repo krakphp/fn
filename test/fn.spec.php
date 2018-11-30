@@ -395,6 +395,15 @@ describe('Fn', function() {
             expect(toArray($values))->equal([3,3,3]);
         });
     });
+    describe('nullable', function() {
+        docFn(nullable::class);
+        test('Performs the callable if the value is not null', function() {
+            expect(nullable('intval', '0'))->equal(0);
+        });
+        test('Returns null if the value is null', function() {
+            expect(nullable('intval', null))->equal(null);
+        });
+    });
     describe('onEach', function() {
         docFn(onEach::class);
         docIntro('Duplicate of each.');

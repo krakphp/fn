@@ -413,6 +413,9 @@ function isInstance($class, $item) {
 function isNull($val) {
     return \is_null($item);
 }
+function nullable(callable $fn, $value) {
+    return $value === null ? $value : $fn($value);
+}
 
 function partition(callable $partition, iterable $iter, int $numParts = 2): array {
     $parts = \array_fill(0, $numParts, []);

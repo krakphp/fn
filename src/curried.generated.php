@@ -418,6 +418,15 @@ function isInstance($class)
         return $item instanceof $class;
     };
 }
+function nullable(callable $fn)
+{
+    return function ($value) use($fn) {
+        if (\is_null($value)) {
+            return null;
+        }
+        return $fn($value);
+    };
+}
 function partition(callable $partition, int $numParts = 2)
 {
     return function (iterable $iter) use($partition, $numParts) {
