@@ -17,6 +17,7 @@ const assign = 'Krak\\Fn\\assign';
 const join = 'Krak\\Fn\\join';
 const construct = 'Krak\\Fn\\construct';
 const spread = 'Krak\\Fn\\spread';
+const dd = 'Krak\\Fn\\dd';
 const takeWhile = 'Krak\\Fn\\takeWhile';
 const dropWhile = 'Krak\\Fn\\dropWhile';
 const take = 'Krak\\Fn\\take';

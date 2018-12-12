@@ -103,6 +103,14 @@ function spread(callable $fn, array $data) {
     return $fn(...$data);
 }
 
+function dd($value, callable $dump = null, bool $die = true) {
+    $dump = $dump ?: 'var_dump';
+    $dump($value);
+    if ($die) {
+        die;
+    }
+}
+
 // SLICING
 
 function takeWhile(callable $predicate, iterable $iter): iterable {

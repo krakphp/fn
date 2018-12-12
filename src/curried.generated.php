@@ -131,6 +131,16 @@ function spread(callable $fn)
         return $fn(...$data);
     };
 }
+function dd(callable $dump = null, bool $die = true)
+{
+    return function ($value) use($dump, $die) {
+        $dump = $dump ?: 'var_dump';
+        $dump($value);
+        if ($die) {
+            die;
+        }
+    };
+}
 function takeWhile(callable $predicate)
 {
     return function (iterable $iter) use($predicate) {

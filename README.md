@@ -117,6 +117,30 @@ $res = f\compose(
 )(f\zip(['a', 'b', 'c'], [1,2,3]));
 ```
 
+### Debugging
+
+If you have a function compose chain and want to debug/test the result of any of the functions, you can do something like the following examples:
+
+1. Debug a single value:
+
+    ```php
+    f\compose(
+        function() {}, // do something else
+        c\dd(), // debug result here
+        function() {}, // do another thing that returns a single value
+        function() {} // do something
+    );
+    ```
+2. Debug an iterable:
+
+    ```php
+    f\compose(
+        function() {}, // do something else
+        c\dd(), f\toArray, // debug result here
+        c\map(function() {}) // do something
+    );
+    ```
+
 ## Docs
 
 Docs are generated with `make docs`. This uses Krak Peridocs to actually generate the documentation from the peridot tests.
