@@ -295,6 +295,7 @@ function zip(iterable ...$iters): \Iterator {
     }
 }
 
+
 function flatMap(callable $map, iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         foreach ($map($v) as $k => $v) {
@@ -350,6 +351,24 @@ function within(array $fields, iterable $iter): \Iterator {
 }
 function without(array $fields, iterable $iter): \Iterator {
     return \Krak\Fn\filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
+}
+
+function compact(iterable $iter): iterable {
+    foreach ($iter as $key => $val) {
+        if ($val !== null) {
+            yield $key => $val;
+        }
+    }
+}
+
+function arrayCompact(iterable $iter): array {
+    $vals = [];
+    foreach ($iter as $key => $val) {
+        if ($val !== null) {
+            $vals[$key] = $val;
+        }
+    }
+    return $vals;
 }
 
 

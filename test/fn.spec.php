@@ -33,7 +33,14 @@ describe('Fn', function() {
             expect($res)->equal([1,2,3]);
         });
     });
-
+    describe('arrayCompact', function() {
+        docFn(arrayCompact::class);
+        test('It will remove all nulls from an iterable and return an array', function() {
+            $res = arrayCompact([1,2,null,null,3]);
+            expect(\array_values($res))->equal([1,2,3]);
+        });
+        docOutro('Keep in mind that the keys will be preserved when using arrayCompact, so make sure to use array_values if you want to ignore keys.');
+    });
     describe('arrayFilter', function() {
         docFn(arrayFilter::class);
         test('Alias of array_filter', function() {
@@ -96,6 +103,14 @@ describe('Fn', function() {
         test('If there is any remainder, it is yielded as is', function() {
             $res = chunk(3, [1,2,3,4]);
             expect(toArray($res))->equal([[1,2,3], [4]]);
+        });
+    });
+    describe('compact', function() {
+        docFn(compact::class);
+
+        test('Removes all null values from an iterable', function() {
+            $res = compact([1,null,2,3,null,null,4]);
+            expect(toArray($res))->equal([1,2,3,4]);
         });
     });
     describe('compose', function() {

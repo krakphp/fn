@@ -421,10 +421,7 @@ function isInstance($class)
 function nullable(callable $fn)
 {
     return function ($value) use($fn) {
-        if (\is_null($value)) {
-            return null;
-        }
-        return $fn($value);
+        return $value === null ? $value : $fn($value);
     };
 }
 function partition(callable $partition, int $numParts = 2)
