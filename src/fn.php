@@ -103,12 +103,10 @@ function spread(callable $fn, array $data) {
     return $fn(...$data);
 }
 
-function dd($value, callable $dump = null, bool $die = true) {
-    $dump = $dump ?: 'var_dump';
+function dd($value, callable $dump = null, callable $die = null) {
+    $dump = $dump ?: (function_exists('dump') ? 'dump' : 'var_dump');
     $dump($value);
-    if ($die) {
-        die;
-    }
+    ($die ?? function() { die; })();
 }
 
 // SLICING

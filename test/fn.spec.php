@@ -148,6 +148,18 @@ describe('Fn', function() {
             expect(toArray($res))->equal([1,5]);
         });
     });
+    describe('dd', function() {
+        docFn(dd::class);
+        test('dumps and dies', function() {
+            $res = null;
+            $died = false;
+            $dump = function($v) use (&$res) {$res = $v;};
+            $die = function() use (&$died) { $died = true; };
+            dd(1, $dump, $die);
+            expect($res)->equal(1);
+            expect($died)->equal(true);
+        });
+    });
     describe('drop', function() {
         docFn(drop::class);
         test('Drops the first num items from an iterable', function() {
