@@ -40,6 +40,7 @@ const within = 'Krak\\Fn\\within';
 const without = 'Krak\\Fn\\without';
 const compact = 'Krak\\Fn\\compact';
 const arrayCompact = 'Krak\\Fn\\arrayCompact';
+const pad = 'Krak\\Fn\\pad';
 const inArray = 'Krak\\Fn\\inArray';
 const arrayMap = 'Krak\\Fn\\arrayMap';
 const arrayFilter = 'Krak\\Fn\\arrayFilter';

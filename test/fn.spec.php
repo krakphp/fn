@@ -515,6 +515,29 @@ INTRO;
             expect($res)->equal(8);
         });
     });
+    describe('pad', function() {
+        docFn(pad::class);
+        test('Pads an iterable to a specific size', function() {
+            $res = pad(5, [1,2,3]);
+            expect(toArray($res))->equal([1,2,3,null,null]);
+        });
+        test('Allows custom pad values', function() {
+            $res = pad(5, [1,2,3], 0);
+            expect(toArray($res))->equal([1,2,3,0,0]);
+        });
+        test('Pads nothing if iterable is the same size as pad size', function() {
+            $res = pad(5, [1,2,3,4,5]);
+            expect(toArray($res))->equal([1,2,3,4,5]);
+        });
+        test('Pads nothing if iterable is greater than pad size', function() {
+            $res = pad(5, [1,2,3,4,5,6]);
+            expect(toArray($res))->equal([1,2,3,4,5,6]);
+        });
+        test('Ignores keys of original iterable', function() {
+            $res = pad(3, ['a' => 1, 'b' => 2]);
+            expect(toArrayWithKeys($res))->equal([1,2,null]);
+        });
+    });
     describe('partial', function() {
         docFn(partial::class);
         test('Partially applies arguments to a function. Given a function signature like f = (a, b, c) -> d, partial(f, a, b) -> (c) -> d', function() {

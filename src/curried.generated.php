@@ -348,6 +348,22 @@ function without(array $fields)
         return \Krak\Fn\filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
     };
 }
+function pad(int $size, $padValue = null)
+{
+    return function (iterable $iter) use($size, $padValue) {
+        $i = 0;
+        foreach ($iter as $key => $value) {
+            (yield $value);
+            $i += 1;
+        }
+        if ($i >= $size) {
+            return;
+        }
+        foreach (\Krak\Fn\range($i, $size - 1) as $index) {
+            (yield $padValue);
+        }
+    };
+}
 function inArray(array $set)
 {
     return function ($item) use($set) {

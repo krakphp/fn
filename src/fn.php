@@ -377,6 +377,22 @@ function arrayCompact(iterable $iter): array {
     return $vals;
 }
 
+function pad(int $size, iterable $iter, $padValue = null): iterable {
+    $i = 0;
+    foreach ($iter as $key => $value) {
+        yield $value;
+        $i += 1;
+    }
+
+    if ($i >= $size) {
+        return;
+    }
+
+    foreach (\Krak\Fn\range($i, $size - 1) as $index) {
+        yield $padValue;
+    }
+}
+
 
 // ALIASES
 
