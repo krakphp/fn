@@ -316,6 +316,13 @@ describe('Fn', function() {
             expect($res)->equal(1);
         });
     });
+    describe('isNull', function() {
+        docFn(isNull::class);
+        test('alias for is_null', function() {
+            expect(isNull(null))->equal(true);
+            expect(isNull(0))->equal(false);
+        });
+    });
     describe('iter', function() {
         docFn(iter::class);
         docIntro('Converts any iterable into a proper instance of Iterator.');

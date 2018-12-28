@@ -452,7 +452,7 @@ function isInstance($class, $item) {
 }
 
 function isNull($val) {
-    return \is_null($item);
+    return \is_null($val);
 }
 function nullable(callable $fn, $value) {
     return $value === null ? $value : $fn($value);
