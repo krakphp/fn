@@ -215,6 +215,25 @@ function chunk(int $size)
         }
     };
 }
+function groupBy(callable $fn)
+{
+    return function (iterable $iter) use($fn) {
+        $group = [];
+        $groupKey = null;
+        foreach ($iter as $v) {
+            $curGroupKey = $fn($v);
+            if ($groupKey !== null && $groupKey !== $curGroupKey) {
+                (yield $group);
+                $group = [];
+            }
+            $group[] = $v;
+            $groupKey = $curGroupKey;
+        }
+        if (\count($group)) {
+            (yield $group);
+        }
+    };
+}
 function range($start, $step = null)
 {
     return function ($end) use($start, $step) {

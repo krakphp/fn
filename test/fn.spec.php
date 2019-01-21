@@ -251,6 +251,20 @@ describe('Fn', function() {
             ]);
         });
     });
+    describe('groupBy', function() {
+        docFn(groupBy::class);
+        test('Groups items together off of the result from the callable', function() {
+            $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
+            $groupedItems = groupBy(function(string $item) {
+                return $item[0]; // return first char
+            }, $items);
+            expect(toArray($groupedItems))->equal([
+                ['aa', 'ab', 'ac'],
+                ['ba', 'bb', 'bc'],
+                ['ca', 'cb', 'cc']
+            ]);
+        });
+    });
     describe('hasIndexIn', function() {
         docFn(hasIndexIn::class);
 

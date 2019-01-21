@@ -182,6 +182,25 @@ function chunk(int $size, iterable $iter): iterable {
     }
 }
 
+function groupBy(callable $fn, iterable $iter): iterable {
+    $group = [];
+    $groupKey = null;
+    foreach ($iter as $v) {
+        $curGroupKey = $fn($v);
+        if ($groupKey !== null && $groupKey !== $curGroupKey) {
+            yield $group;
+            $group = [];
+        }
+
+        $group[] = $v;
+        $groupKey = $curGroupKey;
+    }
+
+    if (\count($group)) {
+        yield $group;
+    }
+}
+
 
 // GENERATORS
 
