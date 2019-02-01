@@ -723,9 +723,16 @@ function retry(callable $fn, $shouldRetry = null) {
 }
 
 function pipe(callable ...$fns) {
-    return function($arg) use ($fns) {
+    return function(...$args) use ($fns) {
+        $isFirstPass = true;
         foreach ($fns as $fn) {
-            $arg = $fn($arg);
+            if ($isFirstPass) {
+                $arg = $fn(...$args);
+                $isFirstPass = false;
+            } else {
+                $arg = $fn($arg);
+            }
+
         }
         return $arg;
     };

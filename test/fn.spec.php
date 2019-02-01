@@ -124,6 +124,13 @@ describe('Fn', function() {
             $res = $add3ThenMul2(5);
             expect($res)->equal(16);
         });
+        test('Allows an empty initial argument', function() {
+            $res = compose(
+                Curried\reduce(function($acc, $v) { return $acc + $v; }, 0),
+                function() { yield from [1,2,3]; }
+            )();
+            expect($res)->equal(6);
+        });
     });
     describe('construct', function() {
         docFn(construct::class);
@@ -603,6 +610,13 @@ INTRO;
             $add3ThenMul2 = pipe($add3, $mul2);
             $res = $add3ThenMul2(5);
             expect($res)->equal(16);
+        });
+        test('Allows an empty initial argument', function() {
+            $res = pipe(
+                function() { yield from [1,2,3]; },
+                Curried\reduce(function($acc, $v) { return $acc + $v; }, 0)
+            )();
+            expect($res)->equal(6);
         });
 
         docOutro('`pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))');

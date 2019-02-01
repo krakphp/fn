@@ -299,6 +299,17 @@ $res = $add3ThenMul2(5);
 expect($res)->equal(16);
 ```
 
+Allows an empty initial argument:
+
+```php
+$res = compose(Curried\reduce(function ($acc, $v) {
+    return $acc + $v;
+}, 0), function () {
+    yield from [1, 2, 3];
+})();
+expect($res)->equal(6);
+```
+
 
 
 <h3 id="api-krak-fn-construct">construct($className, ...$args)</h3>
@@ -980,6 +991,17 @@ $mul2 = Curried\op('*')(2);
 $add3ThenMul2 = pipe($add3, $mul2);
 $res = $add3ThenMul2(5);
 expect($res)->equal(16);
+```
+
+Allows an empty initial argument:
+
+```php
+$res = pipe(function () {
+    yield from [1, 2, 3];
+}, Curried\reduce(function ($acc, $v) {
+    return $acc + $v;
+}, 0))();
+expect($res)->equal(6);
 ```
 
 `pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))
