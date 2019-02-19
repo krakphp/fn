@@ -33,6 +33,28 @@ describe('Fn', function() {
             expect($res)->equal([1,2,3]);
         });
     });
+    describe('all', function() {
+        docFn(all::class);
+        test('Returns true if the predicate returns true on all of the items', function() {
+            $res = all(function($v) { return $v % 2 == 0; }, [2,4,6]);
+            expect($res)->equal(true);
+        });
+        test('Returns false if the predicate returns false on any of the items', function() {
+            $res = all(function($v) { return $v % 2 == 0; }, [1,2,4,6]);
+            expect($res)->equal(false);
+        });
+    });
+    describe('any', function() {
+        docFn(any::class);
+        test('Returns true if the predicate returns true on any of the items', function() {
+            $res = any(function($v) { return $v % 2 == 0; }, [1,3,4,5]);
+            expect($res)->equal(true);
+        });
+        test('Returns false if the predicate returns false on all of the items', function() {
+            $res = any(function($v) { return $v % 2 == 0; }, [1,3,5]);
+            expect($res)->equal(false);
+        });
+    });
     describe('arrayCompact', function() {
         docFn(arrayCompact::class);
         test('It will remove all nulls from an iterable and return an array', function() {
