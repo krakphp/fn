@@ -534,7 +534,7 @@ function withState(callable $fn, $initialState = null) {
     };
 }
 
-function arrayReindex(callable $fn, iterable $iter): iterable {
+function arrayReindex(callable $fn, iterable $iter): array {
     $res = [];
     foreach ($iter as $key => $value) {
         $res[$fn($value)] = $value;
