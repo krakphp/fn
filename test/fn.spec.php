@@ -131,10 +131,10 @@ describe('Fn', function() {
         docFn(chunkBy::class);
         test('Chunks items together off of the result from the callable', function() {
             $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
-            $groupedItems = chunkBy(function(string $item) {
+            $chunks = chunkBy(function(string $item) {
                 return $item[0]; // return first char
             }, $items);
-            expect(toArray($groupedItems))->equal([
+            expect(toArray($chunks))->equal([
                 ['aa', 'ab', 'ac'],
                 ['ba', 'bb', 'bc'],
                 ['ca', 'cb', 'cc']
@@ -142,10 +142,10 @@ describe('Fn', function() {
         });
         test('Allows a maxSize to prevent chunks from exceeding a limit', function() {
             $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
-            $groupedItems = chunkBy(function(string $item) {
+            $chunks = chunkBy(function(string $item) {
                 return $item[0]; // return first char
             }, $items, 2);
-            expect(toArray($groupedItems))->equal([
+            expect(toArray($chunks))->equal([
                 ['aa', 'ab'], ['ac'],
                 ['ba', 'bb'], ['bc'],
                 ['ca', 'cb'], ['cc']
