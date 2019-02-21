@@ -25,6 +25,7 @@ const drop = 'Krak\\Fn\\drop';
 const slice = 'Krak\\Fn\\slice';
 const head = 'Krak\\Fn\\head';
 const chunk = 'Krak\\Fn\\chunk';
+const chunkBy = 'Krak\\Fn\\chunkBy';
 const groupBy = 'Krak\\Fn\\groupBy';
 const range = 'Krak\\Fn\\range';
 const op = 'Krak\\Fn\\op';

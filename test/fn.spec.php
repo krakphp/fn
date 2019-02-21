@@ -127,6 +127,31 @@ describe('Fn', function() {
             expect(toArray($res))->equal([[1,2,3], [4]]);
         });
     });
+    describe('chunkBy', function() {
+        docFn(chunkBy::class);
+        test('Chunks items together off of the result from the callable', function() {
+            $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
+            $groupedItems = chunkBy(function(string $item) {
+                return $item[0]; // return first char
+            }, $items);
+            expect(toArray($groupedItems))->equal([
+                ['aa', 'ab', 'ac'],
+                ['ba', 'bb', 'bc'],
+                ['ca', 'cb', 'cc']
+            ]);
+        });
+        test('Allows a maxSize to prevent chunks from exceeding a limit', function() {
+            $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
+            $groupedItems = chunkBy(function(string $item) {
+                return $item[0]; // return first char
+            }, $items, 2);
+            expect(toArray($groupedItems))->equal([
+                ['aa', 'ab'], ['ac'],
+                ['ba', 'bb'], ['bc'],
+                ['ca', 'cb'], ['cc']
+            ]);
+        });
+    });
     describe('compact', function() {
         docFn(compact::class);
 
@@ -282,6 +307,7 @@ describe('Fn', function() {
     });
     describe('groupBy', function() {
         docFn(groupBy::class);
+        docIntro('Alias of chunkBy');
         test('Groups items together off of the result from the callable', function() {
             $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
             $groupedItems = groupBy(function(string $item) {
@@ -291,6 +317,17 @@ describe('Fn', function() {
                 ['aa', 'ab', 'ac'],
                 ['ba', 'bb', 'bc'],
                 ['ca', 'cb', 'cc']
+            ]);
+        });
+        test('Allows a maxSize to prevent groups from exceeding a limit', function() {
+            $items = ['aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc'];
+            $groupedItems = groupBy(function(string $item) {
+                return $item[0]; // return first char
+            }, $items, 2);
+            expect(toArray($groupedItems))->equal([
+                ['aa', 'ab'], ['ac'],
+                ['ba', 'bb'], ['bc'],
+                ['ca', 'cb'], ['cc']
             ]);
         });
     });

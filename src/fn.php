@@ -182,12 +182,15 @@ function chunk(int $size, iterable $iter): iterable {
     }
 }
 
-function groupBy(callable $fn, iterable $iter): iterable {
+function chunkBy(callable $fn, iterable $iter, $maxSize = null): iterable {
+    assert($maxSize === null || $maxSize > 0);
     $group = [];
     $groupKey = null;
     foreach ($iter as $v) {
         $curGroupKey = $fn($v);
-        if ($groupKey !== null && $groupKey !== $curGroupKey) {
+        $shouldYieldGroup = ($groupKey !== null && $groupKey !== $curGroupKey)
+            || ($maxSize !== null && \count($group) >= $maxSize);
+        if ($shouldYieldGroup) {
             yield $group;
             $group = [];
         }
@@ -199,6 +202,10 @@ function groupBy(callable $fn, iterable $iter): iterable {
     if (\count($group)) {
         yield $group;
     }
+}
+
+function groupBy(callable $fn, iterable $iter, $maxSize = null): iterable {
+    return \Krak\Fn\chunkBy($fn, $iter, $maxSize);
 }
 
 

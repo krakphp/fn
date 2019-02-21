@@ -215,14 +215,16 @@ function chunk(int $size)
         }
     };
 }
-function groupBy(callable $fn)
+function chunkBy(callable $fn, $maxSize = null)
 {
-    return function (iterable $iter) use($fn) {
+    return function (iterable $iter) use($fn, $maxSize) {
+        assert($maxSize === null || $maxSize > 0);
         $group = [];
         $groupKey = null;
         foreach ($iter as $v) {
             $curGroupKey = $fn($v);
-            if ($groupKey !== null && $groupKey !== $curGroupKey) {
+            $shouldYieldGroup = $groupKey !== null && $groupKey !== $curGroupKey || $maxSize !== null && \count($group) >= $maxSize;
+            if ($shouldYieldGroup) {
                 (yield $group);
                 $group = [];
             }
@@ -232,6 +234,12 @@ function groupBy(callable $fn)
         if (\count($group)) {
             (yield $group);
         }
+    };
+}
+function groupBy(callable $fn, $maxSize = null)
+{
+    return function (iterable $iter) use($fn, $maxSize) {
+        return \Krak\Fn\chunkBy($fn, $iter, $maxSize);
     };
 }
 function range($start, $step = null)
