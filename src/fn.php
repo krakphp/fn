@@ -182,7 +182,7 @@ function chunk(int $size, iterable $iter): iterable {
     }
 }
 
-function chunkBy(callable $fn, iterable $iter, $maxSize = null): iterable {
+function chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
     assert($maxSize === null || $maxSize > 0);
     $group = [];
     $groupKey = null;
@@ -204,7 +204,7 @@ function chunkBy(callable $fn, iterable $iter, $maxSize = null): iterable {
     }
 }
 
-function groupBy(callable $fn, iterable $iter, $maxSize = null): iterable {
+function groupBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
     return \Krak\Fn\chunkBy($fn, $iter, $maxSize);
 }
 

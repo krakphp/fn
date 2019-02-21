@@ -215,7 +215,7 @@ function chunk(int $size)
         }
     };
 }
-function chunkBy(callable $fn, $maxSize = null)
+function chunkBy(callable $fn, ?int $maxSize = null)
 {
     return function (iterable $iter) use($fn, $maxSize) {
         assert($maxSize === null || $maxSize > 0);
@@ -236,7 +236,7 @@ function chunkBy(callable $fn, $maxSize = null)
         }
     };
 }
-function groupBy(callable $fn, $maxSize = null)
+function groupBy(callable $fn, ?int $maxSize = null)
 {
     return function (iterable $iter) use($fn, $maxSize) {
         return \Krak\Fn\chunkBy($fn, $iter, $maxSize);

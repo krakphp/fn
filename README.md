@@ -320,7 +320,7 @@ expect(toArray($res))->equal([[1, 2, 3], [4]]);
 
 
 
-<h3 id="api-krak-fn-chunkby">chunkBy(callable $fn, iterable $iter, $maxSize = null): iterable</h3>
+<h3 id="api-krak-fn-chunkby">chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable</h3>
 
 **Name:** `Krak\Fn\chunkBy`
 
@@ -579,7 +579,7 @@ expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
 
 
 
-<h3 id="api-krak-fn-groupby">groupBy(callable $fn, iterable $iter, $maxSize = null): iterable</h3>
+<h3 id="api-krak-fn-groupby">groupBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable</h3>
 
 **Name:** `Krak\Fn\groupBy`
 
