@@ -63,13 +63,35 @@ $res = f\compose(
 // $res == [1, 3, 5]
 ```
 
-Another great example is partial application.
+### Constants
+
+This library generates constants with same name as the function they were generated from where their value is the fully qualified name of the function.
+
+PHP (unfortunately) will treat strings as callables if they resolve to a function name. So generating constants with the same name as functions allows us to support a neat first class function type syntax.
 
 ```php
-use function Krak\Fun\{partial, map, toArray};
-use const Krak\Fun\{op};
+<?php
 
-$res = toArray(map(partial(op, '*', 3)), [1,2,3]);
+use Krak\Fun\{c, f};
+
+function getArrayRange(callable $toArray): array {
+    $toArray(f\range(1,3));
+}
+
+getArrayRange(c\toArray);
+```
+
+The above is valid php and will work because c\toArray resolves to `Krak\\Fun\\toArray` which php will treat as a valid callable.
+
+This is great for compose chains and partial application:
+
+```php
+use Krak\Fun\{f, c};
+
+$res = f\compose(
+    c\toArray,
+    map(partial(c\op, '*', 3))
+)([1,2,3]);
 assert($res == [3,6,9]);
 ```
 
