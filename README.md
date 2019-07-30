@@ -72,7 +72,7 @@ PHP (unfortunately) will treat strings as callables if they resolve to a functio
 ```php
 <?php
 
-use Krak\Fun\{c, f};
+use Krak\Fun\{f, c};
 
 function getArrayRange(callable $toArray): array {
     $toArray(f\range(1,3));
