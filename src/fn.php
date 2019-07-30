@@ -1,6 +1,6 @@
 <?php
 
-namespace Krak\Fn;
+namespace Krak\Fun;
 
 // ACCESS
 
@@ -25,7 +25,7 @@ function setIndex(/* string|int */ $key, $value, array $data) {
 }
 
 function setIndexIn(array $keys, $value, array $data) {
-    return \Krak\Fn\updateIndexIn($keys, function() use ($value) {
+    return \Krak\Fun\updateIndexIn($keys, function() use ($value) {
         return $value;
     }, $data);
 }
@@ -90,7 +90,7 @@ function assign($obj, iterable $iter) {
 }
 
 function join(string $sep, iterable $iter) {
-    return \Krak\Fn\reduce(function($acc, $v) use ($sep) {
+    return \Krak\Fun\reduce(function($acc, $v) use ($sep) {
         return $acc ? $acc . $sep . $v : $v;
     }, $iter, "");
 }
@@ -135,11 +135,11 @@ function dropWhile(callable $predicate, iterable $iter): iterable {
 }
 
 function take(int $num, iterable $iter): iterable {
-    return \Krak\Fn\slice(0, $iter, $num);
+    return \Krak\Fun\slice(0, $iter, $num);
 }
 
 function drop(int $num, iterable $iter): iterable {
-    return \Krak\Fn\slice($num, $iter);
+    return \Krak\Fun\slice($num, $iter);
 }
 
 function slice(int $start, iterable $iter, $length = INF): iterable {
@@ -205,7 +205,7 @@ function chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
 }
 
 function groupBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
-    return \Krak\Fn\chunkBy($fn, $iter, $maxSize);
+    return \Krak\Fun\chunkBy($fn, $iter, $maxSize);
 }
 
 
@@ -379,10 +379,10 @@ function fromPairs(iterable $iter): iterable {
 }
 
 function within(array $fields, iterable $iter): \Iterator {
-    return \Krak\Fn\filterKeys(\Krak\Fn\Curried\inArray($fields), $iter);
+    return \Krak\Fun\filterKeys(\Krak\Fun\Curried\inArray($fields), $iter);
 }
 function without(array $fields, iterable $iter): \Iterator {
-    return \Krak\Fn\filterKeys(\Krak\Fn\Curried\not(\Krak\Fn\Curried\inArray($fields)), $iter);
+    return \Krak\Fun\filterKeys(\Krak\Fun\Curried\not(\Krak\Fun\Curried\inArray($fields)), $iter);
 }
 
 function compact(iterable $iter): iterable {
@@ -414,7 +414,7 @@ function pad(int $size, iterable $iter, $padValue = null): iterable {
         return;
     }
 
-    foreach (\Krak\Fn\range($i, $size - 1) as $index) {
+    foreach (\Krak\Fun\range($i, $size - 1) as $index) {
         yield $padValue;
     }
 }
@@ -427,11 +427,11 @@ function inArray(array $set, $item): bool {
 }
 
 function arrayMap(callable $fn, iterable $data): array {
-    return \array_map($fn, \is_array($data) ? $data : \Krak\Fn\toArray($data));
+    return \array_map($fn, \is_array($data) ? $data : \Krak\Fun\toArray($data));
 }
 
 function arrayFilter(callable $fn, iterable $data): array {
-    return \array_filter(\is_array($data) ? $data : \Krak\Fn\toArray($data), $fn);
+    return \array_filter(\is_array($data) ? $data : \Krak\Fun\toArray($data), $fn);
 }
 
 function all(callable $predicate, iterable $iter): bool {
@@ -628,7 +628,7 @@ function partial(callable $fn, ...$appliedArgs) {
     return function(...$args) use ($fn, $appliedArgs) {
         list($appliedArgs, $args) = \array_reduce($appliedArgs, function($acc, $arg) {
             list($appliedArgs, $args) = $acc;
-            if ($arg === \Krak\Fn\placeholder()) {
+            if ($arg === \Krak\Fun\placeholder()) {
                 $arg = array_shift($args);
             }
 
@@ -645,14 +645,14 @@ function autoCurry(array $args, $numArgs, callable $fn) {
         return $fn(...$args);
     }
     if (\count($args) == $numArgs - 1) {
-        return \Krak\Fn\partial($fn, ...$args);
+        return \Krak\Fun\partial($fn, ...$args);
     }
     if (\count($args) == 0) {
-        return \Krak\Fn\curry($fn, $numArgs - 1);
+        return \Krak\Fun\curry($fn, $numArgs - 1);
     }
 
-    return \Krak\Fn\curry(
-        \Krak\Fn\partial($fn, ...$args),
+    return \Krak\Fun\curry(
+        \Krak\Fun\partial($fn, ...$args),
         ($numArgs - 1 - \count($args))
     );
 }
@@ -681,8 +681,8 @@ function id($v) {
 // UTILITY
 
 function differenceWith(callable $cmp, iterable $a, iterable $b) {
-    return \Krak\Fn\filter(function($aItem) use ($cmp, $b) {
-        return \Krak\Fn\indexOf(\Krak\Fn\partial($cmp, $aItem), $b) === null;
+    return \Krak\Fun\filter(function($aItem) use ($cmp, $b) {
+        return \Krak\Fun\indexOf(\Krak\Fun\partial($cmp, $aItem), $b) === null;
     }, $a);
 }
 
@@ -746,12 +746,12 @@ function pipe(callable ...$fns) {
 }
 
 function compose(callable ...$fns) {
-    return \Krak\Fn\pipe(...\array_reverse($fns));
+    return \Krak\Fun\pipe(...\array_reverse($fns));
 }
 
 function stack(array $funcs, callable $last = null, callable $resolve = null) {
     return function(...$args) use ($funcs, $resolve, $last) {
-        return \Krak\Fn\reduce(function($acc, $func) use ($resolve) {
+        return \Krak\Fun\reduce(function($acc, $func) use ($resolve) {
             return function(...$args) use ($acc, $func, $resolve) {
                 $args[] = $acc;
                 $func = $resolve ? $resolve($func) : $func;

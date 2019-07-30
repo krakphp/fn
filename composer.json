@@ -17,9 +17,9 @@
     ],
     "autoload": {
         "psr-4": {
-            "Krak\\Fn\\": "src"
+            "Krak\\Fun\\": "src"
         },
-        "files": ["src/fn.php", "src/curried.generated.php", "src/consts.generated.php", "src/consts.ns.generated.php", "src/generate.php"]
+        "files": ["src/fn.php", "src/curried.generated.php", "src/consts.generated.php", "src/consts.ns.generated.php", "src/c.generated.php", "src/f.generated.php", "src/generate.php"]
     },
     "require-dev": {
         "krak/peridocs": "dev-master",

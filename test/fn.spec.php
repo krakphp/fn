@@ -1,15 +1,15 @@
 <?php
 
-namespace Krak\Fn;
+namespace Krak\Fun;
 
-use const krak\fn\{toArray, id, op};
+use const Krak\Fun\{toArray, id, op};
 use stdClass;
 
 function _idArgs(...$args) {
     return $args;
 }
 
-describe('Fn', function() {
+describe('Fun', function() {
     it('can perform functional operations', function() {
         $res = compose(toArray, Curried\map(partial(op, '*', 3)), Curried\filter(partial(op, '>', 2)))([1,2,3,4]);
         expect($res)->equal([9, 12]);
