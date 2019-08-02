@@ -153,6 +153,66 @@ If you have a function compose chain and want to debug/test the result of any of
     );
     ```
 
+### Using Compose Chains for Readable Code
+
+One of my favorite features of using this library is building compose chains in a way that make your application services a lot easier to read and follow along with.
+
+```php
+
+use Krak\Fun\{f, c};
+
+/**
+ * Fetches orders based off of the arguments, filters data, and imports to database
+ */
+final class ImportOrdersFromApi
+{
+    public function __construct(ApiClient $client, OrderRepository $orderRepository, SaveOrders $saveOrders) {
+        // ...
+    }
+
+    public function __invoke(ImportOrderRequest $req): void {
+        f\compose(
+            $this->persistApiOrders(),
+            $this->removeAlreadyImportedOrders(),
+            $this->fetchOrdersFromApi()
+        )($req);
+    }
+
+    private function persistApiOrders(): callable {
+        // important that this is an c\each so that it will consume the iterable chain
+        return f\compose(
+            c\each($this->saveOrders), // saveOrders has a signature of `__invoke(iterable Order[]) => void`
+            c\chunk(50), // chunk to persist many at once
+            c\map(function(array $apiOrder) {
+                return Order::createFromApiData($apiOrder);
+            })
+        );
+    }
+
+    private function removeAlreadyImportedOrders(): callable {
+        return f\compose(
+            c\flatMap(function(array $apiOrders) {
+                $apiOrderIds = array_column($apiOrders, 'order_id');
+                /** array of order id => order entity */
+                $orders = $this->orderRepository->findByApiOrderIds($ids);
+                return f\filter(function(array $apiOrder) use ($orders) {
+                    return !array_key_exists($apiOrder['order_id'], $orders);
+                }, $apiOrders);
+            }),
+            // chunk by 50 to save on database requests
+            c\chunk(50)
+        );
+    }
+
+    /** Returns an iterable of api orders */
+    private function fetchOrdersFromApi(): callable {
+        return function(ImportOrderRequest $req) {
+            yield from $this->apiClient->fetch(/* pass in req args */);
+        };
+    }
+}
+```
+
 ## Docs
 
 Docs are generated with `make docs`. This uses Krak Peridocs to actually generate the documentation from the peridot tests.
