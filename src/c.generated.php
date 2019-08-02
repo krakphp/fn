@@ -1,7 +1,7 @@
 <?php
 
 /* This file is was automatically generated. */
-namespace Krak\Fun\Curried;
+namespace Krak\Fun\c;
 
 function method($name, ...$optionalArgs)
 {
@@ -709,3 +709,88 @@ function onEach(callable $handle)
         }
     };
 }
+const method = 'Krak\\Fun\\method';
+const prop = 'Krak\\Fun\\prop';
+const index = 'Krak\\Fun\\index';
+const setProp = 'Krak\\Fun\\setProp';
+const setIndex = 'Krak\\Fun\\setIndex';
+const setIndexIn = 'Krak\\Fun\\setIndexIn';
+const propIn = 'Krak\\Fun\\propIn';
+const indexIn = 'Krak\\Fun\\indexIn';
+const hasIndexIn = 'Krak\\Fun\\hasIndexIn';
+const updateIndexIn = 'Krak\\Fun\\updateIndexIn';
+const assign = 'Krak\\Fun\\assign';
+const join = 'Krak\\Fun\\join';
+const construct = 'Krak\\Fun\\construct';
+const spread = 'Krak\\Fun\\spread';
+const dd = 'Krak\\Fun\\dd';
+const takeWhile = 'Krak\\Fun\\takeWhile';
+const dropWhile = 'Krak\\Fun\\dropWhile';
+const take = 'Krak\\Fun\\take';
+const drop = 'Krak\\Fun\\drop';
+const slice = 'Krak\\Fun\\slice';
+const head = 'Krak\\Fun\\head';
+const chunk = 'Krak\\Fun\\chunk';
+const chunkBy = 'Krak\\Fun\\chunkBy';
+const groupBy = 'Krak\\Fun\\groupBy';
+const range = 'Krak\\Fun\\range';
+const op = 'Krak\\Fun\\op';
+const andf = 'Krak\\Fun\\andf';
+const orf = 'Krak\\Fun\\orf';
+const chain = 'Krak\\Fun\\chain';
+const zip = 'Krak\\Fun\\zip';
+const flatMap = 'Krak\\Fun\\flatMap';
+const flatten = 'Krak\\Fun\\flatten';
+const when = 'Krak\\Fun\\when';
+const toPairs = 'Krak\\Fun\\toPairs';
+const fromPairs = 'Krak\\Fun\\fromPairs';
+const within = 'Krak\\Fun\\within';
+const without = 'Krak\\Fun\\without';
+const compact = 'Krak\\Fun\\compact';
+const arrayCompact = 'Krak\\Fun\\arrayCompact';
+const pad = 'Krak\\Fun\\pad';
+const inArray = 'Krak\\Fun\\inArray';
+const arrayMap = 'Krak\\Fun\\arrayMap';
+const arrayFilter = 'Krak\\Fun\\arrayFilter';
+const all = 'Krak\\Fun\\all';
+const any = 'Krak\\Fun\\any';
+const search = 'Krak\\Fun\\search';
+const indexOf = 'Krak\\Fun\\indexOf';
+const trans = 'Krak\\Fun\\trans';
+const not = 'Krak\\Fun\\not';
+const isInstance = 'Krak\\Fun\\isInstance';
+const isNull = 'Krak\\Fun\\isNull';
+const nullable = 'Krak\\Fun\\nullable';
+const partition = 'Krak\\Fun\\partition';
+const map = 'Krak\\Fun\\map';
+const mapKeys = 'Krak\\Fun\\mapKeys';
+const mapKeyValue = 'Krak\\Fun\\mapKeyValue';
+const mapOn = 'Krak\\Fun\\mapOn';
+const mapAccum = 'Krak\\Fun\\mapAccum';
+const withState = 'Krak\\Fun\\withState';
+const arrayReindex = 'Krak\\Fun\\arrayReindex';
+const reindex = 'Krak\\Fun\\reindex';
+const reduce = 'Krak\\Fun\\reduce';
+const reduceKeyValue = 'Krak\\Fun\\reduceKeyValue';
+const filter = 'Krak\\Fun\\filter';
+const filterKeys = 'Krak\\Fun\\filterKeys';
+const values = 'Krak\\Fun\\values';
+const keys = 'Krak\\Fun\\keys';
+const flip = 'Krak\\Fun\\flip';
+const curry = 'Krak\\Fun\\curry';
+const placeholder = 'Krak\\Fun\\placeholder';
+const _ = 'Krak\\Fun\\_';
+const partial = 'Krak\\Fun\\partial';
+const autoCurry = 'Krak\\Fun\\autoCurry';
+const toArray = 'Krak\\Fun\\toArray';
+const toArrayWithKeys = 'Krak\\Fun\\toArrayWithKeys';
+const id = 'Krak\\Fun\\id';
+const differenceWith = 'Krak\\Fun\\differenceWith';
+const sortFromArray = 'Krak\\Fun\\sortFromArray';
+const retry = 'Krak\\Fun\\retry';
+const pipe = 'Krak\\Fun\\pipe';
+const compose = 'Krak\\Fun\\compose';
+const stack = 'Krak\\Fun\\stack';
+const each = 'Krak\\Fun\\each';
+const onEach = 'Krak\\Fun\\onEach';
+const iter = 'Krak\\Fun\\iter';

@@ -1,6 +1,6 @@
 <?php
 
-namespace Krak\Fn\Generate;
+namespace Krak\Fun\Generate;
 
 use PhpParser\{
     Comment,
@@ -14,7 +14,7 @@ use PhpParser\{
     Node\Stmt,
     BuilderHelpers
 };
-use function Krak\Fn\{
+use function Krak\Fun\{
     toArray, filter, partition
 };
 

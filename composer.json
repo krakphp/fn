@@ -17,14 +17,14 @@
     ],
     "autoload": {
         "psr-4": {
-            "Krak\\Fn\\": "src"
+            "Krak\\Fun\\": "src"
         },
-        "files": ["src/fn.php", "src/curried.generated.php", "src/consts.generated.php", "src/consts.ns.generated.php", "src/generate.php"]
+        "files": ["src/fn.php", "src/curried.generated.php", "src/consts.generated.php", "src/consts.ns.generated.php", "src/c.generated.php", "src/f.generated.php", "src/generate.php"]
     },
     "require-dev": {
         "krak/peridocs": "dev-master",
         "lavoiesl/php-benchmark": "^1.4",
-        "nikic/php-parser": "v4.0.0beta1",
+        "nikic/php-parser": "^4.0",
         "peridot-php/leo": "^1.6",
         "peridot-php/peridot": "^1.19",
         "symfony/var-dumper": "^4.0"

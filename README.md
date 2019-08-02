@@ -1,4 +1,4 @@
-# Fn
+# Fun
 
 Yet another functional library for PHP. What makes this library special is that it uses PHP Parser to generate curried versions of the non-curried implementations for best performance.
 
@@ -8,14 +8,14 @@ Install with composer at `krak/fn`
 
 ## Usage
 
-All functions are defined in `Krak\Fn`, are not curried, and are data last. Curried versions of functions are defined `Kran\Fn\Curried`. Constants are also generated per function in `Krak\Fn` and `Krak\Fn\Consts`.
+All functions are defined in `Krak\Fun`, are not curried, and are data last. Curried versions of functions are defined `Kran\Fun\Curried`. Constants are also generated per function in `Krak\Fun\Consts`.
 
 ```php
 <?php
 
-use function Krak\Fn\Curried\{filter, map, op};
-use function Krak\Fn\{compose};
-use const Krak\Fn\{toArray};
+use function Krak\Fun\Curried\{filter, map, op};
+use function Krak\Fun\{compose};
+use const Krak\Fun\Consts\{toArray};
 
 $res = compose(
     toArray,
@@ -27,24 +27,31 @@ assert($res == [9, 12]);
 
 Check the `src/fn.php` for examples of all the functions.
 
-### Constants
+### Fun API
 
-All functions have equivalent constants generated. These constants are defined as the fully qualified name of the function and in the Consts namespace.
+In addition to importing the functions/consts individually, you can also utilize the `f` and `c` namespaces as a shorthand which make using the library a lot easier.
 
 ```php
-namespace Krak\Fn {
-    function toArray($data) {};
-    const toArray = 'Krak\\Fn\\toArray';
-};
-namespace Krak\Fn\Consts {
-    const toArray = 'Krak\\Fn\\toArray';
-}
+<?php
+
+use Krak\Fun\{f, c};
+
+$res = f\compose(
+    c\toArray,
+    c\map(c\op('*')(3)),
+    c\filter(c\op('>')(2))
+)([1,2,3,4]);
+assert($res == [9, 12]);
 ```
+
+The `f` namespace holds the standard functions basically copied over verbatim from the `Krak\Fun` namespace.
+
+The `c` namespace contains all of the curried functions and constant definitions.
 
 One great way to use the consts is with compose or pipe chains:
 
 ```php
-use Krak\{Fn as f, Fn\Curried as c};
+use Krak\Fun\{f, c};
 
 $res = f\compose(
     f\toArray,
@@ -56,17 +63,39 @@ $res = f\compose(
 // $res == [1, 3, 5]
 ```
 
-Another great example is partial application.
+### Constants
+
+This library generates constants with same name as the function they were generated from where their value is the fully qualified name of the function.
+
+PHP (unfortunately) will treat strings as callables if they resolve to a function name. So generating constants with the same name as functions allows us to support a neat first class function type syntax.
 
 ```php
-use function Krak\Fn\{partial, map, toArray};
-use const Krak\Fn\{op};
+<?php
 
-$res = toArray(map(partial(op, '*', 3)), [1,2,3]);
+use Krak\Fun\{f, c};
+
+function getArrayRange(callable $toArray): array {
+    $toArray(f\range(1,3));
+}
+
+getArrayRange(c\toArray);
+```
+
+The above is valid php and will work because c\toArray resolves to `Krak\\Fun\\toArray` which php will treat as a valid callable.
+
+This is great for compose chains and partial application:
+
+```php
+use Krak\Fun\{f, c};
+
+$res = f\compose(
+    c\toArray,
+    map(partial(c\op, '*', 3))
+)([1,2,3]);
 assert($res == [3,6,9]);
 ```
 
-The `op` function is defined as `op($operator, $b, $a)`. Essentially, what we did was call: `partial('Krak\\Fn\\op', '*', 3)`.
+The `op` function is defined as `op($operator, $b, $a)`. Essentially, what we did was call: `partial('Krak\\Fun\\op', '*', 3)`.
 
 ### Currying
 
@@ -99,23 +128,6 @@ the curried verison would look like:
 (a, c = null) -> (b) -> Void
 ```
 
-### Importing
-
-I've found the most practical way to import functions and constants from the Fn library is as follows:
-
-```php
-<?php
-
-use Krak\{Fn as f, Fn\Curried as c};
-
-$res = f\compose(
-    f\toArray,
-    f\fromPairs,
-    c\map(function($tup) {
-        return [$tup[0], $tup[1] * $tup[1]];
-    })
-)(f\zip(['a', 'b', 'c'], [1,2,3]));
-```
 
 ### Debugging
 
@@ -136,10 +148,70 @@ If you have a function compose chain and want to debug/test the result of any of
     ```php
     f\compose(
         function() {}, // do something else
-        c\dd(), f\toArray, // debug result here
+        c\dd(), c\toArray, // debug result here
         c\map(function() {}) // do something
     );
     ```
+
+### Using Compose Chains for Readable Code
+
+One of my favorite features of using this library is building compose chains in a way that make your application services a lot easier to read and follow along with.
+
+```php
+
+use Krak\Fun\{f, c};
+
+/**
+ * Fetches orders based off of the arguments, filters data, and imports to database
+ */
+final class ImportOrdersFromApi
+{
+    public function __construct(ApiClient $client, OrderRepository $orderRepository, SaveOrders $saveOrders) {
+        // ...
+    }
+
+    public function __invoke(ImportOrderRequest $req): void {
+        f\compose(
+            $this->persistApiOrders(),
+            $this->removeAlreadyImportedOrders(),
+            $this->fetchOrdersFromApi()
+        )($req);
+    }
+
+    private function persistApiOrders(): callable {
+        // important that this is an c\each so that it will consume the iterable chain
+        return f\compose(
+            c\each($this->saveOrders), // saveOrders has a signature of `__invoke(iterable Order[]) => void`
+            c\chunk(50), // chunk to persist many at once
+            c\map(function(array $apiOrder) {
+                return Order::createFromApiData($apiOrder);
+            })
+        );
+    }
+
+    private function removeAlreadyImportedOrders(): callable {
+        return f\compose(
+            c\flatMap(function(array $apiOrders) {
+                $apiOrderIds = array_column($apiOrders, 'order_id');
+                /** array of order id => order entity */
+                $orders = $this->orderRepository->findByApiOrderIds($ids);
+                return f\filter(function(array $apiOrder) use ($orders) {
+                    return !array_key_exists($apiOrder['order_id'], $orders);
+                }, $apiOrders);
+            }),
+            // chunk by 50 to save on database requests
+            c\chunk(50)
+        );
+    }
+
+    /** Returns an iterable of api orders */
+    private function fetchOrdersFromApi(): callable {
+        return function(ImportOrderRequest $req) {
+            yield from $this->apiClient->fetch(/* pass in req args */);
+        };
+    }
+}
+```
 
 ## Docs
 
@@ -154,11 +226,11 @@ The constants and curried functions are generated with `make code`.
 Tests are run via `make test` and are stored in the `test` directory. We use peridot for testing.
 
 ## API
-<table><tr><td><a href="#api-krak-fn-all">all</a></td><td><a href="#api-krak-fn-any">any</a></td><td><a href="#api-krak-fn-arraycompact">arrayCompact</a></td><td><a href="#api-krak-fn-arrayfilter">arrayFilter</a></td><td><a href="#api-krak-fn-arraymap">arrayMap</a></td><td><a href="#api-krak-fn-arrayreindex">arrayReindex</a></td><td><a href="#api-krak-fn-assign">assign</a></td><td><a href="#api-krak-fn-chain">chain</a></td></tr><tr><td><a href="#api-krak-fn-chunk">chunk</a></td><td><a href="#api-krak-fn-chunkby">chunkBy</a></td><td><a href="#api-krak-fn-compact">compact</a></td><td><a href="#api-krak-fn-compose">compose</a></td><td><a href="#api-krak-fn-construct">construct</a></td><td><a href="#api-krak-fn-curry">curry</a></td><td><a href="#api-krak-fn-differencewith">differenceWith</a></td><td><a href="#api-krak-fn-dd">dd</a></td></tr><tr><td><a href="#api-krak-fn-drop">drop</a></td><td><a href="#api-krak-fn-dropwhile">dropWhile</a></td><td><a href="#api-krak-fn-each">each</a></td><td><a href="#api-krak-fn-filter">filter</a></td><td><a href="#api-krak-fn-filterkeys">filterKeys</a></td><td><a href="#api-krak-fn-flatmap">flatMap</a></td><td><a href="#api-krak-fn-flatten">flatten</a></td><td><a href="#api-krak-fn-flip">flip</a></td></tr><tr><td><a href="#api-krak-fn-frompairs">fromPairs</a></td><td><a href="#api-krak-fn-groupby">groupBy</a></td><td><a href="#api-krak-fn-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fn-head">head</a></td><td><a href="#api-krak-fn-inarray">inArray</a></td><td><a href="#api-krak-fn-index">index</a></td><td><a href="#api-krak-fn-indexin">indexIn</a></td><td><a href="#api-krak-fn-indexof">indexOf</a></td></tr><tr><td><a href="#api-krak-fn-isnull">isNull</a></td><td><a href="#api-krak-fn-iter">iter</a></td><td><a href="#api-krak-fn-join">join</a></td><td><a href="#api-krak-fn-keys">keys</a></td><td><a href="#api-krak-fn-map">map</a></td><td><a href="#api-krak-fn-mapaccum">mapAccum</a></td><td><a href="#api-krak-fn-mapkeys">mapKeys</a></td><td><a href="#api-krak-fn-mapkeyvalue">mapKeyValue</a></td></tr><tr><td><a href="#api-krak-fn-mapon">mapOn</a></td><td><a href="#api-krak-fn-nullable">nullable</a></td><td><a href="#api-krak-fn-oneach">onEach</a></td><td><a href="#api-krak-fn-op">op</a></td><td><a href="#api-krak-fn-pad">pad</a></td><td><a href="#api-krak-fn-partial">partial</a></td><td><a href="#api-krak-fn-partition">partition</a></td><td><a href="#api-krak-fn-pipe">pipe</a></td></tr><tr><td><a href="#api-krak-fn-prop">prop</a></td><td><a href="#api-krak-fn-propin">propIn</a></td><td><a href="#api-krak-fn-range">range</a></td><td><a href="#api-krak-fn-reduce">reduce</a></td><td><a href="#api-krak-fn-reducekeyvalue">reduceKeyValue</a></td><td><a href="#api-krak-fn-reindex">reindex</a></td><td><a href="#api-krak-fn-retry">retry</a></td><td><a href="#api-krak-fn-search">search</a></td></tr><tr><td><a href="#api-krak-fn-setindex">setIndex</a></td><td><a href="#api-krak-fn-setindexin">setIndexIn</a></td><td><a href="#api-krak-fn-setprop">setProp</a></td><td><a href="#api-krak-fn-slice">slice</a></td><td><a href="#api-krak-fn-sortfromarray">sortFromArray</a></td><td><a href="#api-krak-fn-spread">spread</a></td><td><a href="#api-krak-fn-take">take</a></td><td><a href="#api-krak-fn-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fn-toarray">toArray</a></td><td><a href="#api-krak-fn-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fn-topairs">toPairs</a></td><td><a href="#api-krak-fn-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fn-values">values</a></td><td><a href="#api-krak-fn-when">when</a></td><td><a href="#api-krak-fn-withstate">withState</a></td><td><a href="#api-krak-fn-within">within</a></td></tr><tr><td><a href="#api-krak-fn-without">without</a></td><td><a href="#api-krak-fn-zip">zip</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fun-all">all</a></td><td><a href="#api-krak-fun-any">any</a></td><td><a href="#api-krak-fun-arraycompact">arrayCompact</a></td><td><a href="#api-krak-fun-arrayfilter">arrayFilter</a></td><td><a href="#api-krak-fun-arraymap">arrayMap</a></td><td><a href="#api-krak-fun-arrayreindex">arrayReindex</a></td><td><a href="#api-krak-fun-assign">assign</a></td><td><a href="#api-krak-fun-chain">chain</a></td></tr><tr><td><a href="#api-krak-fun-chunk">chunk</a></td><td><a href="#api-krak-fun-chunkby">chunkBy</a></td><td><a href="#api-krak-fun-compact">compact</a></td><td><a href="#api-krak-fun-compose">compose</a></td><td><a href="#api-krak-fun-construct">construct</a></td><td><a href="#api-krak-fun-curry">curry</a></td><td><a href="#api-krak-fun-differencewith">differenceWith</a></td><td><a href="#api-krak-fun-dd">dd</a></td></tr><tr><td><a href="#api-krak-fun-drop">drop</a></td><td><a href="#api-krak-fun-dropwhile">dropWhile</a></td><td><a href="#api-krak-fun-each">each</a></td><td><a href="#api-krak-fun-filter">filter</a></td><td><a href="#api-krak-fun-filterkeys">filterKeys</a></td><td><a href="#api-krak-fun-flatmap">flatMap</a></td><td><a href="#api-krak-fun-flatten">flatten</a></td><td><a href="#api-krak-fun-flip">flip</a></td></tr><tr><td><a href="#api-krak-fun-frompairs">fromPairs</a></td><td><a href="#api-krak-fun-groupby">groupBy</a></td><td><a href="#api-krak-fun-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fun-head">head</a></td><td><a href="#api-krak-fun-inarray">inArray</a></td><td><a href="#api-krak-fun-index">index</a></td><td><a href="#api-krak-fun-indexin">indexIn</a></td><td><a href="#api-krak-fun-indexof">indexOf</a></td></tr><tr><td><a href="#api-krak-fun-isnull">isNull</a></td><td><a href="#api-krak-fun-iter">iter</a></td><td><a href="#api-krak-fun-join">join</a></td><td><a href="#api-krak-fun-keys">keys</a></td><td><a href="#api-krak-fun-map">map</a></td><td><a href="#api-krak-fun-mapaccum">mapAccum</a></td><td><a href="#api-krak-fun-mapkeys">mapKeys</a></td><td><a href="#api-krak-fun-mapkeyvalue">mapKeyValue</a></td></tr><tr><td><a href="#api-krak-fun-mapon">mapOn</a></td><td><a href="#api-krak-fun-nullable">nullable</a></td><td><a href="#api-krak-fun-oneach">onEach</a></td><td><a href="#api-krak-fun-op">op</a></td><td><a href="#api-krak-fun-pad">pad</a></td><td><a href="#api-krak-fun-partial">partial</a></td><td><a href="#api-krak-fun-partition">partition</a></td><td><a href="#api-krak-fun-pipe">pipe</a></td></tr><tr><td><a href="#api-krak-fun-prop">prop</a></td><td><a href="#api-krak-fun-propin">propIn</a></td><td><a href="#api-krak-fun-range">range</a></td><td><a href="#api-krak-fun-reduce">reduce</a></td><td><a href="#api-krak-fun-reducekeyvalue">reduceKeyValue</a></td><td><a href="#api-krak-fun-reindex">reindex</a></td><td><a href="#api-krak-fun-retry">retry</a></td><td><a href="#api-krak-fun-search">search</a></td></tr><tr><td><a href="#api-krak-fun-setindex">setIndex</a></td><td><a href="#api-krak-fun-setindexin">setIndexIn</a></td><td><a href="#api-krak-fun-setprop">setProp</a></td><td><a href="#api-krak-fun-slice">slice</a></td><td><a href="#api-krak-fun-sortfromarray">sortFromArray</a></td><td><a href="#api-krak-fun-spread">spread</a></td><td><a href="#api-krak-fun-take">take</a></td><td><a href="#api-krak-fun-takewhile">takeWhile</a></td></tr><tr><td><a href="#api-krak-fun-toarray">toArray</a></td><td><a href="#api-krak-fun-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fun-topairs">toPairs</a></td><td><a href="#api-krak-fun-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fun-values">values</a></td><td><a href="#api-krak-fun-when">when</a></td><td><a href="#api-krak-fun-withstate">withState</a></td><td><a href="#api-krak-fun-within">within</a></td></tr><tr><td><a href="#api-krak-fun-without">without</a></td><td><a href="#api-krak-fun-zip">zip</a></td></tr></table>
 
-<h3 id="api-krak-fn-all">all(callable $predicate, iterable $iter): bool</h3>
+<h3 id="api-krak-fun-all">all(callable $predicate, iterable $iter): bool</h3>
 
-**Name:** `Krak\Fn\all`
+**Name:** `Krak\Fun\all`
 
 Returns true if the predicate returns true on all of the items:
 
@@ -180,9 +252,9 @@ expect($res)->equal(false);
 
 
 
-<h3 id="api-krak-fn-any">any(callable $predicate, iterable $iter): bool</h3>
+<h3 id="api-krak-fun-any">any(callable $predicate, iterable $iter): bool</h3>
 
-**Name:** `Krak\Fn\any`
+**Name:** `Krak\Fun\any`
 
 Returns true if the predicate returns true on any of the items:
 
@@ -204,9 +276,9 @@ expect($res)->equal(false);
 
 
 
-<h3 id="api-krak-fn-arraycompact">arrayCompact(iterable $iter): array</h3>
+<h3 id="api-krak-fun-arraycompact">arrayCompact(iterable $iter): array</h3>
 
-**Name:** `Krak\Fn\arrayCompact`
+**Name:** `Krak\Fun\arrayCompact`
 
 It will remove all nulls from an iterable and return an array:
 
@@ -217,9 +289,9 @@ expect(\array_values($res))->equal([1, 2, 3]);
 
 Keep in mind that the keys will be preserved when using arrayCompact, so make sure to use array_values if you want to ignore keys.
 
-<h3 id="api-krak-fn-arrayfilter">arrayFilter(callable $fn, iterable $data): array</h3>
+<h3 id="api-krak-fun-arrayfilter">arrayFilter(callable $fn, iterable $data): array</h3>
 
-**Name:** `Krak\Fn\arrayFilter`
+**Name:** `Krak\Fun\arrayFilter`
 
 Alias of array_filter:
 
@@ -237,9 +309,9 @@ expect($res)->equal([1]);
 
 
 
-<h3 id="api-krak-fn-arraymap">arrayMap(callable $fn, iterable $data): array</h3>
+<h3 id="api-krak-fun-arraymap">arrayMap(callable $fn, iterable $data): array</h3>
 
-**Name:** `Krak\Fn\arrayMap`
+**Name:** `Krak\Fun\arrayMap`
 
 Alias of array_map:
 
@@ -257,9 +329,9 @@ expect($res)->equal([2, 4, 6]);
 
 
 
-<h3 id="api-krak-fn-arrayreindex">arrayReindex(callable $fn, iterable $iter): array</h3>
+<h3 id="api-krak-fun-arrayreindex">arrayReindex(callable $fn, iterable $iter): array</h3>
 
-**Name:** `Krak\Fn\arrayReindex`
+**Name:** `Krak\Fun\arrayReindex`
 
 Re-indexes a collection via a callable into an associative array:
 
@@ -272,9 +344,9 @@ expect($res)->equal([2 => ['id' => 2], 3 => ['id' => 3], 1 => ['id' => 1]]);
 
 
 
-<h3 id="api-krak-fn-assign">assign($obj, iterable $iter)</h3>
+<h3 id="api-krak-fun-assign">assign($obj, iterable $iter)</h3>
 
-**Name:** `Krak\Fn\assign`
+**Name:** `Krak\Fun\assign`
 
 Assigns iterable keys and values to an object:
 
@@ -287,9 +359,9 @@ expect($obj->b)->equal(2);
 
 
 
-<h3 id="api-krak-fn-chain">chain(iterable ...$iters)</h3>
+<h3 id="api-krak-fun-chain">chain(iterable ...$iters)</h3>
 
-**Name:** `Krak\Fn\chain`
+**Name:** `Krak\Fun\chain`
 
 Chains iterables together into one iterable:
 
@@ -300,9 +372,9 @@ expect(toArray($res))->equal([1, 2, 3]);
 
 
 
-<h3 id="api-krak-fn-chunk">chunk(int $size, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-chunk">chunk(int $size, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\chunk`
+**Name:** `Krak\Fun\chunk`
 
 Chunks an iterable into equal sized chunks.:
 
@@ -320,9 +392,9 @@ expect(toArray($res))->equal([[1, 2, 3], [4]]);
 
 
 
-<h3 id="api-krak-fn-chunkby">chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable</h3>
+<h3 id="api-krak-fun-chunkby">chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable</h3>
 
-**Name:** `Krak\Fn\chunkBy`
+**Name:** `Krak\Fun\chunkBy`
 
 Chunks items together off of the result from the callable:
 
@@ -348,9 +420,9 @@ expect(toArray($chunks))->equal([['aa', 'ab'], ['ac'], ['ba', 'bb'], ['bc'], ['c
 
 
 
-<h3 id="api-krak-fn-compact">compact(iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-compact">compact(iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\compact`
+**Name:** `Krak\Fun\compact`
 
 Removes all null values from an iterable:
 
@@ -361,9 +433,9 @@ expect(toArray($res))->equal([1, 2, 3, 4]);
 
 
 
-<h3 id="api-krak-fn-compose">compose(callable ...$fns)</h3>
+<h3 id="api-krak-fun-compose">compose(callable ...$fns)</h3>
 
-**Name:** `Krak\Fn\compose`
+**Name:** `Krak\Fun\compose`
 
 Composes functions together. compose(f, g)(x) == f(g(x)):
 
@@ -388,9 +460,9 @@ expect($res)->equal(6);
 
 
 
-<h3 id="api-krak-fn-construct">construct($className, ...$args)</h3>
+<h3 id="api-krak-fun-construct">construct($className, ...$args)</h3>
 
-**Name:** `Krak\Fn\construct`
+**Name:** `Krak\Fun\construct`
 
 Constructs (instantiates) a new class with the given arguments:
 
@@ -401,9 +473,9 @@ expect($res->count())->equal(3);
 
 
 
-<h3 id="api-krak-fn-curry">curry(callable $fn, int $num = 1)</h3>
+<h3 id="api-krak-fun-curry">curry(callable $fn, int $num = 1)</h3>
 
-**Name:** `Krak\Fn\curry`
+**Name:** `Krak\Fun\curry`
 
 currys the given function $n times:
 
@@ -414,9 +486,9 @@ expect($res)->equal([1, 2, 3]);
 
 Given a function definition: (a, b) -> c. A curried version will look like (a) -> (b) -> c
 
-<h3 id="api-krak-fn-differencewith">differenceWith(callable $cmp, iterable $a, iterable $b)</h3>
+<h3 id="api-krak-fun-differencewith">differenceWith(callable $cmp, iterable $a, iterable $b)</h3>
 
-**Name:** `Krak\Fn\differenceWith`
+**Name:** `Krak\Fun\differenceWith`
 
 Takes the difference between two iterables with a given comparator:
 
@@ -427,9 +499,9 @@ expect(toArray($res))->equal([1, 5]);
 
 
 
-<h3 id="api-krak-fn-dd">dd($value, callable $dump = null, callable $die = null)</h3>
+<h3 id="api-krak-fun-dd">dd($value, callable $dump = null, callable $die = null)</h3>
 
-**Name:** `Krak\Fn\dd`
+**Name:** `Krak\Fun\dd`
 
 dumps and dies:
 
@@ -449,9 +521,9 @@ expect($died)->equal(true);
 
 
 
-<h3 id="api-krak-fn-drop">drop(int $num, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-drop">drop(int $num, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\drop`
+**Name:** `Krak\Fun\drop`
 
 Drops the first num items from an iterable:
 
@@ -462,9 +534,9 @@ expect(toArray($res))->equal([2, 3]);
 
 
 
-<h3 id="api-krak-fn-dropwhile">dropWhile(callable $predicate, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-dropwhile">dropWhile(callable $predicate, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\dropWhile`
+**Name:** `Krak\Fun\dropWhile`
 
 Drops elements from the iterable while the predicate returns true:
 
@@ -475,9 +547,9 @@ expect(toArray($res))->equal([0, 1, 2]);
 
 
 
-<h3 id="api-krak-fn-each">each(callable $handle, iterable $iter)</h3>
+<h3 id="api-krak-fun-each">each(callable $handle, iterable $iter)</h3>
 
-**Name:** `Krak\Fn\each`
+**Name:** `Krak\Fun\each`
 
 Invokes a callable on each item in an iterable:
 
@@ -491,9 +563,9 @@ expect([$state[0]->id, $state[1]->id])->equal([2, 3]);
 
 Normally using php foreach should suffice for iterating over an iterable; however, php variables in foreach loops are not scoped whereas closures are.
 
-<h3 id="api-krak-fn-filter">filter(callable $predicate, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-filter">filter(callable $predicate, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\filter`
+**Name:** `Krak\Fun\filter`
 
 Lazily filters an iterable off of a predicate that should return true or false. If true, keep the data, else remove the data from the iterable:
 
@@ -505,9 +577,9 @@ expect(toArray($values))->equal([3, 4]);
 
 
 
-<h3 id="api-krak-fn-filterkeys">filterKeys(callable $predicate, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-filterkeys">filterKeys(callable $predicate, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\filterKeys`
+**Name:** `Krak\Fun\filterKeys`
 
 Filters an iterable off of the keys:
 
@@ -518,9 +590,9 @@ expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
 
 
 
-<h3 id="api-krak-fn-flatmap">flatMap(callable $map, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-flatmap">flatMap(callable $map, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\flatMap`
+**Name:** `Krak\Fun\flatMap`
 
 Maps and then flattens an iterable:
 
@@ -533,9 +605,9 @@ expect(toArray($res))->equal([-1, 1, -2, 2, -3, 3]);
 
 flatMap is perfect for when you want to map an iterable and also add elements to the resulting iterable.
 
-<h3 id="api-krak-fn-flatten">flatten(iterable $iter, $levels = INF): iterable</h3>
+<h3 id="api-krak-fun-flatten">flatten(iterable $iter, $levels = INF): iterable</h3>
 
-**Name:** `Krak\Fn\flatten`
+**Name:** `Krak\Fun\flatten`
 
 Flattens nested iterables into a flattened set of elements:
 
@@ -553,9 +625,9 @@ expect(toArray($res))->equal([1, 2, [3]]);
 
 
 
-<h3 id="api-krak-fn-flip">flip(iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-flip">flip(iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\flip`
+**Name:** `Krak\Fun\flip`
 
 Flips the keys => values of an iterable to values => keys:
 
@@ -566,9 +638,9 @@ expect(toArray($res))->equal(['a', 'b']);
 
 
 
-<h3 id="api-krak-fn-frompairs">fromPairs(iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-frompairs">fromPairs(iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\fromPairs`
+**Name:** `Krak\Fun\fromPairs`
 
 Converts an iterable of tuples [$key, $value] into an associative iterable:
 
@@ -579,9 +651,9 @@ expect(toArrayWithKeys($res))->equal(['a' => 1, 'b' => 2]);
 
 
 
-<h3 id="api-krak-fn-groupby">groupBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable</h3>
+<h3 id="api-krak-fun-groupby">groupBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable</h3>
 
-**Name:** `Krak\Fn\groupBy`
+**Name:** `Krak\Fun\groupBy`
 
 Alias of chunkBy
 
@@ -609,9 +681,9 @@ expect(toArray($groupedItems))->equal([['aa', 'ab'], ['ac'], ['ba', 'bb'], ['bc'
 
 
 
-<h3 id="api-krak-fn-hasindexin">hasIndexIn(array $keys, array $data): bool</h3>
+<h3 id="api-krak-fun-hasindexin">hasIndexIn(array $keys, array $data): bool</h3>
 
-**Name:** `Krak\Fn\hasIndexIn`
+**Name:** `Krak\Fun\hasIndexIn`
 
 Checks if a nested index exists in the given data:
 
@@ -629,9 +701,9 @@ expect($res)->equal(false);
 
 
 
-<h3 id="api-krak-fn-head">head(iterable $iter)</h3>
+<h3 id="api-krak-fun-head">head(iterable $iter)</h3>
 
-**Name:** `Krak\Fn\head`
+**Name:** `Krak\Fun\head`
 
 Returns the fist element in an iterable:
 
@@ -649,9 +721,9 @@ expect($res)->equal(null);
 
 
 
-<h3 id="api-krak-fn-inarray">inArray(array $set, $item): bool</h3>
+<h3 id="api-krak-fun-inarray">inArray(array $set, $item): bool</h3>
 
-**Name:** `Krak\Fn\inArray`
+**Name:** `Krak\Fun\inArray`
 
 Checks if an item is within an array of items:
 
@@ -662,9 +734,9 @@ expect($res)->equal(true);
 
 
 
-<h3 id="api-krak-fn-index">index($key, array $data, $else = null)</h3>
+<h3 id="api-krak-fun-index">index($key, array $data, $else = null)</h3>
 
-**Name:** `Krak\Fn\index`
+**Name:** `Krak\Fun\index`
 
 Accesses an index in an array:
 
@@ -682,9 +754,9 @@ expect($res)->equal(2);
 
 
 
-<h3 id="api-krak-fn-indexin">indexIn(array $keys, array $data, $else = null)</h3>
+<h3 id="api-krak-fun-indexin">indexIn(array $keys, array $data, $else = null)</h3>
 
-**Name:** `Krak\Fn\indexIn`
+**Name:** `Krak\Fun\indexIn`
 
 Accesses a nested index in a deep array structure:
 
@@ -702,9 +774,9 @@ expect($res)->equal(2);
 
 
 
-<h3 id="api-krak-fn-indexof">indexOf(callable $predicate, iterable $iter)</h3>
+<h3 id="api-krak-fun-indexof">indexOf(callable $predicate, iterable $iter)</h3>
 
-**Name:** `Krak\Fn\indexOf`
+**Name:** `Krak\Fun\indexOf`
 
 Searches for an element and returns the key if found:
 
@@ -715,9 +787,9 @@ expect($res)->equal(1);
 
 
 
-<h3 id="api-krak-fn-isnull">isNull($val)</h3>
+<h3 id="api-krak-fun-isnull">isNull($val)</h3>
 
-**Name:** `Krak\Fn\isNull`
+**Name:** `Krak\Fun\isNull`
 
 alias for is_null:
 
@@ -728,9 +800,9 @@ expect(isNull(0))->equal(false);
 
 
 
-<h3 id="api-krak-fn-iter">iter($iter): \Iterator</h3>
+<h3 id="api-krak-fun-iter">iter($iter): \Iterator</h3>
 
-**Name:** `Krak\Fn\iter`
+**Name:** `Krak\Fun\iter`
 
 Converts any iterable into a proper instance of Iterator.
 
@@ -785,9 +857,9 @@ expect(function () {
 
 
 
-<h3 id="api-krak-fn-join">join(string $sep, iterable $iter)</h3>
+<h3 id="api-krak-fun-join">join(string $sep, iterable $iter)</h3>
 
-**Name:** `Krak\Fn\join`
+**Name:** `Krak\Fun\join`
 
 Joins an iterable with a given separator:
 
@@ -798,9 +870,9 @@ expect($res)->equal("1,2,3");
 
 
 
-<h3 id="api-krak-fn-keys">keys(iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-keys">keys(iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\keys`
+**Name:** `Krak\Fun\keys`
 
 Yields only the keys of an in iterable:
 
@@ -811,9 +883,9 @@ expect(toArray($keys))->equal(['a', 'b']);
 
 
 
-<h3 id="api-krak-fn-map">map(callable $predicate, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-map">map(callable $predicate, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\map`
+**Name:** `Krak\Fun\map`
 
 Lazily maps an iterable's values to a different set:
 
@@ -824,9 +896,9 @@ expect(toArray($values))->equal([2, 4, 6, 8]);
 
 
 
-<h3 id="api-krak-fn-mapaccum">mapAccum(callable $fn, iterable $iter, $acc = null)</h3>
+<h3 id="api-krak-fun-mapaccum">mapAccum(callable $fn, iterable $iter, $acc = null)</h3>
 
-**Name:** `Krak\Fn\mapAccum`
+**Name:** `Krak\Fun\mapAccum`
 
 Maps a function to each element of a list while passing in an accumulator to accumulate over every iteration:
 
@@ -841,9 +913,9 @@ expect($values)->equal([['name' => 'a', 'sort' => 0], ['name' => 'b', 'sort' => 
 
 Note: mapAccum converts the interable into an array and is not lazy like most of the other functions in this library
 
-<h3 id="api-krak-fn-mapkeys">mapKeys(callable $predicate, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-mapkeys">mapKeys(callable $predicate, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\mapKeys`
+**Name:** `Krak\Fun\mapKeys`
 
 Lazily maps an iterable's keys to a different set:
 
@@ -854,9 +926,9 @@ expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 2]);
 
 
 
-<h3 id="api-krak-fn-mapkeyvalue">mapKeyValue(callable $fn, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-mapkeyvalue">mapKeyValue(callable $fn, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\mapKeyValue`
+**Name:** `Krak\Fun\mapKeyValue`
 
 Lazily maps an iterable's key/value tuples to a different set:
 
@@ -870,9 +942,9 @@ expect(toArrayWithKeys($keys))->equal(['a_' => 1, 'b_' => 4]);
 
 
 
-<h3 id="api-krak-fn-mapon">mapOn(array $maps, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-mapon">mapOn(array $maps, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\mapOn`
+**Name:** `Krak\Fun\mapOn`
 
 Maps values on specific keys:
 
@@ -883,9 +955,9 @@ expect(toArray($values))->equal([3, 3, 3]);
 
 
 
-<h3 id="api-krak-fn-nullable">nullable(callable $fn, $value)</h3>
+<h3 id="api-krak-fun-nullable">nullable(callable $fn, $value)</h3>
 
-**Name:** `Krak\Fn\nullable`
+**Name:** `Krak\Fun\nullable`
 
 Performs the callable if the value is not null:
 
@@ -901,9 +973,9 @@ expect(nullable('intval', null))->equal(null);
 
 
 
-<h3 id="api-krak-fn-oneach">onEach(callable $handle, iterable $iter)</h3>
+<h3 id="api-krak-fun-oneach">onEach(callable $handle, iterable $iter)</h3>
 
-**Name:** `Krak\Fn\onEach`
+**Name:** `Krak\Fun\onEach`
 
 Duplicate of each.
 
@@ -919,9 +991,9 @@ expect([$state[0]->id, $state[1]->id])->equal([2, 3]);
 
 Normally using php foreach should suffice for iterating over an iterable; however, php variables in foreach loops are not scoped whereas closures are.
 
-<h3 id="api-krak-fn-op">op(string $op, $b, $a)</h3>
+<h3 id="api-krak-fun-op">op(string $op, $b, $a)</h3>
 
-**Name:** `Krak\Fn\op`
+**Name:** `Krak\Fun\op`
 
 op evaluates binary operations. It expects the right hand operator first which makes most sense when currying or partially applying the op function.
 When reading the op func, it should be read: `evaluate $op with $b with $a` e.g.:
@@ -973,9 +1045,9 @@ expect($res)->equal(8);
 
 
 
-<h3 id="api-krak-fn-pad">pad(int $size, iterable $iter, $padValue = null): iterable</h3>
+<h3 id="api-krak-fun-pad">pad(int $size, iterable $iter, $padValue = null): iterable</h3>
 
-**Name:** `Krak\Fn\pad`
+**Name:** `Krak\Fun\pad`
 
 Pads an iterable to a specific size:
 
@@ -1014,9 +1086,9 @@ expect(toArrayWithKeys($res))->equal([1, 2, null]);
 
 
 
-<h3 id="api-krak-fn-partial">partial(callable $fn, ...$appliedArgs)</h3>
+<h3 id="api-krak-fun-partial">partial(callable $fn, ...$appliedArgs)</h3>
 
-**Name:** `Krak\Fn\partial`
+**Name:** `Krak\Fun\partial`
 
 Partially applies arguments to a function. Given a function signature like f = (a, b, c) -> d, partial(f, a, b) -> (c) -> d:
 
@@ -1053,9 +1125,9 @@ expect($fn())->equal([1, 2]);
 
 
 
-<h3 id="api-krak-fn-partition">partition(callable $partition, iterable $iter, int $numParts = 2): array</h3>
+<h3 id="api-krak-fun-partition">partition(callable $partition, iterable $iter, int $numParts = 2): array</h3>
 
-**Name:** `Krak\Fn\partition`
+**Name:** `Krak\Fun\partition`
 
 Splits an iterable into different arrays based off of a predicate. The predicate should return the index to partition the data into:
 
@@ -1068,9 +1140,9 @@ expect([$left, $right])->equal([[1, 2], [3, 4]]);
 
 
 
-<h3 id="api-krak-fn-pipe">pipe(callable ...$fns)</h3>
+<h3 id="api-krak-fun-pipe">pipe(callable ...$fns)</h3>
 
-**Name:** `Krak\Fn\pipe`
+**Name:** `Krak\Fun\pipe`
 
 Creates a function that pipes values from one func to the next.:
 
@@ -1095,9 +1167,9 @@ expect($res)->equal(6);
 
 `pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))
 
-<h3 id="api-krak-fn-prop">prop(string $key, $data, $else = null)</h3>
+<h3 id="api-krak-fun-prop">prop(string $key, $data, $else = null)</h3>
 
-**Name:** `Krak\Fn\prop`
+**Name:** `Krak\Fun\prop`
 
 Accesses a property from an object:
 
@@ -1118,9 +1190,9 @@ expect($res)->equal(2);
 
 
 
-<h3 id="api-krak-fn-propin">propIn(array $props, $obj, $else = null)</h3>
+<h3 id="api-krak-fun-propin">propIn(array $props, $obj, $else = null)</h3>
 
-**Name:** `Krak\Fn\propIn`
+**Name:** `Krak\Fun\propIn`
 
 Accesses a property deep in an object tree:
 
@@ -1145,9 +1217,9 @@ expect($res)->equal(3);
 
 
 
-<h3 id="api-krak-fn-range">range($start, $end, $step = null)</h3>
+<h3 id="api-krak-fun-range">range($start, $end, $step = null)</h3>
 
-**Name:** `Krak\Fn\range`
+**Name:** `Krak\Fun\range`
 
 Creates an iterable of a range of values starting from $start going to $end inclusively incrementing by $step:
 
@@ -1176,9 +1248,9 @@ expect(function () {
 
 
 
-<h3 id="api-krak-fn-reduce">reduce(callable $reduce, iterable $iter, $acc = null)</h3>
+<h3 id="api-krak-fun-reduce">reduce(callable $reduce, iterable $iter, $acc = null)</h3>
 
-**Name:** `Krak\Fn\reduce`
+**Name:** `Krak\Fun\reduce`
 
 Reduces an iterable into a single value:
 
@@ -1191,9 +1263,9 @@ expect($res)->equal(6);
 
 
 
-<h3 id="api-krak-fn-reducekeyvalue">reduceKeyValue(callable $reduce, iterable $iter, $acc = null)</h3>
+<h3 id="api-krak-fun-reducekeyvalue">reduceKeyValue(callable $reduce, iterable $iter, $acc = null)</h3>
 
-**Name:** `Krak\Fn\reduceKeyValue`
+**Name:** `Krak\Fun\reduceKeyValue`
 
 Reduces an iterables key value pairs into a value:
 
@@ -1207,9 +1279,9 @@ expect($res)->equal("a1b2");
 
 
 
-<h3 id="api-krak-fn-reindex">reindex(callable $fn, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-reindex">reindex(callable $fn, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\reindex`
+**Name:** `Krak\Fun\reindex`
 
 Re-indexes a collection via a callable:
 
@@ -1222,9 +1294,9 @@ expect(toArrayWithKeys($res))->equal([2 => ['id' => 2], 3 => ['id' => 3], 1 => [
 
 
 
-<h3 id="api-krak-fn-retry">retry(callable $fn, $shouldRetry = null)</h3>
+<h3 id="api-krak-fun-retry">retry(callable $fn, $shouldRetry = null)</h3>
 
-**Name:** `Krak\Fn\retry`
+**Name:** `Krak\Fun\retry`
 
 Executes a function and retries if an exception is thrown:
 
@@ -1280,9 +1352,9 @@ expect($res)->equal(1);
 
 Keep in mind that maxTries determines the number of *re*-tries. This means the function will execute maxTries + 1 times since the first invocation is not a retry.
 
-<h3 id="api-krak-fn-search">search(callable $predicate, iterable $iter)</h3>
+<h3 id="api-krak-fun-search">search(callable $predicate, iterable $iter)</h3>
 
-**Name:** `Krak\Fn\search`
+**Name:** `Krak\Fun\search`
 
 Searches for an element in a collection where the callable returns true:
 
@@ -1304,9 +1376,9 @@ expect($res)->equal(null);
 
 
 
-<h3 id="api-krak-fn-setindex">setIndex($key, $value, array $data)</h3>
+<h3 id="api-krak-fun-setindex">setIndex($key, $value, array $data)</h3>
 
-**Name:** `Krak\Fn\setIndex`
+**Name:** `Krak\Fun\setIndex`
 
 Sets an index in an array:
 
@@ -1317,9 +1389,9 @@ expect($res['a'])->equal(1);
 
 
 
-<h3 id="api-krak-fn-setindexin">setIndexIn(array $keys, $value, array $data)</h3>
+<h3 id="api-krak-fun-setindexin">setIndexIn(array $keys, $value, array $data)</h3>
 
-**Name:** `Krak\Fn\setIndexIn`
+**Name:** `Krak\Fun\setIndexIn`
 
 Sets a nested index in an array:
 
@@ -1330,9 +1402,9 @@ expect($res['a']['b'])->equal(1);
 
 
 
-<h3 id="api-krak-fn-setprop">setProp(string $key, $value, $data)</h3>
+<h3 id="api-krak-fun-setprop">setProp(string $key, $value, $data)</h3>
 
-**Name:** `Krak\Fn\setProp`
+**Name:** `Krak\Fun\setProp`
 
 Sets a property in an object:
 
@@ -1343,9 +1415,9 @@ expect($res->a)->equal(1);
 
 
 
-<h3 id="api-krak-fn-slice">slice(int $start, iterable $iter, $length = INF): iterable</h3>
+<h3 id="api-krak-fun-slice">slice(int $start, iterable $iter, $length = INF): iterable</h3>
 
-**Name:** `Krak\Fn\slice`
+**Name:** `Krak\Fun\slice`
 
 It takes an inclusive slice from start to a given length of an interable:
 
@@ -1378,9 +1450,9 @@ expect($i)->equal(2);
 
 
 
-<h3 id="api-krak-fn-sortfromarray">sortFromArray(callable $fn, array $orderedElements, iterable $iter): array</h3>
+<h3 id="api-krak-fun-sortfromarray">sortFromArray(callable $fn, array $orderedElements, iterable $iter): array</h3>
 
-**Name:** `Krak\Fn\sortFromArray`
+**Name:** `Krak\Fun\sortFromArray`
 
 Sort an iterable with a given array of ordered elements to sort by:
 
@@ -1401,9 +1473,9 @@ expect(function () {
 
 I've found this to be very useful when you fetch records from a database with a WHERE IN clause, and you need to make sure the results are in the same order as the ids in the WHERE IN clause.
 
-<h3 id="api-krak-fn-spread">spread(callable $fn, array $data)</h3>
+<h3 id="api-krak-fun-spread">spread(callable $fn, array $data)</h3>
 
-**Name:** `Krak\Fn\spread`
+**Name:** `Krak\Fun\spread`
 
 Spreads an array of arguments to a callable:
 
@@ -1416,9 +1488,9 @@ expect($res)->equal('ab');
 
 Note: this is basically just an alias for `call_user_func_array` or simply a functional wrapper around the `...` (spread) operator.
 
-<h3 id="api-krak-fn-take">take(int $num, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-take">take(int $num, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\take`
+**Name:** `Krak\Fun\take`
 
 Takes the first num items from an iterable:
 
@@ -1429,9 +1501,9 @@ expect(toArray($res))->equal([0, 1]);
 
 
 
-<h3 id="api-krak-fn-takewhile">takeWhile(callable $predicate, iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-takewhile">takeWhile(callable $predicate, iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\takeWhile`
+**Name:** `Krak\Fun\takeWhile`
 
 Takes elements from an iterable while the $predicate returns true:
 
@@ -1442,9 +1514,9 @@ expect(toArray($res))->equal([2, 1]);
 
 
 
-<h3 id="api-krak-fn-toarray">toArray(iterable $iter): array</h3>
+<h3 id="api-krak-fun-toarray">toArray(iterable $iter): array</h3>
 
-**Name:** `Krak\Fn\toArray`
+**Name:** `Krak\Fun\toArray`
 
 will tranform any iterable into an array:
 
@@ -1470,9 +1542,9 @@ expect($res)->equal([1, 2, 3]);
 
 
 
-<h3 id="api-krak-fn-toarraywithkeys">toArrayWithKeys(iterable $iter): array</h3>
+<h3 id="api-krak-fun-toarraywithkeys">toArrayWithKeys(iterable $iter): array</h3>
 
-**Name:** `Krak\Fn\toArrayWithKeys`
+**Name:** `Krak\Fun\toArrayWithKeys`
 
 can convert to an array and keep the keys:
 
@@ -1486,9 +1558,9 @@ expect(toArrayWithKeys($gen()))->equal(['a' => 1, 'b' => 2]);
 
 
 
-<h3 id="api-krak-fn-topairs">toPairs(iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-topairs">toPairs(iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\toPairs`
+**Name:** `Krak\Fun\toPairs`
 
 Transforms an associative array into an iterable of tuples [$key, $value]:
 
@@ -1499,9 +1571,9 @@ expect(toArray($res))->equal([['a', 1], ['b', 2]]);
 
 
 
-<h3 id="api-krak-fn-updateindexin">updateIndexIn(array $keys, callable $update, array $data): array</h3>
+<h3 id="api-krak-fun-updateindexin">updateIndexIn(array $keys, callable $update, array $data): array</h3>
 
-**Name:** `Krak\Fn\updateIndexIn`
+**Name:** `Krak\Fun\updateIndexIn`
 
 Updates a nested element within a deep array structure:
 
@@ -1525,9 +1597,9 @@ expect(function () {
 
 
 
-<h3 id="api-krak-fn-values">values(iterable $iter): iterable</h3>
+<h3 id="api-krak-fun-values">values(iterable $iter): iterable</h3>
 
-**Name:** `Krak\Fn\values`
+**Name:** `Krak\Fun\values`
 
 Exports only the values of an iterable:
 
@@ -1538,9 +1610,9 @@ expect(toArrayWithKeys($res))->equal([1, 2]);
 
 
 
-<h3 id="api-krak-fn-when">when(callable $if, callable $then, $value)</h3>
+<h3 id="api-krak-fun-when">when(callable $if, callable $then, $value)</h3>
 
-**Name:** `Krak\Fn\when`
+**Name:** `Krak\Fun\when`
 
 Evaluates the given value with the $then callable if the predicate returns true:
 
@@ -1570,9 +1642,9 @@ expect($res)->equal(4);
 
 
 
-<h3 id="api-krak-fn-withstate">withState(callable $fn, $initialState = null)</h3>
+<h3 id="api-krak-fun-withstate">withState(callable $fn, $initialState = null)</h3>
 
-**Name:** `Krak\Fn\withState`
+**Name:** `Krak\Fun\withState`
 
 Decorate a function with accumulating state:
 
@@ -1586,9 +1658,9 @@ expect($res)->equal(['1: a', '2: b', '3: c', '4: d']);
 
 
 
-<h3 id="api-krak-fn-within">within(array $fields, iterable $iter): \Iterator</h3>
+<h3 id="api-krak-fun-within">within(array $fields, iterable $iter): \Iterator</h3>
 
-**Name:** `Krak\Fn\within`
+**Name:** `Krak\Fun\within`
 
 Only allows keys within the given array to stay:
 
@@ -1600,9 +1672,9 @@ expect(toArrayWithKeys($res))->equal(['a' => 0, 'c' => 2]);
 
 
 
-<h3 id="api-krak-fn-without">without(array $fields, iterable $iter): \Iterator</h3>
+<h3 id="api-krak-fun-without">without(array $fields, iterable $iter): \Iterator</h3>
 
-**Name:** `Krak\Fn\without`
+**Name:** `Krak\Fun\without`
 
 Filters an iterable to be without the given keys:
 
@@ -1614,9 +1686,9 @@ expect(toArrayWithKeys($res))->equal(['b' => 1, 'd' => 3]);
 
 
 
-<h3 id="api-krak-fn-zip">zip(iterable ...$iters): \Iterator</h3>
+<h3 id="api-krak-fun-zip">zip(iterable ...$iters): \Iterator</h3>
 
-**Name:** `Krak\Fn\zip`
+**Name:** `Krak\Fun\zip`
 
 Zips multiple iterables into an iterable n-tuples:
 
