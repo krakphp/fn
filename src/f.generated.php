@@ -325,7 +325,7 @@ function flatMap(callable $map, iterable $iter) : iterable
 function flatten(iterable $iter, $levels = INF) : iterable
 {
     if ($levels == 0) {
-        return $iter;
+        yield from $iter;
     } else {
         if ($levels == 1) {
             foreach ($iter as $k => $v) {
@@ -348,6 +348,25 @@ function flatten(iterable $iter, $levels = INF) : iterable
                 }
             }
         }
+    }
+}
+function product(iterable ...$iters) : iterable
+{
+    if (count($iters) === 0) {
+        yield from [];
+        return;
+    }
+    if (count($iters) === 1) {
+        yield from \Krak\Fun\map(function ($v) {
+            return [$v];
+        }, $iters[0]);
+        return;
+    }
+    foreach ($iters[0] as $value) {
+        yield from \Krak\Fun\map(function (array $tup) use($value) {
+            array_unshift($tup, $value);
+            return $tup;
+        }, \Krak\Fun\product(...\array_slice($iters, 1)));
     }
 }
 function when(callable $if, callable $then, $value)

@@ -329,7 +329,7 @@ function flatten($levels = INF)
 {
     return function (iterable $iter) use($levels) {
         if ($levels == 0) {
-            return $iter;
+            yield from $iter;
         } else {
             if ($levels == 1) {
                 foreach ($iter as $k => $v) {
@@ -741,6 +741,7 @@ const chain = 'Krak\\Fun\\chain';
 const zip = 'Krak\\Fun\\zip';
 const flatMap = 'Krak\\Fun\\flatMap';
 const flatten = 'Krak\\Fun\\flatten';
+const product = 'Krak\\Fun\\product';
 const when = 'Krak\\Fun\\when';
 const toPairs = 'Krak\\Fun\\toPairs';
 const fromPairs = 'Krak\\Fun\\fromPairs';

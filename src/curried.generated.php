@@ -329,7 +329,7 @@ function flatten($levels = INF)
 {
     return function (iterable $iter) use($levels) {
         if ($levels == 0) {
-            return $iter;
+            yield from $iter;
         } else {
             if ($levels == 1) {
                 foreach ($iter as $k => $v) {

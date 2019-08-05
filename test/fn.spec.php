@@ -284,6 +284,10 @@ describe('Fun', function() {
             $res = flatten([1,[2, [3]]], 1);
             expect(toArray($res))->equal([1, 2, [3]]);
         });
+        test('Flattening zero levels does nothing', function() {
+            $res = flatten([1, [2]], 0);
+            expect(toArray($res))->equal([1,[2]]);
+        });
     });
     describe('flip', function() {
         docFn(flip::class);
@@ -679,6 +683,23 @@ INTRO;
         });
 
         docOutro('`pipe` and `compose` are sister functions and do the same thing except the functions are composed in reverse order. pipe(f, g)(x) = g(f(x))');
+    });
+    describe('product', function() {
+        docFn(product::class);
+
+        test('Creates a cartesian product of multiple sets', function() {
+            $res = product([1,2], [3,4], [5, 6]);
+            expect(toArray($res))->equal([
+                [1,3,5],
+                [1,3,6],
+                [1,4,5],
+                [1,4,6],
+                [2,3,5],
+                [2,3,6],
+                [2,4,5],
+                [2,4,6],
+            ]);
+        });
     });
     describe('prop', function() {
         docFn(prop::class);

@@ -35,6 +35,7 @@ const chain = 'Krak\\Fun\\chain';
 const zip = 'Krak\\Fun\\zip';
 const flatMap = 'Krak\\Fun\\flatMap';
 const flatten = 'Krak\\Fun\\flatten';
+const product = 'Krak\\Fun\\product';
 const when = 'Krak\\Fun\\when';
 const toPairs = 'Krak\\Fun\\toPairs';
 const fromPairs = 'Krak\\Fun\\fromPairs';
