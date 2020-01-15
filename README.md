@@ -54,11 +54,11 @@ One great way to use the consts is with compose or pipe chains:
 use Krak\Fun\{f, c};
 
 $res = f\compose(
-    f\toArray,
+    c\toArray,
     c\map(function($tup) {
         return $tup[0] + $tup[1];
     }),
-    f\toPairs
+    c\toPairs
 )([1,2,3]);
 // $res == [1, 3, 5]
 ```
