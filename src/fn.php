@@ -397,6 +397,23 @@ function fromPairs(iterable $iter): iterable {
     }
 }
 
+function pick(iterable $fields, array $data): array {
+    $pickedData = [];
+    foreach ($fields as $field) {
+        $pickedData[$field] = $data[$field] ?? null;
+    }
+    return $pickedData;
+}
+function pickBy(callable $pick, array $data): array {
+    $pickedData = [];
+    foreach ($data as $key => $value) {
+        if ($pick([$key, $value])) {
+            $pickedData[$key] = $value;
+        }
+    }
+    return $pickedData;
+}
+
 function within(array $fields, iterable $iter): \Iterator {
     return \Krak\Fun\filterKeys(\Krak\Fun\Curried\inArray($fields), $iter);
 }
