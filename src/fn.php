@@ -3,78 +3,151 @@
 namespace Krak\Fun;
 
 // ACCESS
-
-function method($name, /* object */ $data, ...$optionalArgs) {
+/**
+ * @param object $data
+ * @param mixed ...$optionalArgs
+ * @return mixed
+ * @psalm-pure
+ */
+function method(string $name, $data, ...$optionalArgs) {
+    /** @psalm-suppress MixedMethodCall */
     return $data->{$name}(...$optionalArgs);
 }
-function prop(string $key, /* object */ $data, $else = null) {
+
+/**
+ * @template TElse
+ * @param object $data
+ * @param TElse $else
+ * @return mixed|TElse
+ * @psalm-pure
+ */
+function prop(string $key, $data, $else = null) {
     return \property_exists($data, $key) ? $data->{$key} : $else;
 }
-function index(/* string|int */ $key, array $data, $else = null) {
+
+/**
+ * @template TData as array
+ * @template TKey as array-key
+ * @template TElse
+ * @param TKey $key
+ * @param TData $data
+ * @param TElse $else
+ * @return TData[TKey]|TElse
+ * @psalm-suppress MixedReturnStatement
+ * @psalm-pure
+ */
+function index($key, array $data, $else = null) {
     return \array_key_exists($key, $data) ? $data[$key] : $else;
 }
-
-function setProp(string $key, $value, /* object */ $data) {
+/**
+ * @template TValue
+ * @template TData as object
+ * @param TValue $value
+ * @param TData $data
+ * @return TData
+ */
+function setProp(string $key, $value, $data) {
     $data->{$key} = $value;
     return $data;
 }
 
-function setIndex(/* string|int */ $key, $value, array $data) {
+/**
+ * @template TValue
+ * @template TData as array
+ * @param array-key $key
+ * @param TValue $value
+ * @param TData $data
+ * @return TData
+ */
+function setIndex($key, $value, array $data) {
     $data[$key] = $value;
     return $data;
 }
 
-function setIndexIn(array $keys, $value, array $data) {
-    return \Krak\Fun\updateIndexIn($keys, function() use ($value) {
-        return $value;
-    }, $data);
+/**
+ * @param list<string> $keys
+ * @param mixed $value
+ */
+function setIndexIn(array $keys, $value, array $data): array {
+    return \Krak\Fun\updateIndexIn(
+        $keys,
+        /** @return mixed */
+        function() use ($value) {
+            return $value;
+        },
+        $data
+    );
 }
 
+/**
+ * @param string[] $props
+ * @param object $obj
+ * @param mixed $else
+ * @return mixed
+ */
 function propIn(array $props, /* object */ $obj, $else = null) {
     foreach ($props as $prop) {
         if (!\is_object($obj) || !\property_exists($obj, $prop)) {
             return $else;
         }
 
+        /** @psalm-suppress MixedAssignment */
         $obj = $obj->{$prop};
     }
 
     return $obj;
 }
 
+/**
+ * @param string[] $keys
+ * @param mixed $else
+ * @return mixed
+ */
 function indexIn(array $keys, array $data, $else = null) {
     foreach ($keys as $part) {
         if (!\is_array($data) || !\array_key_exists($part, $data)) {
             return $else;
         }
 
+        /** @psalm-suppress MixedAssignment */
         $data = $data[$part];
     }
 
     return $data;
 }
 
+/**
+ * @param list<array-key> $keys
+ */
 function hasIndexIn(array $keys, array $data): bool {
     foreach ($keys as $key) {
         if (!\is_array($data) || !\array_key_exists($key, $data)) {
             return false;
         }
+        /** @psalm-suppress MixedAssignment */
         $data = $data[$key];
     }
 
     return true;
 }
 
+/**
+ * @param list<array-key> $keys
+ * @param callable(mixed): mixed $update
+ * @return array
+ */
 function updateIndexIn(array $keys, callable $update, array $data): array {
     $curData = &$data;
     foreach (\array_slice($keys, 0, -1) as $key) {
-        if (!\array_key_exists($key, $curData)) {
+        if (!is_array($curData) || !\array_key_exists($key, $curData)) {
             throw new \RuntimeException('Could not updateIn because the keys ' . \implode(' -> ', $keys) . ' could not be found.');
         }
+        /** @psalm-suppress MixedAssignment */
         $curData = &$curData[$key];
     }
 
     $lastKey = $keys[count($keys) - 1];
+    /** @psalm-suppress MixedAssignment */
     $curData[$lastKey] = $update($curData[$lastKey] ?? null);
 
     return $data;
@@ -82,28 +155,52 @@ function updateIndexIn(array $keys, callable $update, array $data): array {
 
 // UTILITY
 
+/**
+ * @template TObj as object
+ * @param TObj $obj
+ * @return TObj
+ */
 function assign($obj, iterable $iter) {
+    /** @psalm-suppress MixedAssignment */
     foreach ($iter as $key => $value) {
         $obj->{$key} = $value;
     }
     return $obj;
 }
 
-function join(string $sep, iterable $iter) {
-    return \Krak\Fun\reduce(function($acc, $v) use ($sep) {
+/**
+ * @param iterable<string> $iter
+ */
+function join(string $sep, iterable $iter): string {
+    return \Krak\Fun\reduce(function(string $acc, string $v) use ($sep): string {
         return $acc ? $acc . $sep . $v : $v;
     }, $iter, "");
 }
 
-function construct($className, ...$args) {
+/**
+ * @template T
+ * @param class-string<T> $className
+ * @param mixed ...$args
+ * @return T
+ */
+function construct(string $className, ...$args) {
     return new $className(...$args);
 }
 
+/**
+ * @template TReturn
+ * @param callable(...mixed): TReturn $fn
+ * @return TReturn
+ */
 function spread(callable $fn, array $data) {
     return $fn(...$data);
 }
 
-function dd($value, callable $dump = null, callable $die = null) {
+/**
+ * @param mixed $value
+ * @never-returns
+ */
+function dd($value, callable $dump = null, callable $die = null): void {
     $dump = $dump ?: (function_exists('dump') ? 'dump' : 'var_dump');
     $dump($value);
     ($die ?? function() { die; })();
@@ -111,6 +208,12 @@ function dd($value, callable $dump = null, callable $die = null) {
 
 // SLICING
 
+/**
+ * @template TValue
+ * @param callable(TValue): bool $predicate
+ * @param iterable<TValue> $iter
+ * @return iterable<TValue>
+ */
 function takeWhile(callable $predicate, iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         if ($predicate($v)) {
@@ -121,6 +224,12 @@ function takeWhile(callable $predicate, iterable $iter): iterable {
     }
 }
 
+/**
+ * @template TValue
+ * @param callable(TValue): bool $predicate
+ * @param iterable<TValue> $iter
+ * @return iterable<TValue>
+ */
 function dropWhile(callable $predicate, iterable $iter): iterable {
     $stillDropping = true;
     foreach ($iter as $k => $v) {
@@ -134,14 +243,30 @@ function dropWhile(callable $predicate, iterable $iter): iterable {
     }
 }
 
+/**
+ * @template TValue
+ * @param iterable<TValue> $iter
+ * @return iterable<TValue>
+ */
 function take(int $num, iterable $iter): iterable {
     return \Krak\Fun\slice(0, $iter, $num);
 }
 
+/**
+ * @template TValue
+ * @param iterable<TValue> $iter
+ * @return iterable<TValue>
+ */
 function drop(int $num, iterable $iter): iterable {
     return \Krak\Fun\slice($num, $iter);
 }
 
+/**
+ * @template TValue
+ * @param iterable<TValue> $iter
+ * @param int|float $length
+ * @return iterable<TValue>
+ */
 function slice(int $start, iterable $iter, $length = INF): iterable {
     assert($start >= 0);
 
@@ -159,12 +284,22 @@ function slice(int $start, iterable $iter, $length = INF): iterable {
     }
 }
 
+/**
+ * @template TValue
+ * @param iterable<TValue> $iter
+ * @return ?TValue
+ */
 function head(iterable $iter) {
     foreach ($iter as $v) {
         return $v;
     }
 }
 
+/**
+ * @template TValue
+ * @param iterable<TValue> $iter
+ * @return iterable<array<TValue>>
+ */
 function chunk(int $size, iterable $iter): iterable {
     assert($size > 0);
 
@@ -182,6 +317,13 @@ function chunk(int $size, iterable $iter): iterable {
     }
 }
 
+/**
+ * @template TValue
+ * @template TKey as array-key
+ * @param callable(TValue): TKey $fn
+ * @param iterable<TValue> $iter
+ * @return iterable<array<TValue>>
+ */
 function chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
     assert($maxSize === null || $maxSize > 0);
     $group = [];
@@ -204,14 +346,21 @@ function chunkBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
     }
 }
 
+/**
+ * @template TValue
+ * @template TKey as array-key
+ * @param callable(TValue): TKey $fn
+ * @param iterable<TValue> $iter
+ * @return iterable<array<TValue>>
+ */
 function groupBy(callable $fn, iterable $iter, ?int $maxSize = null): iterable {
     return \Krak\Fun\chunkBy($fn, $iter, $maxSize);
 }
 
-
 // GENERATORS
 
-function range($start, $end, $step = null) {
+/** @return iterable<int> */
+function range(int $start, int $end, ?int $step = null) {
     if ($start == $end) {
         yield $start;
     } else if ($start < $end) {
@@ -235,6 +384,11 @@ function range($start, $end, $step = null) {
 
 // OPERATORS
 
+/**
+ * @param mixed $b
+ * @param mixed $a
+ * @return mixed
+ */
 function op(string $op, $b, $a) {
     switch ($op) {
     case '==':
@@ -260,26 +414,39 @@ function op(string $op, $b, $a) {
     case 'lte':
         return $a <= $b;
     case '+':
+        /** @psalm-suppress MixedOperand */
         return $a + $b;
     case '-':
+        /** @psalm-suppress MixedOperand */
         return $a - $b;
     case '*':
+        /** @psalm-suppress MixedOperand */
         return $a * $b;
     case '**':
+        /** @psalm-suppress MixedOperand */
         return $a ** $b;
     case '/':
+        /** @psalm-suppress MixedOperand */
         return $a / $b;
     case '%':
+        /** @psalm-suppress MixedOperand */
         return $a % $b;
     case '.':
+        /** @psalm-suppress MixedOperand */
         return $a . $b;
     default:
         throw new \LogicException('Invalid operator '.$op);
     }
 }
 
-function andf(callable ...$fns) {
-    return function($el) use ($fns) {
+/**
+ * @template T
+ * @param callable(T): bool ...$fns
+ */
+function andf(callable ...$fns): callable {
+    return
+    /** @param T $el */
+    function($el) use ($fns): bool {
         foreach ($fns as $fn) {
             if (!$fn($el)) {
                 return false;
@@ -288,8 +455,15 @@ function andf(callable ...$fns) {
         return true;
     };
 }
-function orf(callable ...$fns) {
-    return function($el) use ($fns) {
+
+/**
+ * @template T
+ * @param callable(T): bool ...$fns
+ */
+function orf(callable ...$fns): callable {
+    return
+    /** @param T $el */
+    function($el) use ($fns) {
         foreach ($fns as $fn) {
             if ($fn($el)) {
                 return true;
@@ -299,6 +473,11 @@ function orf(callable ...$fns) {
     };
 }
 
+/**
+ * @template T
+ * @param iterable<T> ...$iters
+ * @return iterable<T>
+ */
 function chain(iterable ...$iters) {
     foreach ($iters as $iter) {
         foreach ($iter as $k => $v) {
@@ -312,7 +491,7 @@ function zip(iterable ...$iters): \Iterator {
         return;
     }
 
-    $iters = \array_map(iter::class, $iters);
+    $iters = \array_map('Krak\Fun\iter', $iters);
 
     while (true) {
         $tup = [];
@@ -320,6 +499,7 @@ function zip(iterable ...$iters): \Iterator {
             if (!$iter->valid()) {
                 return;
             }
+            /** @psalm-suppress MixedAssignment */
             $tup[] = $iter->current();
             $iter->next();
         }
@@ -327,7 +507,69 @@ function zip(iterable ...$iters): \Iterator {
     }
 }
 
+/**
+ * @template A
+ * @template B
+ * @param iterable<A> $iterA
+ * @param iterable<B> $iterB
+ * @return iterable<array{0: A, 1: B}>
+ */
+function zip2(iterable $iterA, iterable $iterB): iterable {
+    return zip($iterA, $iterB);
+}
 
+/**
+ * @template A
+ * @template B
+ * @template C
+ * @param iterable<A> $iterA
+ * @param iterable<B> $iterB
+ * @param iterable<C> $iterC
+ * @return iterable<array{0: A, 1: B, 2: C}>
+ */
+function zip3(iterable $iterA, iterable $iterB, iterable $iterC): iterable {
+    return zip($iterA, $iterB, $iterC);
+}
+
+/**
+ * @template A
+ * @template B
+ * @template C
+ * @template D
+ * @param iterable<A> $iterA
+ * @param iterable<B> $iterB
+ * @param iterable<C> $iterC
+ * @param iterable<D> $iterD
+ * @return iterable<array{0: A, 1: B, 2: C, 3: D}>
+ */
+function zip4(iterable $iterA, iterable $iterB, iterable $iterC, iterable $iterD): iterable {
+    return zip($iterA, $iterB, $iterC, $iterD);
+}
+
+/**
+ * @template A
+ * @template B
+ * @template C
+ * @template D
+ * @template E
+ * @param iterable<A> $iterA
+ * @param iterable<B> $iterB
+ * @param iterable<C> $iterC
+ * @param iterable<D> $iterD
+ * @param iterable<E> $iterE
+ * @return iterable<array{0: A, 1: B, 2: C, 3: D, 4: E}>
+ */
+function zip5(iterable $iterA, iterable $iterB, iterable $iterC, iterable $iterD, iterable $iterE): iterable {
+    return zip($iterA, $iterB, $iterC, $iterD, $iterE);
+}
+
+/**
+ * @template T
+ * @template U
+ * @param callable(T): iterable<U> $map
+ * @param iterable<T> $iter
+ * @return iterable<U>
+ */
 function flatMap(callable $map, iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         foreach ($map($v) as $k => $v) {
@@ -336,10 +578,14 @@ function flatMap(callable $map, iterable $iter): iterable {
     }
 }
 
+/**
+ * @param int|float $levels
+ */
 function flatten(iterable $iter, $levels = INF): iterable {
     if ($levels == 0) {
         yield from $iter;
     } else if ($levels == 1) {
+        /** @psalm-suppress MixedAssignment */
         foreach ($iter as $k => $v) {
             if (\is_iterable($v)) {
                 foreach ($v as $k1 => $v1) {
@@ -350,6 +596,7 @@ function flatten(iterable $iter, $levels = INF): iterable {
             }
         }
     } else {
+        /** @psalm-suppress MixedAssignment */
         foreach ($iter as $k => $v) {
             if (\is_iterable($v)) {
                 foreach (flatten($v, $levels - 1) as $k1 => $v1) {
@@ -362,50 +609,92 @@ function flatten(iterable $iter, $levels = INF): iterable {
     }
 }
 
-
+/**
+ * @template T
+ * @return iterable<array<T>>
+ */
 function product(iterable ...$iters): iterable {
     if (count($iters) === 0) {
         yield from [];
         return;
     }
     if (count($iters) === 1) {
-        yield from \Krak\Fun\map(function($v) { return [$v]; }, $iters[0]);
+        yield from \Krak\Fun\map(
+            /**
+             * @template T
+             * @param T $v
+             * @return list<T>
+             */
+            function($v) { return [$v]; },
+            $iters[0]
+        );
         return;
     }
 
+    /** @psalm-suppress MixedAssignment */
     foreach ($iters[0] as $value) {
-        yield from \Krak\Fun\map(function(array $tup) use ($value) {
+        yield from \Krak\Fun\map(function(array $tup) use ($value): array {
             array_unshift($tup, $value);
             return $tup;
         }, \Krak\Fun\product(...\array_slice($iters, 1)));
     }
 }
 
-
+/**
+ * @template TValue
+ * @template TReturn
+ * @param callable(TValue): bool $if
+ * @param callable(TValue): TReturn $then
+ * @param TValue $value
+ * @return TReturn|TValue
+ */
 function when(callable $if, callable $then, $value) {
     return $if($value) ? $then($value) : $value;
 }
 
+/**
+ * @template V
+ * @template K
+ * @param iterable<K, V> $iter
+ * @return iterable<array{0: K, 1: V}>
+ */
 function toPairs(iterable $iter): iterable {
     foreach ($iter as $key => $val) {
         yield [$key, $val];
     }
 }
+
+/**
+ * @template V
+ * @template K
+ * @param iterable<array{0: K, 1: V}> $iter
+ * @return iterable<K, V>
+ */
 function fromPairs(iterable $iter): iterable {
     foreach ($iter as list($key, $val)) {
         yield $key => $val;
     }
 }
 
+/**
+ * @template K as array-key
+ * @param iterable<K> $fields
+ */
 function pick(iterable $fields, array $data): array {
     $pickedData = [];
     foreach ($fields as $field) {
+        /** @psalm-suppress MixedAssignment */
         $pickedData[$field] = $data[$field] ?? null;
     }
     return $pickedData;
 }
+
+/**
+ * @param callable(array{0: array-key, 1: mixed}): bool $pick
+ */
 function pickBy(callable $pick, array $data): array {
     $pickedData = [];
+    /** @psalm-suppress MixedAssignment */
     foreach ($data as $key => $value) {
         if ($pick([$key, $value])) {
             $pickedData[$key] = $value;
@@ -414,13 +703,18 @@ function pickBy(callable $pick, array $data): array {
     return $pickedData;
 }
 
-function within(array $fields, iterable $iter): \Iterator {
+function within(array $fields, iterable $iter): iterable {
     return \Krak\Fun\filterKeys(\Krak\Fun\Curried\inArray($fields), $iter);
 }
-function without(array $fields, iterable $iter): \Iterator {
+function without(array $fields, iterable $iter): iterable {
     return \Krak\Fun\filterKeys(\Krak\Fun\Curried\not(\Krak\Fun\Curried\inArray($fields)), $iter);
 }
 
+/**
+ * @template T
+ * @param iterable<T|null> $iter
+ * @return iterable<T>
+ */
 function compact(iterable $iter): iterable {
     foreach ($iter as $key => $val) {
         if ($val !== null) {
@@ -429,6 +723,12 @@ function compact(iterable $iter): iterable {
     }
 }
 
+/**
+ * @template T
+ * @template K as array-key
+ * @param iterable<K, T|null> $iter
+ * @return array<K, T>
+ */
 function arrayCompact(iterable $iter): array {
     $vals = [];
     foreach ($iter as $key => $val) {
@@ -439,6 +739,13 @@ function arrayCompact(iterable $iter): array {
     return $vals;
 }
 
+/**
+ * @template T
+ * @template U
+ * @param iterable<T> $iter
+ * @param U $padValue
+ * @return iterable<T|U>
+ */
 function pad(int $size, iterable $iter, $padValue = null): iterable {
     $i = 0;
     foreach ($iter as $key => $value) {
@@ -458,18 +765,41 @@ function pad(int $size, iterable $iter, $padValue = null): iterable {
 
 // ALIASES
 
+/**
+ * @template T
+ * @param array<T> $set
+ * @param T $item
+ */
 function inArray(array $set, $item): bool {
     return \in_array($item, $set);
 }
 
+/**
+ * @template T
+ * @template U
+ * @param callable(T): U $predicate
+ * @param iterable<T> $iter
+ * @return array<array-key, U>
+ */
 function arrayMap(callable $fn, iterable $data): array {
     return \array_map($fn, \is_array($data) ? $data : \Krak\Fun\toArray($data));
 }
 
+/**
+ * @template V
+ * @param callable(V): bool $fn
+ * @param iterable<V> $iter
+ * @return array<array-key, V>
+ */
 function arrayFilter(callable $fn, iterable $data): array {
     return \array_filter(\is_array($data) ? $data : \Krak\Fun\toArray($data), $fn);
 }
 
+/**
+ * @template T
+ * @param callable(T): bool $predicate
+ * @param iterable<T> $iter
+ */
 function all(callable $predicate, iterable $iter): bool {
     foreach ($iter as $key => $value) {
         if (!$predicate($value)) {
@@ -479,6 +809,12 @@ function all(callable $predicate, iterable $iter): bool {
 
     return true;
 }
+
+/**
+ * @template T
+ * @param callable(T): bool $predicate
+ * @param iterable<T> $iter
+ */
 function any(callable $predicate, iterable $iter): bool {
     foreach ($iter as $key => $value) {
         if ($predicate($value)) {
@@ -488,6 +824,13 @@ function any(callable $predicate, iterable $iter): bool {
 
     return false;
 }
+
+/**
+ * @template T
+ * @param callable(T): bool $predicate
+ * @param iterable<T> $iter
+ * @return ?T
+ */
 function search(callable $predicate, iterable $iter) {
     foreach ($iter as $value) {
         if ($predicate($value)) {
@@ -495,6 +838,14 @@ function search(callable $predicate, iterable $iter) {
         }
     }
 }
+
+/**
+ * @template T
+ * @template K
+ * @param callable(T): bool $predicate
+ * @param iterable<K, T> $iter
+ * @return ?K
+ */
 function indexOf(callable $predicate, iterable $iter) {
     foreach ($iter as $key => $value) {
         if ($predicate($value)) {
@@ -502,24 +853,56 @@ function indexOf(callable $predicate, iterable $iter) {
         }
     }
 }
-
+/**
+ * @template T
+ * @template U
+ * @template V
+ * @param callable(T): U $trans
+ * @param callable(U): V $fn
+ * @param T $data
+ * @return V
+ */
 function trans(callable $trans, callable $fn, $data) {
     return $fn($trans($data));
 }
+/**
+ * @template T
+ * @param callable(...T): bool $fn
+ * @param T ...$args
+ * @return bool
+ */
 function not(callable $fn, ...$args): bool {
     return !$fn(...$args);
 }
-function isInstance($class, $item) {
+/**
+ * @param class-string|object $class
+ * @param object $item
+ */
+function isInstance($class, $item): bool {
     return $item instanceof $class;
 }
-
-function isNull($val) {
+/** @param mixed $val */
+function isNull($val): bool {
     return \is_null($val);
 }
+/**
+ * @template T
+ * @template U
+ * @param callable(T): U $fn
+ * @param ?T $value
+ * @return ?U
+ */
 function nullable(callable $fn, $value) {
     return $value === null ? $value : $fn($value);
 }
 
+/**
+ * @template T
+ * @template U as int|bool
+ * @param callable(T): U $partition
+ * @param iterable<T> $iter
+ * @return array<array<T>>
+ */
 function partition(callable $partition, iterable $iter, int $numParts = 2): array {
     $parts = \array_fill(0, $numParts, []);
     foreach ($iter as $val) {
@@ -530,26 +913,56 @@ function partition(callable $partition, iterable $iter, int $numParts = 2): arra
     return $parts;
 }
 
+/**
+ * @template T
+ * @template K
+ * @template U
+ * @param callable(T): U $predicate
+ * @param iterable<K, T> $iter
+ * @return iterable<K, U>
+ */
 function map(callable $predicate, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         yield $key => $predicate($value);
     }
 }
 
+/**
+ * @template T
+ * @template K
+ * @template U
+ * @param callable(K): U $predicate
+ * @param iterable<K, T> $iter
+ * @return iterable<U, T>
+ */
 function mapKeys(callable $predicate, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         yield $predicate($key) => $value;
     }
 }
 
-function mapKeyValue(callable $fn , iterable $iter): iterable {
+/**
+ * @template T
+ * @template U
+ * @template K
+ * @template V
+ * @param callable(array{0: U, 1: T}): array{0: K, 1: V} $fn
+ * @param iterable<U, T> $iter
+ * @return iterable<K, V>
+ */
+function mapKeyValue(callable $fn, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         [$key, $value] = $fn([$key, $value]);
         yield $key => $value;
     }
 }
 
+/**
+ * @param array<callable> $maps
+ * @param iterable<array-key, mixed> $iter
+ */
 function mapOn(array $maps, iterable $iter): iterable {
+    /** @psalm-suppress MixedAssignment */
     foreach ($iter as $key => $value) {
         if (isset($maps[$key])) {
             yield $key => $maps[$key]($value);
@@ -559,7 +972,16 @@ function mapOn(array $maps, iterable $iter): iterable {
     }
 }
 
-function mapAccum(callable $fn, iterable $iter, $acc = null) {
+/**
+ * @template T
+ * @template U
+ * @template A
+ * @param callable(A, T): array{0: A, 1: U} $fn
+ * @param iterable<T> $iter
+ * @param A $acc
+ * @return array{0: A, 1: list<U>}
+ */
+function mapAccum(callable $fn, iterable $iter, $acc = null): array {
     $data = [];
     foreach ($iter as $key => $value) {
         [$acc, $value] = $fn($acc, $value);
@@ -569,14 +991,33 @@ function mapAccum(callable $fn, iterable $iter, $acc = null) {
     return [$acc, $data];
 }
 
-function withState(callable $fn, $initialState = null) {
+/**
+ * @template T
+ * @template U
+ * @param callable(T, ...mixed): array{0: T, 1: U} $fn
+ * @param T $initialState
+ */
+function withState(callable $fn, $initialState = null): callable {
     $state = $initialState;
-    return function(...$args) use ($fn, &$state) {
+    return
+    /**
+     * @param mixed ...$args
+     * @return U
+     */
+    function(...$args) use ($fn, &$state) {
+        /** @psalm-suppress MixedArgument */
         [$state, $res] = $fn($state, ...$args);
         return $res;
     };
 }
 
+/**
+ * @template T
+ * @template U as array-key
+ * @param callable(T): U $fn
+ * @param iterable<T> $iter
+ * @return array<U, T>
+ */
 function arrayReindex(callable $fn, iterable $iter): array {
     $res = [];
     foreach ($iter as $key => $value) {
@@ -585,12 +1026,27 @@ function arrayReindex(callable $fn, iterable $iter): array {
     return $res;
 }
 
+/**
+ * @template T
+ * @template U
+ * @param callable(T): U $fn
+ * @param iterable<T> $iter
+ * @return iterable<U, T>
+ */
 function reindex(callable $fn, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         yield $fn($value) => $value;
     }
 }
 
+/**
+ * @template TAcc
+ * @template TValue
+ * @param callable(TAcc, TValue): TAcc $reduce
+ * @param iterable<TValue> $iter
+ * @param TAcc $acc
+ * @return TAcc
+ */
 function reduce(callable $reduce, iterable $iter, $acc = null) {
     foreach ($iter as $key => $value) {
         $acc = $reduce($acc, $value);
@@ -598,6 +1054,15 @@ function reduce(callable $reduce, iterable $iter, $acc = null) {
     return $acc;
 }
 
+/**
+ * @template TAcc
+ * @template TValue
+ * @template TKey
+ * @param callable(TAcc, array{0: TKey, 1: TValue}): TAcc $reduce
+ * @param iterable<TKey, TValue> $iter
+ * @param TAcc $acc
+ * @return TAcc
+ */
 function reduceKeyValue(callable $reduce, iterable $iter, $acc = null) {
     foreach ($iter as $key => $value) {
         $acc = $reduce($acc, [$key, $value]);
@@ -605,6 +1070,13 @@ function reduceKeyValue(callable $reduce, iterable $iter, $acc = null) {
     return $acc;
 }
 
+/**
+ * @template V
+ * @template K
+ * @param callable(V): bool $predicate
+ * @param iterable<K, V> $iter
+ * @return iterable<K, V>
+ */
 function filter(callable $predicate, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         if ($predicate($value)) {
@@ -612,6 +1084,14 @@ function filter(callable $predicate, iterable $iter): iterable {
         }
     }
 }
+
+/**
+ * @template V
+ * @template K
+ * @param callable(K): bool $predicate
+ * @param iterable<K, V> $iter
+ * @return iterable<K, V>
+ */
 function filterKeys(callable $predicate, iterable $iter): iterable {
     foreach ($iter as $key => $value) {
         if ($predicate($key)) {
@@ -620,63 +1100,119 @@ function filterKeys(callable $predicate, iterable $iter): iterable {
     }
 }
 
+/**
+ * @template V
+ * @template K
+ * @param iterable<K, V> $iter
+ * @return iterable<V>
+ */
 function values(iterable $iter): iterable {
     foreach ($iter as $v) {
         yield $v;
     }
 }
 
+/**
+ * @template V
+ * @template K
+ * @param iterable<K, V> $iter
+ * @return iterable<K>
+ */
 function keys(iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         yield $k;
     }
 }
 
+/**
+ * @template V as array-key
+ * @template K as array-key
+ * @param iterable<K, V> $iter
+ * @return iterable<V, K>
+ */
 function flip(iterable $iter): iterable {
     foreach ($iter as $k => $v) {
         yield $v => $k;
     }
 }
 
-function curry(callable $fn, int $num = 1) {
+function curry(callable $fn, int $num = 1): callable {
     if ($num == 0) {
         return $fn;
     }
 
-    return function($arg1) use ($fn, $num) {
-        return curry(function(...$args) use ($fn, $arg1) {
-            return $fn($arg1, ...$args);
-        }, $num - 1);
+    return
+    /**
+     * @param mixed $arg1
+     * @return mixed
+     */
+    function($arg1) use ($fn, $num) {
+        return curry(
+            /**
+             * @param mixed ...$args
+             * @return mixed
+             */
+            function(...$args) use ($fn, $arg1) {
+                return $fn($arg1, ...$args);
+            },
+            $num - 1
+        );
     };
 }
 
+/** @return object */
 function placeholder() {
     static $v;
-
+    /** @var object */
     $v = $v ?: new class {};
     return $v;
 }
+/** @return object */
 function _() {
     return placeholder();
 }
 
-function partial(callable $fn, ...$appliedArgs) {
-    return function(...$args) use ($fn, $appliedArgs) {
-        list($appliedArgs, $args) = \array_reduce($appliedArgs, function($acc, $arg) {
-            list($appliedArgs, $args) = $acc;
-            if ($arg === \Krak\Fun\placeholder()) {
-                $arg = array_shift($args);
-            }
+/**
+ * @template T
+ * @param callable(...mixed): T $fn
+ * @param mixed ...$appliedArgs
+ */
+function partial(callable $fn, ...$appliedArgs): callable {
+    return
+    /**
+     * @param mixed ...$args
+     * @return T
+     */
+    function(...$args) use ($fn, $appliedArgs) {
+        /** @psalm-suppress MixedAssignment */
+        [$appliedArgs, $args] = \array_reduce(
+            $appliedArgs,
+            /**
+             * @param array<array> $acc
+             * @param mixed $arg
+             */
+            function(array $acc, $arg) {
+                [$appliedArgs, $args] = $acc;
+                if ($arg === \Krak\Fun\placeholder()) {
+                    $arg = array_shift($args);
+                }
 
-            $appliedArgs[] = $arg;
-            return [$appliedArgs, $args];
-        }, [[], $args]);
+                $appliedArgs[] = $arg;
+                return [$appliedArgs, $args];
+            },
+            [[], $args]
+        );
 
         return $fn(...$appliedArgs, ...$args);
     };
 }
 
-function autoCurry(array $args, $numArgs, callable $fn) {
+/**
+ * @template T
+ * @param callable(...mixed): T $fn
+ * @return T|callable
+ */
+function autoCurry(array $args, int $numArgs, callable $fn) {
     if (\count($args) >= $numArgs) {
         return $fn(...$args);
     }
@@ -693,6 +1229,11 @@ function autoCurry(array $args, $numArgs, callable $fn) {
     );
 }
 
+/**
+ * @template T
+ * @param iterable<T> $iter
+ * @return list<T>
+ */
 function toArray(iterable $iter): array {
     $data = [];
     foreach ($iter as $key => $val) {
@@ -701,6 +1242,12 @@ function toArray(iterable $iter): array {
     return $data;
 }
 
+/**
+ * @template V
+ * @template K as array-key
+ * @param iterable<K, V> $iter
+ * @return array<K, V>
+ */
 function toArrayWithKeys(iterable $iter): array {
     $data = [];
     foreach ($iter as $key => $val) {
@@ -709,24 +1256,48 @@ function toArrayWithKeys(iterable $iter): array {
     return $data;
 }
 
+/**
+ * @template T
+ * @param T $v
+ * @return T
+ */
 function id($v) {
     return $v;
 }
 
 
 // UTILITY
-
-function differenceWith(callable $cmp, iterable $a, iterable $b) {
-    return \Krak\Fun\filter(function($aItem) use ($cmp, $b) {
-        return \Krak\Fun\indexOf(\Krak\Fun\partial($cmp, $aItem), $b) === null;
+/**
+ * @template A
+ * @template B
+ * @param callable(A, B): bool $cmp
+ * @param iterable<A> $a
+ * @param iterable<B> $b
+ * @return iterable<A>
+ */
+function differenceWith(callable $cmp, iterable $a, iterable $b): iterable {
+    return \Krak\Fun\filter(/** @param A $aItem */ function($aItem) use ($cmp, $b) {
+        return \Krak\Fun\indexOf(/** @param B $bItem */ function($bItem) use ($cmp, $aItem) {
+            return $cmp($aItem, $bItem);
+        }, $b) === null;
     }, $a);
 }
 
+/**
+ * @template T
+ * @template U as array-key
+ * @template K as array-key
+ * @param callable(T): U $fn
+ * @param array<K> $orderedElements
+ * @param iterable<T> $iter
+ * @return array<T>
+ */
 function sortFromArray(callable $fn, array $orderedElements, iterable $iter): array {
     $data = [];
     $flippedElements = \array_flip($orderedElements);
 
     foreach ($iter as $value) {
+        /** @var array-key */
         $key = $fn($value);
         if (!\array_key_exists($key, $flippedElements)) {
             throw new \LogicException('Cannot sort element key '  . $key . ' because it does not exist in the ordered elements.');
@@ -739,16 +1310,22 @@ function sortFromArray(callable $fn, array $orderedElements, iterable $iter): ar
     return $data;
 }
 
+/**
+ * @template T
+ * @param callable(int): T $fn
+ * @param null|int|callable(int, ?\Throwable): bool $shouldRetry
+ * @return T
+ */
 function retry(callable $fn, $shouldRetry = null) {
     if (\is_null($shouldRetry)) {
-        $shouldRetry = function($numRetries, \Throwable $t = null) { return true; };
+        $shouldRetry = function(int $numRetries, \Throwable $t = null): bool { return true; };
     }
     if (\is_int($shouldRetry)) {
         $maxTries = $shouldRetry;
         if ($maxTries < 0) {
             throw new \LogicException("maxTries must be greater than or equal to 0");
         }
-        $shouldRetry = function($numRetries, \Throwable $t = null) use ($maxTries) { return $numRetries <= $maxTries; };
+        $shouldRetry = function(int $numRetries, \Throwable $t = null) use ($maxTries): bool { return $numRetries <= $maxTries; };
     }
     if (!\is_callable($shouldRetry)) {
         throw new \InvalidArgumentException('shouldRetry must be an int or callable');
@@ -765,14 +1342,22 @@ function retry(callable $fn, $shouldRetry = null) {
     throw $t;
 }
 
-function pipe(callable ...$fns) {
-    return function(...$args) use ($fns) {
+function pipe(callable ...$fns): callable {
+    assert(count($fns) > 0);
+    return
+    /**
+     * @param mixed ...$args
+     * @return mixed
+     */
+    function(...$args) use ($fns) {
         $isFirstPass = true;
         foreach ($fns as $fn) {
             if ($isFirstPass) {
+                /** @psalm-suppress MixedAssignment */
                 $arg = $fn(...$args);
                 $isFirstPass = false;
             } else {
+                /** @psalm-suppress MixedAssignment */
                 $arg = $fn($arg);
             }
 
@@ -781,49 +1366,85 @@ function pipe(callable ...$fns) {
     };
 }
 
-function compose(callable ...$fns) {
+function compose(callable ...$fns): callable {
     return \Krak\Fun\pipe(...\array_reverse($fns));
 }
 
-function stack(array $funcs, callable $last = null, callable $resolve = null) {
-    return function(...$args) use ($funcs, $resolve, $last) {
-        return \Krak\Fun\reduce(function($acc, $func) use ($resolve) {
-            return function(...$args) use ($acc, $func, $resolve) {
+/**
+ * @template T
+ * @param array<T> $funcs
+ * @param ?callable(T): callable $resolve
+ */
+function stack(array $funcs, callable $last = null, callable $resolve = null): callable {
+    return
+    /**
+     * @param mixed ...$args
+     * @return mixed
+     */
+    function(...$args) use ($funcs, $resolve, $last) {
+        return \Krak\Fun\reduce(/** @param T $func */ function(callable $acc, $func) use ($resolve) {
+            return
+            /**
+             * @param mixed ...$args
+             * @return mixed
+             */
+            function(...$args) use ($acc, $func, $resolve) {
+                /** @psalm-suppress MixedAssignment */
                 $args[] = $acc;
+                /** @psalm-suppress MixedAssignment */
                 $func = $resolve ? $resolve($func) : $func;
+                if (!is_callable($func)) {
+                    throw new \RuntimeException('Func was not resolved to a callable.');
+                }
                 return $func(...$args);
             };
         }, $funcs, $last ?: function() { throw new \LogicException('No stack handler was able to capture this request'); });
     };
 }
 
-function each(callable $handle, iterable $iter) {
+/**
+ * @template V
+ * @param callable(V): void $handle
+ * @param iterable<V> $iter
+ */
+function each(callable $handle, iterable $iter): void {
     foreach ($iter as $v) {
         $handle($v);
     }
 }
-/** @deprecated */
-function onEach(callable $handle, iterable $iter) {
+/**
+ * @deprecated
+ * @template V
+ * @param callable(V): void $handle
+ * @param iterable<V> $iter
+ */
+function onEach(callable $handle, iterable $iter): void {
     foreach ($iter as $v) {
         $handle($v);
     }
 }
 
+/**
+ * @param array|object|iterable|\Iterator|string $iter
+ * @psalm-suppress RedundantConditionGivenDocblockType
+ * @psalm-suppress DocblockTypeContradiction
+ */
 function iter($iter): \Iterator {
     if (\is_array($iter)) {
         return new \ArrayIterator($iter);
     } else if ($iter instanceof \Iterator) {
         return $iter;
-    } else if (\is_object($iter) || \is_iterable($iter)) {
-        return (function($iter) {
-            foreach ($iter as $key => $value) {
-                yield $key => $value;
-            }
-        })($iter);
     } else if (\is_string($iter)) {
-        return (function($s) {
+        return (function(string $s): \Generator {
             for ($i = 0; $i < \strlen($s); $i++) {
                 yield $i => $s[$i];
+            }
+        })($iter);
+    } else if (\is_object($iter) || \is_iterable($iter)) {
+        return (/** @param object|iterable $iter */ function($iter): \Generator {
+            /** @psalm-suppress MixedAssignment */
+            foreach ($iter as $key => $value) {
+                yield $key => $value;
             }
         })($iter);
     }
