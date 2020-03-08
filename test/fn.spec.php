@@ -160,6 +160,14 @@ describe('Fun', function() {
             expect(toArray($res))->equal([1,2,3,4]);
         });
     });
+    describe('complement', function() {
+        docFn(complement::class);
+        test('Returns a function that, for the same arguments, returns the same values as its argument function, but negated', function() {
+            $isEven = function($n) { return $n % 2 === 0; };
+            $isOdd = complement($isEven);
+            expect($isOdd(3))->equal(true);
+        });
+    });
     describe('compose', function() {
         docFn(compose::class);
 
@@ -364,6 +372,13 @@ describe('Fun', function() {
             expect($res)->equal(null);
         });
     });
+    describe('identity', function() {
+        docFn(identity::class);
+        it('Returns its only argument as is', function() {
+            expect(identity(1))->equal(1);
+            expect(identity("foo"))->equal("foo");
+        });
+    });
     describe('inArray', function() {
         docFn(inArray::class);
         it('Checks if an item is within an array of items', function() {
@@ -511,6 +526,16 @@ describe('Fun', function() {
             ]);
 
             expect(toArray($values))->equal([3,3,3]);
+        });
+    });
+    describe('not', function() {
+        docFn(not::class);
+        test('Negates (!) its argument', function() {
+            expect(not(true))->equal(false);
+        });
+        test('Also works with truth-y or false-y values', function() {
+            expect(not(""))->equal(true);
+            expect(not([]))->equal(true);
         });
     });
     describe('nullable', function() {
@@ -985,7 +1010,7 @@ INTRO;
             expect($res)->equal([1,2,3]);
         });
         it('can also be used as a constant', function() {
-            $res = compose(toArray, id)((function() {yield 1; yield 2; yield 3;})());
+            $res = compose(toArray, identity)((function() {yield 1; yield 2; yield 3;})());
             expect($res)->equal([1,2,3]);
         });
     });

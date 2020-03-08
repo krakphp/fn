@@ -394,7 +394,7 @@ function within(array $fields)
 function without(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        return \Krak\Fun\filterKeys(\Krak\Fun\Curried\not(\Krak\Fun\Curried\inArray($fields)), $iter);
+        return \Krak\Fun\filterKeys(\Krak\Fun\complement(\Krak\Fun\Curried\inArray($fields)), $iter);
     };
 }
 function pad(int $size, $padValue = null)
@@ -479,12 +479,6 @@ function trans(callable $trans)
         return function ($data) use($fn, $trans) {
             return $fn($trans($data));
         };
-    };
-}
-function not(callable $fn)
-{
-    return function (...$args) use($fn) {
-        return !$fn(...$args);
     };
 }
 function isInstance($class)

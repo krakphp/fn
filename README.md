@@ -226,7 +226,7 @@ The constants and curried functions are generated with `make code`.
 Tests are run via `make test` and are stored in the `test` directory. We use peridot for testing.
 
 ## API
-<table><tr><td><a href="#api-krak-fun-all">all</a></td><td><a href="#api-krak-fun-any">any</a></td><td><a href="#api-krak-fun-arraycompact">arrayCompact</a></td><td><a href="#api-krak-fun-arrayfilter">arrayFilter</a></td><td><a href="#api-krak-fun-arraymap">arrayMap</a></td><td><a href="#api-krak-fun-arrayreindex">arrayReindex</a></td><td><a href="#api-krak-fun-assign">assign</a></td><td><a href="#api-krak-fun-chain">chain</a></td></tr><tr><td><a href="#api-krak-fun-chunk">chunk</a></td><td><a href="#api-krak-fun-chunkby">chunkBy</a></td><td><a href="#api-krak-fun-compact">compact</a></td><td><a href="#api-krak-fun-compose">compose</a></td><td><a href="#api-krak-fun-construct">construct</a></td><td><a href="#api-krak-fun-curry">curry</a></td><td><a href="#api-krak-fun-differencewith">differenceWith</a></td><td><a href="#api-krak-fun-dd">dd</a></td></tr><tr><td><a href="#api-krak-fun-drop">drop</a></td><td><a href="#api-krak-fun-dropwhile">dropWhile</a></td><td><a href="#api-krak-fun-each">each</a></td><td><a href="#api-krak-fun-filter">filter</a></td><td><a href="#api-krak-fun-filterkeys">filterKeys</a></td><td><a href="#api-krak-fun-flatmap">flatMap</a></td><td><a href="#api-krak-fun-flatten">flatten</a></td><td><a href="#api-krak-fun-flip">flip</a></td></tr><tr><td><a href="#api-krak-fun-frompairs">fromPairs</a></td><td><a href="#api-krak-fun-groupby">groupBy</a></td><td><a href="#api-krak-fun-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fun-head">head</a></td><td><a href="#api-krak-fun-inarray">inArray</a></td><td><a href="#api-krak-fun-index">index</a></td><td><a href="#api-krak-fun-indexin">indexIn</a></td><td><a href="#api-krak-fun-indexof">indexOf</a></td></tr><tr><td><a href="#api-krak-fun-isnull">isNull</a></td><td><a href="#api-krak-fun-iter">iter</a></td><td><a href="#api-krak-fun-join">join</a></td><td><a href="#api-krak-fun-keys">keys</a></td><td><a href="#api-krak-fun-map">map</a></td><td><a href="#api-krak-fun-mapaccum">mapAccum</a></td><td><a href="#api-krak-fun-mapkeys">mapKeys</a></td><td><a href="#api-krak-fun-mapkeyvalue">mapKeyValue</a></td></tr><tr><td><a href="#api-krak-fun-mapon">mapOn</a></td><td><a href="#api-krak-fun-nullable">nullable</a></td><td><a href="#api-krak-fun-oneach">onEach</a></td><td><a href="#api-krak-fun-op">op</a></td><td><a href="#api-krak-fun-pad">pad</a></td><td><a href="#api-krak-fun-partial">partial</a></td><td><a href="#api-krak-fun-partition">partition</a></td><td><a href="#api-krak-fun-pick">pick</a></td></tr><tr><td><a href="#api-krak-fun-pickby">pickBy</a></td><td><a href="#api-krak-fun-pipe">pipe</a></td><td><a href="#api-krak-fun-product">product</a></td><td><a href="#api-krak-fun-prop">prop</a></td><td><a href="#api-krak-fun-propin">propIn</a></td><td><a href="#api-krak-fun-range">range</a></td><td><a href="#api-krak-fun-reduce">reduce</a></td><td><a href="#api-krak-fun-reducekeyvalue">reduceKeyValue</a></td></tr><tr><td><a href="#api-krak-fun-reindex">reindex</a></td><td><a href="#api-krak-fun-retry">retry</a></td><td><a href="#api-krak-fun-search">search</a></td><td><a href="#api-krak-fun-setindex">setIndex</a></td><td><a href="#api-krak-fun-setindexin">setIndexIn</a></td><td><a href="#api-krak-fun-setprop">setProp</a></td><td><a href="#api-krak-fun-slice">slice</a></td><td><a href="#api-krak-fun-sortfromarray">sortFromArray</a></td></tr><tr><td><a href="#api-krak-fun-spread">spread</a></td><td><a href="#api-krak-fun-take">take</a></td><td><a href="#api-krak-fun-takewhile">takeWhile</a></td><td><a href="#api-krak-fun-toarray">toArray</a></td><td><a href="#api-krak-fun-toarraywithkeys">toArrayWithKeys</a></td><td><a href="#api-krak-fun-topairs">toPairs</a></td><td><a href="#api-krak-fun-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fun-values">values</a></td></tr><tr><td><a href="#api-krak-fun-when">when</a></td><td><a href="#api-krak-fun-withstate">withState</a></td><td><a href="#api-krak-fun-within">within</a></td><td><a href="#api-krak-fun-without">without</a></td><td><a href="#api-krak-fun-zip">zip</a></td></tr></table>
+<table><tr><td><a href="#api-krak-fun-all">all</a></td><td><a href="#api-krak-fun-any">any</a></td><td><a href="#api-krak-fun-arraycompact">arrayCompact</a></td><td><a href="#api-krak-fun-arrayfilter">arrayFilter</a></td><td><a href="#api-krak-fun-arraymap">arrayMap</a></td><td><a href="#api-krak-fun-arrayreindex">arrayReindex</a></td><td><a href="#api-krak-fun-assign">assign</a></td><td><a href="#api-krak-fun-chain">chain</a></td></tr><tr><td><a href="#api-krak-fun-chunk">chunk</a></td><td><a href="#api-krak-fun-chunkby">chunkBy</a></td><td><a href="#api-krak-fun-compact">compact</a></td><td><a href="#api-krak-fun-complement">complement</a></td><td><a href="#api-krak-fun-compose">compose</a></td><td><a href="#api-krak-fun-construct">construct</a></td><td><a href="#api-krak-fun-curry">curry</a></td><td><a href="#api-krak-fun-differencewith">differenceWith</a></td></tr><tr><td><a href="#api-krak-fun-dd">dd</a></td><td><a href="#api-krak-fun-drop">drop</a></td><td><a href="#api-krak-fun-dropwhile">dropWhile</a></td><td><a href="#api-krak-fun-each">each</a></td><td><a href="#api-krak-fun-filter">filter</a></td><td><a href="#api-krak-fun-filterkeys">filterKeys</a></td><td><a href="#api-krak-fun-flatmap">flatMap</a></td><td><a href="#api-krak-fun-flatten">flatten</a></td></tr><tr><td><a href="#api-krak-fun-flip">flip</a></td><td><a href="#api-krak-fun-frompairs">fromPairs</a></td><td><a href="#api-krak-fun-groupby">groupBy</a></td><td><a href="#api-krak-fun-hasindexin">hasIndexIn</a></td><td><a href="#api-krak-fun-head">head</a></td><td><a href="#api-krak-fun-identity">identity</a></td><td><a href="#api-krak-fun-inarray">inArray</a></td><td><a href="#api-krak-fun-index">index</a></td></tr><tr><td><a href="#api-krak-fun-indexin">indexIn</a></td><td><a href="#api-krak-fun-indexof">indexOf</a></td><td><a href="#api-krak-fun-isnull">isNull</a></td><td><a href="#api-krak-fun-iter">iter</a></td><td><a href="#api-krak-fun-join">join</a></td><td><a href="#api-krak-fun-keys">keys</a></td><td><a href="#api-krak-fun-map">map</a></td><td><a href="#api-krak-fun-mapaccum">mapAccum</a></td></tr><tr><td><a href="#api-krak-fun-mapkeys">mapKeys</a></td><td><a href="#api-krak-fun-mapkeyvalue">mapKeyValue</a></td><td><a href="#api-krak-fun-mapon">mapOn</a></td><td><a href="#api-krak-fun-not">not</a></td><td><a href="#api-krak-fun-nullable">nullable</a></td><td><a href="#api-krak-fun-oneach">onEach</a></td><td><a href="#api-krak-fun-op">op</a></td><td><a href="#api-krak-fun-pad">pad</a></td></tr><tr><td><a href="#api-krak-fun-partial">partial</a></td><td><a href="#api-krak-fun-partition">partition</a></td><td><a href="#api-krak-fun-pick">pick</a></td><td><a href="#api-krak-fun-pickby">pickBy</a></td><td><a href="#api-krak-fun-pipe">pipe</a></td><td><a href="#api-krak-fun-product">product</a></td><td><a href="#api-krak-fun-prop">prop</a></td><td><a href="#api-krak-fun-propin">propIn</a></td></tr><tr><td><a href="#api-krak-fun-range">range</a></td><td><a href="#api-krak-fun-reduce">reduce</a></td><td><a href="#api-krak-fun-reducekeyvalue">reduceKeyValue</a></td><td><a href="#api-krak-fun-reindex">reindex</a></td><td><a href="#api-krak-fun-retry">retry</a></td><td><a href="#api-krak-fun-search">search</a></td><td><a href="#api-krak-fun-setindex">setIndex</a></td><td><a href="#api-krak-fun-setindexin">setIndexIn</a></td></tr><tr><td><a href="#api-krak-fun-setprop">setProp</a></td><td><a href="#api-krak-fun-slice">slice</a></td><td><a href="#api-krak-fun-sortfromarray">sortFromArray</a></td><td><a href="#api-krak-fun-spread">spread</a></td><td><a href="#api-krak-fun-take">take</a></td><td><a href="#api-krak-fun-takewhile">takeWhile</a></td><td><a href="#api-krak-fun-toarray">toArray</a></td><td><a href="#api-krak-fun-toarraywithkeys">toArrayWithKeys</a></td></tr><tr><td><a href="#api-krak-fun-topairs">toPairs</a></td><td><a href="#api-krak-fun-updateindexin">updateIndexIn</a></td><td><a href="#api-krak-fun-values">values</a></td><td><a href="#api-krak-fun-when">when</a></td><td><a href="#api-krak-fun-withstate">withState</a></td><td><a href="#api-krak-fun-within">within</a></td><td><a href="#api-krak-fun-without">without</a></td><td><a href="#api-krak-fun-zip">zip</a></td></tr></table>
 
 <h3 id="api-krak-fun-all">all(callable $predicate, iterable $iter): bool</h3>
 
@@ -429,6 +429,22 @@ Removes all null values from an iterable:
 ```php
 $res = compact([1, null, 2, 3, null, null, 4]);
 expect(toArray($res))->equal([1, 2, 3, 4]);
+```
+
+
+
+<h3 id="api-krak-fun-complement">complement(callable $fn): callable</h3>
+
+**Name:** `Krak\Fun\complement`
+
+Returns a function that, for the same arguments, returns the same values as its argument function, but negated:
+
+```php
+$isEven = function ($n) {
+    return $n % 2 === 0;
+};
+$isOdd = complement($isEven);
+expect($isOdd(3))->equal(true);
 ```
 
 
@@ -728,6 +744,19 @@ expect($res)->equal(null);
 
 
 
+<h3 id="api-krak-fun-identity">identity($item)</h3>
+
+**Name:** `Krak\Fun\identity`
+
+Returns its only argument as is:
+
+```php
+expect(identity(1))->equal(1);
+expect(identity("foo"))->equal("foo");
+```
+
+
+
 <h3 id="api-krak-fun-inarray">inArray(array $set, $item): bool</h3>
 
 **Name:** `Krak\Fun\inArray`
@@ -958,6 +987,25 @@ Maps values on specific keys:
 ```php
 $values = mapOn(['a' => partial(op, '*', 3), 'b' => partial(op, '+', 1)], ['a' => 1, 'b' => 2, 'c' => 3]);
 expect(toArray($values))->equal([3, 3, 3]);
+```
+
+
+
+<h3 id="api-krak-fun-not">not($value): bool</h3>
+
+**Name:** `Krak\Fun\not`
+
+Negates (!) its argument:
+
+```php
+expect(not(true))->equal(false);
+```
+
+Also works with truth-y or false-y values:
+
+```php
+expect(not(""))->equal(true);
+expect(not([]))->equal(true);
 ```
 
 
@@ -1596,7 +1644,7 @@ expect($res)->equal([1, 2, 3]);
 can also be used as a constant:
 
 ```php
-$res = compose(toArray, id)((function () {
+$res = compose(toArray, identity)((function () {
     (yield 1);
     (yield 2);
     (yield 3);

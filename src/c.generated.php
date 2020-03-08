@@ -394,7 +394,7 @@ function within(array $fields)
 function without(array $fields)
 {
     return function (iterable $iter) use($fields) {
-        return \Krak\Fun\filterKeys(\Krak\Fun\Curried\not(\Krak\Fun\Curried\inArray($fields)), $iter);
+        return \Krak\Fun\filterKeys(\Krak\Fun\complement(\Krak\Fun\Curried\inArray($fields)), $iter);
     };
 }
 function pad(int $size, $padValue = null)
@@ -479,12 +479,6 @@ function trans(callable $trans)
         return function ($data) use($fn, $trans) {
             return $fn($trans($data));
         };
-    };
-}
-function not(callable $fn)
-{
-    return function (...$args) use($fn) {
-        return !$fn(...$args);
     };
 }
 function isInstance($class)
@@ -756,6 +750,7 @@ const chunk = 'Krak\\Fun\\chunk';
 const chunkBy = 'Krak\\Fun\\chunkBy';
 const groupBy = 'Krak\\Fun\\groupBy';
 const range = 'Krak\\Fun\\range';
+const not = 'Krak\\Fun\\not';
 const op = 'Krak\\Fun\\op';
 const andf = 'Krak\\Fun\\andf';
 const orf = 'Krak\\Fun\\orf';
@@ -782,7 +777,7 @@ const any = 'Krak\\Fun\\any';
 const search = 'Krak\\Fun\\search';
 const indexOf = 'Krak\\Fun\\indexOf';
 const trans = 'Krak\\Fun\\trans';
-const not = 'Krak\\Fun\\not';
+const complement = 'Krak\\Fun\\complement';
 const isInstance = 'Krak\\Fun\\isInstance';
 const isNull = 'Krak\\Fun\\isNull';
 const nullable = 'Krak\\Fun\\nullable';
@@ -809,7 +804,7 @@ const partial = 'Krak\\Fun\\partial';
 const autoCurry = 'Krak\\Fun\\autoCurry';
 const toArray = 'Krak\\Fun\\toArray';
 const toArrayWithKeys = 'Krak\\Fun\\toArrayWithKeys';
-const id = 'Krak\\Fun\\id';
+const identity = 'Krak\\Fun\\identity';
 const differenceWith = 'Krak\\Fun\\differenceWith';
 const sortFromArray = 'Krak\\Fun\\sortFromArray';
 const retry = 'Krak\\Fun\\retry';

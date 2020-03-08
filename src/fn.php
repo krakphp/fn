@@ -235,6 +235,10 @@ function range($start, $end, $step = null) {
 
 // OPERATORS
 
+function not($value) : bool {
+    return !$value;
+}
+
 function op(string $op, $b, $a) {
     switch ($op) {
     case '==':
@@ -418,7 +422,7 @@ function within(array $fields, iterable $iter): \Iterator {
     return \Krak\Fun\filterKeys(\Krak\Fun\Curried\inArray($fields), $iter);
 }
 function without(array $fields, iterable $iter): \Iterator {
-    return \Krak\Fun\filterKeys(\Krak\Fun\Curried\not(\Krak\Fun\Curried\inArray($fields)), $iter);
+    return \Krak\Fun\filterKeys(\Krak\Fun\complement(\Krak\Fun\Curried\inArray($fields)), $iter);
 }
 
 function compact(iterable $iter): iterable {
@@ -506,9 +510,13 @@ function indexOf(callable $predicate, iterable $iter) {
 function trans(callable $trans, callable $fn, $data) {
     return $fn($trans($data));
 }
-function not(callable $fn, ...$args): bool {
-    return !$fn(...$args);
+
+function complement(callable $fn): callable {
+    return function(...$args) use($fn) {
+        return !$fn(...$args);
+    };
 }
+
 function isInstance($class, $item) {
     return $item instanceof $class;
 }
@@ -709,8 +717,8 @@ function toArrayWithKeys(iterable $iter): array {
     return $data;
 }
 
-function id($v) {
-    return $v;
+function identity($item) {
+    return $item;
 }
 
 
