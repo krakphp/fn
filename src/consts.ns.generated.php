@@ -82,6 +82,7 @@ const partial = 'Krak\\Fun\\partial';
 const autoCurry = 'Krak\\Fun\\autoCurry';
 const toArray = 'Krak\\Fun\\toArray';
 const toArrayWithKeys = 'Krak\\Fun\\toArrayWithKeys';
+const id = 'Krak\\Fun\\id';
 const identity = 'Krak\\Fun\\identity';
 const differenceWith = 'Krak\\Fun\\differenceWith';
 const sortFromArray = 'Krak\\Fun\\sortFromArray';

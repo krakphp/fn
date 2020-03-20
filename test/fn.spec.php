@@ -528,16 +528,6 @@ describe('Fun', function() {
             expect(toArray($values))->equal([3,3,3]);
         });
     });
-    describe('not', function() {
-        docFn(not::class);
-        test('Negates (!) its argument', function() {
-            expect(not(true))->equal(false);
-        });
-        test('Also works with truth-y or false-y values', function() {
-            expect(not(""))->equal(true);
-            expect(not([]))->equal(true);
-        });
-    });
     describe('nullable', function() {
         docFn(nullable::class);
         test('Performs the callable if the value is not null', function() {

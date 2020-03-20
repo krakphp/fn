@@ -223,9 +223,11 @@ function range($start, $end, $step = null)
     }
 }
 // OPERATORS
-function not($value) : bool
+function not(callable $fn)
 {
-    return !$value;
+    return function (...$args) use($fn) {
+        return !$fn(...$args);
+    };
 }
 function op(string $op, $b, $a)
 {
@@ -698,6 +700,10 @@ function toArrayWithKeys(iterable $iter) : array
         $data[$key] = $val;
     }
     return $data;
+}
+function id($item)
+{
+    return $item;
 }
 function identity($item)
 {
