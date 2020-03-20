@@ -97,6 +97,12 @@ function spread(callable $fn, array $data)
 {
     return $fn(...$data);
 }
+function invoker(string $method, ...$args)
+{
+    return function ($instance) use($method, $args) {
+        return call_user_func_array([$instance, $method], $args);
+    };
+}
 function dd($value, callable $dump = null, callable $die = null)
 {
     $dump = $dump ?: (function_exists('dump') ? 'dump' : 'var_dump');

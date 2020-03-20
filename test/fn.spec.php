@@ -964,6 +964,16 @@ INTRO;
         });
         docOutro("Note: this is basically just an alias for `call_user_func_array` or simply a functional wrapper around the `...` (spread) operator.");
     });
+    describe('invoker', function() {
+        docFn(invoker::class);
+        test("Builds a function that invokes a method with the specified parameters on its argument", function() {
+            $person1 = new \ArrayObject(['name' => 'John']);
+            $person2 = new \ArrayObject(['age' => '18']);
+            $isAgeDefined = invoker('offsetExists', 'age');
+            $res = arrayMap($isAgeDefined, [$person1, $person2]);
+            expect($res)->equal([false, true]);
+        });
+    });
     describe('take', function() {
         docFn(take::class);
         test('Takes the first num items from an iterable', function() {

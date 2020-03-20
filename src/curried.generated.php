@@ -131,6 +131,14 @@ function spread(callable $fn)
         return $fn(...$data);
     };
 }
+function invoker(string $method)
+{
+    return function (...$args) use($method) {
+        return function ($instance) use($method, $args) {
+            return call_user_func_array([$instance, $method], $args);
+        };
+    };
+}
 function dd(callable $dump = null, callable $die = null)
 {
     return function ($value) use($dump, $die) {
