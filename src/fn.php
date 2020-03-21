@@ -235,11 +235,8 @@ function range($start, $end, $step = null) {
 
 // OPERATORS
 
-function not(callable $fn)
-{
-    return function (...$args) use($fn) {
-        return !$fn(...$args);
-    };
+function not(callable $fn, ...$args): bool {
+    return !$fn(...$args);
 }
 
 function op(string $op, $b, $a) {

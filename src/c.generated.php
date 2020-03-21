@@ -268,6 +268,12 @@ function range($start, $step = null)
         }
     };
 }
+function not(callable $fn)
+{
+    return function (...$args) use($fn) {
+        return !$fn(...$args);
+    };
+}
 function op(string $op)
 {
     return function ($b) use($op) {
