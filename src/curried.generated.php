@@ -17,8 +17,13 @@ function prop(string $key, $else = null)
 }
 function index($key, $else = null)
 {
-    return function (array $data) use($key, $else) {
-        return \array_key_exists($key, $data) ? $data[$key] : $else;
+    return function ($data) use($key, $else) {
+        if (\Krak\Fun\isInstance(\ArrayAccess::class, $data)) {
+            $exists = $data->offsetExists($key);
+        } else {
+            $exists = \array_key_exists($key, $data);
+        }
+        return $exists ? $data[$key] : $else;
     };
 }
 function setProp(string $key)

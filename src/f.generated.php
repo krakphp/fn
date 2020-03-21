@@ -12,9 +12,14 @@ function prop(string $key, $data, $else = null)
 {
     return \property_exists($data, $key) ? $data->{$key} : $else;
 }
-function index($key, array $data, $else = null)
+function index($key, $data, $else = null)
 {
-    return \array_key_exists($key, $data) ? $data[$key] : $else;
+    if (\Krak\Fun\isInstance(\ArrayAccess::class, $data)) {
+        $exists = $data->offsetExists($key);
+    } else {
+        $exists = \array_key_exists($key, $data);
+    }
+    return $exists ? $data[$key] : $else;
 }
 function setProp(string $key, $value, $data)
 {

@@ -741,7 +741,7 @@ expect($res)->equal(true);
 
 
 
-<h3 id="api-krak-fun-index">index($key, array $data, $else = null)</h3>
+<h3 id="api-krak-fun-index">index($key, $data, $else = null)</h3>
 
 **Name:** `Krak\Fun\index`
 
@@ -757,6 +757,38 @@ If no value exists at the given index, $else will be returned:
 ```php
 $res = index('a', ['b' => 1], 2);
 expect($res)->equal(2);
+```
+
+Also works with objects that implement ArrayAccess:
+
+```php
+class MyClass implements \ArrayAccess
+{
+    private $container = [];
+    public function __construct()
+    {
+        $this->container = ['one' => 1, 'two' => 2];
+    }
+    public function offsetExists($offset)
+    {
+        return isset($this->container[$offset]);
+    }
+    public function offsetGet($offset)
+    {
+        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+    }
+    public function offsetSet($offset, $value)
+    {
+        /* ... */
+    }
+    public function offsetUnset($offset)
+    {
+        /* ... */
+    }
+}
+$object = new MyClass();
+expect(index('two', $object))->equal(2);
+expect(index('three', $object, 'else'))->equal('else');
 ```
 
 

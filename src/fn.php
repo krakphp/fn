@@ -10,8 +10,14 @@ function method($name, /* object */ $data, ...$optionalArgs) {
 function prop(string $key, /* object */ $data, $else = null) {
     return \property_exists($data, $key) ? $data->{$key} : $else;
 }
-function index(/* string|int */ $key, array $data, $else = null) {
-    return \array_key_exists($key, $data) ? $data[$key] : $else;
+function index(/* string|int */ $key, /* array|ArrayAccess */ $data, $else = null) {
+    if (\Krak\Fun\isInstance(\ArrayAccess::class, $data)) {
+        $exists = $data->offsetExists($key);
+    }
+    else {
+        $exists = \array_key_exists($key, $data);
+    }
+    return $exists ? $data[$key] : $else;
 }
 
 function setProp(string $key, $value, /* object */ $data) {
