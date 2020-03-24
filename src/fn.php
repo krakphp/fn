@@ -512,9 +512,7 @@ function trans(callable $trans, callable $fn, $data) {
 }
 
 function complement(callable $fn): callable {
-    return function(...$args) use($fn) {
-        return !$fn(...$args);
-    };
+    return \Krak\Fun\Curried\not($fn);
 }
 
 function isInstance($class, $item) {
