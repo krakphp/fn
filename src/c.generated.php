@@ -134,9 +134,7 @@ function spread(callable $fn)
 function invoker(string $method)
 {
     return function (...$args) use($method) {
-        return function ($instance) use($method, $args) {
-            return call_user_func_array([$instance, $method], $args);
-        };
+        return \Krak\Fun\Curried\method($method, ...$args);
     };
 }
 function dd(callable $dump = null, callable $die = null)
