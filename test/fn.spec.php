@@ -973,6 +973,7 @@ INTRO;
             $res = arrayMap($isAgeDefined, [$person1, $person2]);
             expect($res)->equal([false, true]);
         });
+        docOutro("Note: this function is an alias of the curried version of `method`");
     });
     describe('take', function() {
         docFn(take::class);

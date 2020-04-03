@@ -1566,7 +1566,7 @@ $res = arrayMap($isAgeDefined, [$person1, $person2]);
 expect($res)->equal([false, true]);
 ```
 
-
+Note: this function is an alias of the curried version of `method`
 
 <h3 id="api-krak-fun-take">take(int $num, iterable $iter): iterable</h3>
 
