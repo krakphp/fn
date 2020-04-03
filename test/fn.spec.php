@@ -167,6 +167,7 @@ describe('Fun', function() {
             $isOdd = complement($isEven);
             expect($isOdd(3))->equal(true);
         });
+        docOutro('Note: this function is an alias of the curried version of `not`');
     });
     describe('compose', function() {
         docFn(compose::class);
@@ -378,6 +379,7 @@ describe('Fun', function() {
             expect(identity(1))->equal(1);
             expect(identity("foo"))->equal("foo");
         });
+        docOutro('Note: this function is an alias of `id`');
     });
     describe('inArray', function() {
         docFn(inArray::class);

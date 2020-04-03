@@ -447,7 +447,7 @@ $isOdd = complement($isEven);
 expect($isOdd(3))->equal(true);
 ```
 
-
+Note: this function is an alias of the curried version of `not`
 
 <h3 id="api-krak-fun-compose">compose(callable ...$fns)</h3>
 
@@ -755,7 +755,7 @@ expect(identity(1))->equal(1);
 expect(identity("foo"))->equal("foo");
 ```
 
-
+Note: this function is an alias of `id`
 
 <h3 id="api-krak-fun-inarray">inArray(array $set, $item): bool</h3>
 
