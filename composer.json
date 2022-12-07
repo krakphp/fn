@@ -27,7 +27,11 @@
         "nikic/php-parser": "^4.0",
         "peridot-php/leo": "^1.6",
         "peridot-php/peridot": "^1.19",
+        "symfony/polyfill-php81": "^1.27",
         "symfony/var-dumper": "^4.0"
+    },
+    "suggest": {
+        "symfony/polyfill-php81": "To use arrayWrap in PHP 7"
     },
     "extra": {
         "branch-alias": {

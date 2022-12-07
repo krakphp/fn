@@ -2,7 +2,7 @@
 
 namespace Krak\Fun;
 
-use const Krak\Fun\{toArray, id, op};
+use const Krak\Fun\{toArray, id, op, arrayWrap};
 use RuntimeException;
 use stdClass;
 
@@ -99,6 +99,33 @@ describe('Fun', function() {
                 1 => ['id' => 1],
             ]);
         });
+    });
+    describe('arrayWrap', function() {
+        docFn(arrayWrap::class);
+        test('Wraps any non list array into an array', function() {
+            $results = arrayMap(arrayWrap, [
+                1,
+                'abc',
+                ['a' => 1],
+            ]);
+
+            expect($results)->equal([
+                [1],
+                ['abc'],
+                [['a' => 1]],
+            ]);
+        });
+        test('List based arrays are left as is', function() {
+            $results = arrayMap(arrayWrap, [
+                [],
+                [1,2,3],
+            ]);
+            expect($results)->equal([
+                [],
+                [1,2,3],
+            ]);
+        });
+        docOutro('Note: `array_is_list` which requires php 8.1 or symfony/polyfill-php81');
     });
     describe('assign', function() {
         docFn(assign::class);

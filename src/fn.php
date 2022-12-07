@@ -476,6 +476,10 @@ function arrayFilter(callable $fn, iterable $data): array {
     return \array_filter(\is_array($data) ? $data : \Krak\Fun\toArray($data), $fn);
 }
 
+function arrayWrap($value) {
+    return is_array($value) && array_is_list($value) ? $value : [$value];
+}
+
 function all(callable $predicate, iterable $iter): bool {
     foreach ($iter as $key => $value) {
         if (!$predicate($value)) {

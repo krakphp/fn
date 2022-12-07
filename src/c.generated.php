@@ -800,6 +800,7 @@ const pad = 'Krak\\Fun\\pad';
 const inArray = 'Krak\\Fun\\inArray';
 const arrayMap = 'Krak\\Fun\\arrayMap';
 const arrayFilter = 'Krak\\Fun\\arrayFilter';
+const arrayWrap = 'Krak\\Fun\\arrayWrap';
 const all = 'Krak\\Fun\\all';
 const any = 'Krak\\Fun\\any';
 const search = 'Krak\\Fun\\search';
