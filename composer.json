@@ -12,7 +12,7 @@
     "authors": [
         {
             "name": "RJ Garcia",
-            "email": "rj@bighead.net"
+            "email": "ragboyjr@icloud.com"
         }
     ],
     "autoload": {
@@ -35,5 +35,8 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "test": "peridot test"
+    }
 }
