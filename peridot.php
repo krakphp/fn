@@ -7,7 +7,7 @@ return function($emitter) {
         return new Peridocs\DocsContext(null, [
             'showLinks' => true,
             'nsPrefix' => 'Krak\\Fun\\',
-            'numTableRows' => 10,
+            'numTableRows' => 6,
         ]);
     });
 };
