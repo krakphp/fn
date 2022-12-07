@@ -722,6 +722,19 @@ function id($v) {
 
 // UTILITY
 
+function tap(callable $tap, $value) {
+    $tap($value);
+    return $value;
+}
+
+function throwIf(callable $throw, callable $if, $value) {
+    if ($if($value)) {
+        throw $throw($value);
+    }
+
+    return $value;
+}
+
 function differenceWith(callable $cmp, iterable $a, iterable $b) {
     return \Krak\Fun\filter(function($aItem) use ($cmp, $b) {
         return \Krak\Fun\indexOf(\Krak\Fun\partial($cmp, $aItem), $b) === null;

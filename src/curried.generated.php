@@ -645,6 +645,24 @@ function partial(callable $fn)
         };
     };
 }
+function tap(callable $tap)
+{
+    return function ($value) use($tap) {
+        $tap($value);
+        return $value;
+    };
+}
+function throwIf(callable $throw)
+{
+    return function (callable $if) use($throw) {
+        return function ($value) use($if, $throw) {
+            if ($if($value)) {
+                throw $throw($value);
+            }
+            return $value;
+        };
+    };
+}
 function differenceWith(callable $cmp)
 {
     return function (iterable $a) use($cmp) {

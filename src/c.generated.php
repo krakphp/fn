@@ -645,6 +645,24 @@ function partial(callable $fn)
         };
     };
 }
+function tap(callable $tap)
+{
+    return function ($value) use($tap) {
+        $tap($value);
+        return $value;
+    };
+}
+function throwIf(callable $throw)
+{
+    return function (callable $if) use($throw) {
+        return function ($value) use($if, $throw) {
+            if ($if($value)) {
+                throw $throw($value);
+            }
+            return $value;
+        };
+    };
+}
 function differenceWith(callable $cmp)
 {
     return function (iterable $a) use($cmp) {
@@ -815,6 +833,8 @@ const autoCurry = 'Krak\\Fun\\autoCurry';
 const toArray = 'Krak\\Fun\\toArray';
 const toArrayWithKeys = 'Krak\\Fun\\toArrayWithKeys';
 const id = 'Krak\\Fun\\id';
+const tap = 'Krak\\Fun\\tap';
+const throwIf = 'Krak\\Fun\\throwIf';
 const differenceWith = 'Krak\\Fun\\differenceWith';
 const sortFromArray = 'Krak\\Fun\\sortFromArray';
 const retry = 'Krak\\Fun\\retry';

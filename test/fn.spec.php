@@ -3,6 +3,7 @@
 namespace Krak\Fun;
 
 use const Krak\Fun\{toArray, id, op};
+use RuntimeException;
 use stdClass;
 
 function _idArgs(...$args) {
@@ -406,7 +407,7 @@ describe('Fun', function() {
                     /* ... */
                 }
             }
-            
+
             $object = new MyClass();
             expect(index('two', $object))->equal(2);
             expect(index('three', $object, 'else'))->equal('else');
@@ -694,7 +695,7 @@ INTRO;
         });
     });
     describe('pick', function() {
-        docFn(pick::class);        
+        docFn(pick::class);
         test('Picks only the given fields from a structured array', function() {
             $res = pick(['a', 'b'], [
                 'a' => 1,
@@ -715,7 +716,7 @@ INTRO;
         });
     });
     describe('pickBy', function() {
-        docFn(pickBy::class);        
+        docFn(pickBy::class);
         test('Picks only the fields that match the pick function from a structured array', function() {
             $res = pickBy(Curried\spread(function(string $key, int $value): bool {
                 return $value % 2 === 0;
@@ -1007,6 +1008,38 @@ INTRO;
             $res = takeWhile(Curried\op('>')(0), [2, 1, 0, 1, 2]);
             expect(toArray($res))->equal([2,1]);
         });
+    });
+    describe('tap', function() {
+        docFn(tap::class);
+        it('Calls given tap function on value and returns value', function() {
+            $loggedValues = [];
+            $res = tap(function(string $v) use (&$loggedValues) {
+                $loggedValues[] = $v;
+            }, 'abc');
+            expect([$loggedValues[0], $res])->equal(['abc', 'abc']);
+        });
+        docOutro('`tap` is useful anytime you need to operate on a value and do not want to modify the return value.');
+    });
+    describe('throwIf', function() {
+        docFn(throwIf::class);
+        it('Throws the given exception if value given evaluates to true', function() {
+            expect(function() {
+                throwIf(
+                    function(int $value) { return new RuntimeException('Error: ' . $value); },
+                    function(int $value) { return $value === 0; },
+                    0
+                );
+            })->throw(RuntimeException::class, 'Error: 0');
+        });
+        it('Returns given value if value evaluates to false', function() {
+            $res = throwIf(
+                function(int $value) { return new RuntimeException('Error: ' . $value); },
+                function(int $value) { return $value === 0; },
+                1
+            );
+            expect($res)->equal(1);
+        });
+        docOutro('Note: works best with short closures!');
     });
     describe('toArray', function() {
         docFn(toArray::class);
